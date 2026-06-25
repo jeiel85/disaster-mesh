@@ -131,3 +131,13 @@ Goal 6: hardening and beta
 ## 중요한 제품 문구
 
 > 이 앱은 재난 상황에서 주변 기기를 이용해 메시지 전달 가능성을 높이는 보조 수단입니다. 주변 중계 경로가 없거나 기기가 꺼져 있으면 메시지가 전달되지 않을 수 있으며, 구조 요청의 접수와 대응을 보장하지 않습니다.
+
+## 라이선스
+
+이 프로젝트는 [Apache License 2.0](LICENSE) 하에 배포되는 오픈소스다.
+
+Copyright 2026 The DisasterMesh Authors
+
+설계는 아직 외부 crypto/protocol 리뷰 전이다(`docs/14-known-limitations.md`,
+`docs/06-security-and-threat-model.md`의 출시 게이트 참고). 안정 1.0 이전에는
+프로토콜·보안 속성이 변경될 수 있다.
