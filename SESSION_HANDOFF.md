@@ -1,8 +1,25 @@
 # DisasterMesh Design Review Handoff
 
-Date: 2026-06-25
-Status: Paused during final cross-document validation
-Scope: Design/CDDL/SQLite/contracts only. No Rust or Android implementation started.
+Date: 2026-06-25 (updated session 2)
+Status: Design review COMPLETE — go/no-go verdict is GO (zero start-blockers). Paused
+before Goal 0 at the user's request; resume with Goal 0 when the user is ready.
+Scope so far: Design/CDDL/SQLite/contracts only. No Rust or Android implementation started.
+
+## Current state (read first)
+
+- Design bundle v1.0.1 is consistency-verified and START-READY. A multi-agent
+  adversarial go/no-go review (recorded in `docs/16`) found zero true start-blockers.
+- Three pre-Goal-0 mechanical fixes were applied and pushed: mesh-store added to all
+  crate enumerations (9 crates), `[routing.location_update]` added to the constants
+  TOML, and `token_grants.token_count` CHECK widened to `1..16`. See `docs/16`
+  items 16-18.
+- Git: repo initialized, default branch `master`, pushed to PUBLIC GitHub
+  **github.com/jeiel85/disaster_mesh** under Apache-2.0. Working tree clean.
+- THE NEXT STEP IS GOAL 0 (repo bootstrap): Rust 9-crate workspace + Android
+  multi-module + CI, driven by `prompts/goal-00-bootstrap.md`. No protocol logic yet.
+- Remaining verified review findings are non-blocking and tracked per Goal in
+  `docs/16` (state-enum reconciliation -> Goal 1; contact-card capabilities -> Goal 2;
+  BLE control frame payloads + resume-by-packet_id -> Goal 3/4).
 
 ## Next-session entry
 
@@ -13,14 +30,15 @@ Read in this order:
 1. `README.md`
 2. `docs/16-design-review-v1.0.1.md`
 3. this file
-4. `docs/03-protocol-dme-v1.md`
-5. `docs/04-protocol-ble-cla-v1.md`
-6. `docs/05-routing-and-queue.md`
-7. `docs/07-storage-schema.md`
-8. `schemas/sqlite_v1.sql`
+4. `prompts/goal-00-bootstrap.md` (the next action)
+5. `docs/03-protocol-dme-v1.md`
+6. `docs/04-protocol-ble-cla-v1.md`
+7. `docs/05-routing-and-queue.md`
+8. `docs/07-storage-schema.md`
+9. `schemas/sqlite_v1.sql`
 
-Do not implement code yet. Finish design/schema consistency validation first unless
-the user explicitly changes scope.
+Design/schema consistency validation is finished. The next scope is Goal 0
+implementation — start it only when the user asks.
 
 ## Completed decisions
 
