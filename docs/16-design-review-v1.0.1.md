@@ -55,6 +55,32 @@ snapshot and must not be used for implementation.
   and surfaces as `displayed_safety_number` in the Rust facade. These are the same
   concept at different layers; reconcile field names during Goal 2.
 
+## Go/no-go review and pre-Goal-0 fixes (2026-06-25)
+
+A multi-agent adversarial review (10 dimension reviewers, per-finding verification,
+architect synthesis) assessed implementation-start readiness. Verdict: **ready to
+start, zero true start-blockers**. 27 confirmed-real findings, all either fillable
+contract/doc omissions with a canonical value elsewhere in the bundle, cosmetic
+naming mismatches, or wire-format details scoped to Goal 3/4.
+
+Three mechanical reconciliations were applied before Goal 0 (no design decisions):
+
+16. `mesh-store` crate added to every enumeration so all lists agree on 9 crates
+    (`README.md`, `docs/01` §4 already had it; added to `prompts/goal-00-bootstrap.md`,
+    `docs/13` Goal 0 task list, and the `docs/01` dependency graph; README tree order
+    aligned to dependency order store-before-engine).
+17. `[routing.location_update]` added to `contracts/protocol_constants.toml`
+    (priority 1, ttl 86400 s = 24h, hop 12, tokens 8) matching `docs/05` §5; it is a
+    distinct policy from CHECK_IN (48h) and must not fall back to it.
+18. `token_grants.token_count` CHECK widened from `1..15` to `1..16` so a CDDL-valid
+    `proposed-receiver-tokens`/`accepted-tokens` value (ceiling 16) cannot pass the
+    wire schema yet abort the relay INSERT.
+
+Remaining verified findings are tracked for their relevant Goal: delivery_state /
+open state-code enum reconciliation (Goal 1 state machines), contact-card signed
+`capabilities` prose (Goal 2 vectors), BLE control frame payloads
+CREDIT_UPDATE/PING/PONG/ERROR/GOODBYE and resume-by-packet_id keying (Goal 3/4).
+
 ## Implementation gates
 
 - Accept or replace ADR-007 and ADR-008 before Goal 1.

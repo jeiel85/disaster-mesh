@@ -16,7 +16,7 @@
 ### 작업
 
 1. root Cargo workspace 생성
-2. `mesh-types`, `mesh-codec`, `mesh-crypto`, `mesh-bundle`, `mesh-routing`, `mesh-engine`, `mesh-sim`, `mesh-ffi`
+2. `mesh-types`, `mesh-codec`, `mesh-crypto`, `mesh-bundle`, `mesh-routing`, `mesh-store`, `mesh-engine`, `mesh-sim`, `mesh-ffi`
 3. Android modules 생성
 4. Rust Android targets build pipeline
 5. single UniFFI facade AAR/native packaging

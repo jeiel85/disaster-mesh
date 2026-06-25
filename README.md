@@ -99,8 +99,8 @@ Goal 6: hardening and beta
 │  ├─ mesh-crypto/
 │  ├─ mesh-bundle/
 │  ├─ mesh-routing/
-│  ├─ mesh-engine/
 │  ├─ mesh-store/
+│  ├─ mesh-engine/
 │  ├─ mesh-sim/
 │  └─ mesh-ffi/
 ├─ spec/

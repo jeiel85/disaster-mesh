@@ -167,7 +167,7 @@ CREATE TABLE token_grants (
     peer_link_hash BLOB NOT NULL,
     direction INTEGER NOT NULL CHECK (direction IN (0,1)),
     state INTEGER NOT NULL CHECK (state BETWEEN 0 AND 3),
-    token_count INTEGER NOT NULL CHECK (token_count BETWEEN 1 AND 15),
+    token_count INTEGER NOT NULL CHECK (token_count BETWEEN 1 AND 16),
     transfer_id BLOB CHECK (transfer_id IS NULL OR length(transfer_id) = 16),
     created_at_ms INTEGER NOT NULL,
     updated_at_ms INTEGER NOT NULL,

@@ -127,8 +127,8 @@ mesh-codec  mesh-crypto
   ↑          ↑
 mesh-bundle
   ↑
-mesh-routing
-  ↑
+mesh-routing  mesh-store
+  ↑            ↑
 mesh-engine
   ↑
 mesh-ffi / mesh-sim

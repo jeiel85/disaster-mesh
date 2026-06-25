@@ -38,6 +38,12 @@ ttl_seconds = 172800
 hop_limit = 12
 copy_tokens = 8
 
+[routing.location_update]
+priority = 1
+ttl_seconds = 86400
+hop_limit = 12
+copy_tokens = 8
+
 [routing.private_sos]
 priority = 0
 ttl_seconds = 86400
