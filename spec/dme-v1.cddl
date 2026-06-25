@@ -1,0 +1,115 @@
+; Disaster Message Envelope v1
+; Encoding: RFC 8949 Core Deterministic CBOR only.
+
+packet-id = bstr .size 16
+message-id = bstr .size 16
+conversation-id = bstr .size 16
+routing-slot = bstr .size 16
+pub32 = bstr .size 32
+sig64 = bstr .size 64
+sha256 = bstr .size 32
+
+message-type = 1..6
+priority = 0..3
+
+geo-location = [
+  kind: 1,
+  latitude-e7: -900000000..900000000,
+  longitude-e7: -1800000000..1800000000,
+  accuracy-meters: 0..50000,
+  altitude-meters: null / int,
+  captured-before-send-ms: 0..86400000,
+  note: tstr .size (0..800)
+]
+
+manual-location = [
+  kind: 2,
+  description: tstr .size (1..800)
+]
+
+location = geo-location / manual-location
+
+direct-text = [
+  text: tstr .size (1..7800),
+  reply-to: null / message-id
+]
+
+check-in = [
+  status: 1..5,
+  people-count: 1..99,
+  note: tstr .size (0..2000),
+  location: null / location,
+  battery-percent: null / 0..100
+]
+
+private-sos = [
+  category: 1..6,
+  description: tstr .size (1..3200),
+  people-count: 1..99,
+  severe-injury-count: 0..99,
+  location: null / location,
+  movement-direction: tstr .size (0..400),
+  battery-percent: null / 0..100
+]
+
+delivery-receipt = [
+  original-packet-id: packet-id,
+  original-message-id: message-id,
+  receipt-status: 1,
+  receiver-note: null / tstr .size (0..400)
+]
+
+cancel = [
+  target-packet-id: packet-id,
+  target-message-id: message-id,
+  cancel-reason: 1..4
+]
+
+location-update = [ location ]
+message-body = direct-text / check-in / private-sos /
+               location-update / delivery-receipt / cancel
+
+dme-plaintext-no-signature = [
+  version: 1,
+  message-type: message-type,
+  packet-id: packet-id,
+  message-id: message-id,
+  conversation-id: conversation-id,
+  sender-signing-public-key: pub32,
+  sender-hpke-public-key: pub32,
+  recipient-identity-hash: sha256,
+  sender-sequence: uint,
+  reply-routing-slot: routing-slot,
+  created-time-optional: null / uint,
+  body: message-body
+]
+
+dme-plaintext = [
+  version: 1,
+  message-type: message-type,
+  packet-id: packet-id,
+  message-id: message-id,
+  conversation-id: conversation-id,
+  sender-signing-public-key: pub32,
+  sender-hpke-public-key: pub32,
+  recipient-identity-hash: sha256,
+  sender-sequence: uint,
+  reply-routing-slot: routing-slot,
+  created-time-optional: null / uint,
+  body: message-body,
+  signature: sig64
+]
+
+dme-ciphertext = [
+  version: 1,
+  suite-id: 1,
+  encapsulated-key: bstr .size 32,
+  aad-hash: sha256,
+  ciphertext: bstr .size (1..8118)
+]
+
+; Semantic validation additionally requires DIRECT_TEXT to contain at most
+; 2,000 Unicode scalar values, sender-sequence <= 9223372036854775807,
+; CHECK_IN/SOS/location/receipt text to obey their documented Unicode scalar
+; limits, PRIVATE_SOS severe-injury-count <= people-count, and body shape to
+; match message-type.

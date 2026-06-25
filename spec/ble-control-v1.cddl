@@ -1,0 +1,68 @@
+beacon-id = bstr .size 8
+id16 = bstr .size 16
+hash32 = bstr .size 32
+slot16 = bstr .size 16
+
+version-hello = [
+  protocol-major: 1,
+  protocol-minor: uint,
+  beacon-id: beacon-id,
+  max-control-frame: 64..4096,
+  max-data-chunk: 1..4096,
+  capabilities: uint,
+  random-session-nonce: bstr .size 16
+]
+
+session-hello = [
+  session-id: id16,
+  negotiated-minor: uint,
+  node-capabilities: uint,
+  mode: 0..2,
+  max-concurrent-streams: 1..4,
+  max-session-bytes: 1024..1048576,
+  max-session-seconds: 1..120,
+  current-age-resolution-ms: 1..60000
+]
+
+routing-slots = [ page: uint, is-last: bool, slots: [0*32 slot16] ]
+
+bundle-summary = [
+  packet-id: id16,
+  destination-slot: slot16,
+  priority: 0..3,
+  remaining-lifetime-seconds: uint,
+  hop-count: uint,
+  hop-limit: uint,
+  copy-tokens: 1..16,
+  total-bundle-bytes: uint
+]
+
+inventory-page = [
+  page-token: uint,
+  is-last: bool,
+  entries: [0*32 bundle-summary]
+]
+
+bundle-request-entry = [ packet-id: id16, reason: 1..3 ]
+bundle-request = [ 0*16 bundle-request-entry ]
+
+bundle-meta = [
+  transfer-id: id16,
+  token-grant-id: null / id16,
+  packet-id: id16,
+  total-size: 1..12288,
+  sha256: hash32,
+  chunk-size: 1..4096,
+  chunk-count: 1..1024,
+  proposed-receiver-tokens: 1..16,
+  sender-remaining-tokens-after-reservation: 1..16
+]
+
+bundle-commit = [ transfer-id: id16, packet-id: id16, total-sha256: hash32 ]
+transfer-ack = [
+  transfer-id: id16,
+  packet-id: id16,
+  status: 1..7,
+  accepted-tokens: 0..16,
+  committed-payload-sha256: null / hash32
+]

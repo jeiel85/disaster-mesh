@@ -1,0 +1,6 @@
+# /goal 2 — Identity, Contacts and E2EE
+
+```text
+/goal
+Implement DisasterMesh identity and message security exactly as specified. Generate separate Ed25519 identity, X25519 HPKE and X25519 Noise static keys. Implement domain-separated self-signed DME contact cards, the exact `DM1:<Base45>~<CRC32C>` QR framing, inbound routing slots, display ID, 12-character Base32 safety number, contact trust states, replay windows and key-change handling. Implement RFC 9180 HPKE Base with DHKEM(X25519, HKDF-SHA256), HKDF-SHA256 and ChaCha20Poly1305; place sender Ed25519 identity and signature inside the encrypted DME plaintext; bind the specified immutable routing fields through AAD. Enforce the 8,192-byte encoded DME and 8,118-byte HPKE-ciphertext limits. Implement local key and plaintext column encryption using a master key supplied by the Android layer. Generate real golden vectors and invalid vectors. Never invent cryptographic primitives, never log secrets, and do not claim Signal-equivalent forward secrecy. Complete only when cross-process vectors pass, wrong recipient/AAD/signature inputs fail, private-key buffers are redacted/zeroized where supported, and test-only deterministic randomness cannot be compiled into offlineRelease.
+```

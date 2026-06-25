@@ -1,0 +1,65 @@
+[protocol]
+major = 1
+minor = 0
+dme_version = 1
+ble_cla_version = 1
+routing_block_type = 192
+max_bundle_bytes = 12288
+max_dme_payload_bytes = 8192
+max_hpke_ciphertext_bytes = 8118
+max_text_chars = 2000
+max_text_utf8_bytes = 7800
+
+[ble]
+service_uuid = "6f1d0001-8f6b-4d5b-9c61-57c43d4d4d31"
+control_rx_uuid = "6f1d0002-8f6b-4d5b-9c61-57c43d4d4d31"
+control_tx_uuid = "6f1d0003-8f6b-4d5b-9c61-57c43d4d4d31"
+data_rx_uuid = "6f1d0004-8f6b-4d5b-9c61-57c43d4d4d31"
+data_tx_uuid = "6f1d0005-8f6b-4d5b-9c61-57c43d4d4d31"
+beacon_rotation_seconds = 600
+beacon_jitter_seconds = 120
+gatt_connect_timeout_seconds = 12
+service_discovery_timeout_seconds = 8
+noise_handshake_timeout_seconds = 10
+partial_transfer_retention_seconds = 600
+max_inventory_entries_per_page = 32
+max_bundle_requests_per_frame = 16
+max_chunk_count = 1024
+
+[routing.direct_text]
+priority = 2
+ttl_seconds = 259200
+hop_limit = 12
+copy_tokens = 6
+
+[routing.check_in]
+priority = 1
+ttl_seconds = 172800
+hop_limit = 12
+copy_tokens = 8
+
+[routing.private_sos]
+priority = 0
+ttl_seconds = 86400
+hop_limit = 16
+copy_tokens = 12
+
+[routing.receipt]
+priority = 0
+ttl_seconds = 604800
+hop_limit = 16
+copy_tokens = 12
+
+[routing.cancel]
+priority = 0
+ttl_seconds = 604800
+hop_limit = 16
+copy_tokens = 12
+
+[storage]
+default_relay_quota_bytes = 33554432
+priority_reserved_bytes = 8388608
+per_ingress_peer_daily_bytes = 8388608
+per_ingress_peer_unverified_direct_daily_bytes = 2097152
+per_source_bytes = 4194304
+partial_total_bytes = 4194304

@@ -1,0 +1,10 @@
+; Private BPv7 canonical block type 192
+routing-block = [
+  version: 1,
+  packet-id: bstr .size 16,
+  message-class-hint: 1..5,
+  priority: 0..3,
+  copy-tokens: 1..16,
+  payload-size: 1..8192,
+  payload-sha256: bstr .size 32
+]

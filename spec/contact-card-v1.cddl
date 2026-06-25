@@ -1,0 +1,25 @@
+; Contact Card v1
+pub32 = bstr .size 32
+routing-slot = bstr .size 16
+sig64 = bstr .size 64
+
+contact-card-no-signature = [
+  version: 1,
+  identity-signing-public-key: pub32,
+  hpke-public-key: pub32,
+  inbound-routing-slot: routing-slot,
+  optional-display-name: tstr .size (0..64),
+  key-version: uint,
+  capabilities: uint
+]
+
+contact-card = [
+  version: 1,
+  identity-signing-public-key: pub32,
+  hpke-public-key: pub32,
+  inbound-routing-slot: routing-slot,
+  optional-display-name: tstr .size (0..64),
+  key-version: uint,
+  capabilities: uint,
+  signature: sig64
+]

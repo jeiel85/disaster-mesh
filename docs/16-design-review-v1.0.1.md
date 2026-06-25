@@ -1,0 +1,63 @@
+# 16. Design Review Resolution v1.0.1
+
+Date: 2026-06-25
+
+## Status
+
+v1.0.1 separated documents, CDDL, contracts, and `schemas/sqlite_v1.sql` are the
+implementation baseline. `FULL_IMPLEMENTATION_DESIGN.md` is a superseded v1.0
+snapshot and must not be used for implementation.
+
+## Resolved blockers
+
+1. BPv7 Payload Block number fixed to 1; outer bundle indefinite array explicitly allowed.
+2. ACK-loss token inflation replaced by persistent token-grant escrow and reconciliation.
+3. Receipt/cancel processing limited to final endpoints; relays do not delete target copies.
+4. Owned inbound routing slots and contact destination slots separated in the data model.
+5. Legacy BLE advertisement fixed to the 31-byte boundary with a service-UUID-only fallback.
+6. Encoded DME and inner HPKE ciphertext limits separated as 8192/8118 bytes.
+7. Contact QR framing, signature domain separation, and safety-number format fixed.
+8. Replay state moved to contact-scoped sender sequences and a persisted 256-entry window.
+9. Multi-recipient check-in/SOS defined as one send group with per-recipient ciphertext/bundle.
+10. Verified-local protected storage separated from unauthenticated relay priority metadata.
+11. Direct-destination traffic kept subject to ingress/session/partial-storage limits.
+12. Reboot bundle-age recovery made fail-closed when the wall checkpoint is invalid.
+13. GPS and manual locations split into an explicit wire union.
+14. Android baseline updated to compile SDK 37, target SDK 36 with API 37 tests.
+15. BLE control CDDL occurrence indicators normalized from the whitespace-separated
+    `* 32` / `* 16` form to the unambiguous `0*32` / `0*16` form (RFC 8610 §3.2).
+    The bounds are unchanged; only the spec-ambiguous encoding was corrected.
+
+## Verification performed
+
+- SQLite schema executed successfully in an in-memory SQLite engine.
+- Foreign-key check returned no violations on the empty initial schema.
+- `PRAGMA user_version` is 1 and matches the initial schema metadata value.
+- TOML and JSON schema files parsed successfully.
+- DME CBOR size arithmetic confirms an 8,118-byte HPKE ciphertext produces an
+  8,192-byte encoded DME ciphertext envelope at the maximum.
+- Repository-wide stale-term searches were used to remove superseded ACK,
+  routing-slot, payload-size, and Android baseline wording.
+
+## Final consistency sweep (2026-06-25, re-run)
+
+- SQLite schema re-executed: `user_version=1`, `foreign_key_check` empty,
+  `quick_check` ok, 19 non-internal tables, `bundles.creation_sequence` is BLOB.
+- TOML and manifest JSON schema re-parsed; protocol size/type constants match the docs.
+- DME size arithmetic re-derived from CBOR headers: an 8,118-byte HPKE ciphertext
+  yields exactly an 8,192-byte encoded `DmeCiphertext` (1+1+1+34+34+8121).
+- All 14 resolved blockers confirmed propagated across docs, CDDL, schema, contracts,
+  ADRs, and goal prompts. `FULL_IMPLEMENTATION_DESIGN.md` retains the superseded values
+  by intent and carries the do-not-implement warning header.
+- One defect found and fixed during the sweep: blocker 15 (CDDL occurrence indicators).
+- Open naming variance (non-blocking): the verified-in-person flag is
+  `safety_number_verified` in the domain model, `safety_verified` in the SQLite schema,
+  and surfaces as `displayed_safety_number` in the Rust facade. These are the same
+  concept at different layers; reconcile field names during Goal 2.
+
+## Implementation gates
+
+- Accept or replace ADR-007 and ADR-008 before Goal 1.
+- Generate real protocol vectors from implementation; do not hand-author crypto output.
+- Validate CDDL files with the selected CDDL tool in Goal 1 CI.
+- Perform external protocol/security review before stable 1.0.

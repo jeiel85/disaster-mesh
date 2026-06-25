@@ -1,0 +1,6 @@
+# /goal 4 — Multi-hop Relay
+
+```text
+/goal
+Implement the complete multi-hop store-carry-forward layer. Add secure SESSION_HELLO, owned inbound-routing-slot pages, explicit inventory pages, BUNDLE_REQUEST, token-grant-aware BUNDLE_META, credit flow control, chunk transfer, commit hash, TRANSFER_ACK, partial transfer retention and resume. Reserve the receiver token share in persistent escrow before relay transfer, retain uncertain grants after lost ACKs, and reconcile the same grant ID idempotently. Add endpoint-only receipt and cancel bundles, endpoint tombstones, peer cooldown/backoff, source and ingress-peer quota, verified-local P0/P1 protected storage, packet conflict quarantine and deterministic offer scoring. Relays must not interpret receipt/cancel targets or delete their corresponding originals. Expose a redacted relay diagnostics screen. Prove A-to-B, separation, then B-to-C delivery on physical devices; B must not decrypt the payload. Complete only after 50 controlled three-device runs pass, duplicate/lost ACK paths are idempotent without token reuse, receipt can return to A through later contacts, and a P2 or forged-P0 flood cannot consume the verified-local protected floor.
+```

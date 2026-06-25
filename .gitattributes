@@ -1,0 +1,35 @@
+# Normalize line endings: store text as LF in the repo regardless of platform.
+* text=auto eol=lf
+
+# Explicit text types (built on Windows, also built in Linux CI).
+*.md        text eol=lf
+*.txt       text eol=lf
+*.toml      text eol=lf
+*.json      text eol=lf
+*.sql       text eol=lf
+*.cddl      text eol=lf
+*.rs        text eol=lf
+*.kt        text eol=lf
+*.kts       text eol=lf
+*.gradle    text eol=lf
+*.xml       text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.sh        text eol=lf
+*.py        text eol=lf
+
+# Windows-specific scripts keep CRLF.
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# Binary assets — never touch.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.webp      binary
+*.aab       binary
+*.apk       binary
+*.jks       binary
+*.keystore  binary
+*.bin       binary

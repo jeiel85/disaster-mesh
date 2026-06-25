@@ -1,0 +1,31 @@
+# Protocol Test Vectors
+
+이 디렉터리에는 Goal 2에서 실제 구현으로 생성한 언어 독립 golden vector를 커밋한다.
+
+## 규칙
+
+- RFC/프로토콜 입력과 random seed를 manifest에 기록한다.
+- production build에는 deterministic RNG feature가 포함되지 않는다.
+- `.hex`는 공백 없는 lowercase hex.
+- JSON은 설명용이며 wire source of truth는 CBOR/BPv7 bytes다.
+- 각 vector는 Rust decoder round-trip과 별도 inspector에서 검증한다.
+
+## Required vectors
+
+1. valid contact card
+2. invalid contact signature
+3. contact QR Base45/CRC32C and invalid checksum
+4. direct text HPKE
+5. wrong AAD
+6. check-in with location
+7. private SOS without location
+8. receipt
+9. cancel
+10. expired bundle
+11. hop-limit bundle
+12. sender/receiver token-grant variants
+13. lost-ACK same-grant reconciliation
+14. malformed/non-canonical CBOR
+15. valid RFC 9171 outer indefinite bundle and invalid payload block number
+
+현재 묶음에는 암호 출력을 임의로 만들지 않았다. Goal 2 구현이 생성한 실제 bytes만 추가한다.

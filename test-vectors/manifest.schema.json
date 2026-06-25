@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DisasterMesh protocol vector manifest",
+  "type": "object",
+  "required": ["name", "protocol", "inputs", "outputs"],
+  "properties": {
+    "name": {"type": "string"},
+    "protocol": {"type": "string"},
+    "description": {"type": "string"},
+    "inputs": {"type": "object"},
+    "outputs": {"type": "object"},
+    "expected_error": {"type": ["string", "null"]},
+    "generator_commit": {"type": "string"}
+  },
+  "additionalProperties": false
+}

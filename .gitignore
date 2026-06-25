@@ -1,0 +1,46 @@
+# ── Rust ────────────────────────────────────────────────
+/target/
+**/target/
+*.rs.bk
+# Cargo.lock is committed: this is an application workspace, not a library.
+
+# ── Android / Gradle ────────────────────────────────────
+.gradle/
+**/build/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+captures/
+.cxx/
+output.json
+release/
+# Keep wrapper; ignore generated keystores and signing secrets.
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+
+# ── Kotlin / JVM ────────────────────────────────────────
+*.hprof
+.kotlin/
+
+# ── IDE / tooling ───────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# ── OS noise ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Local secrets / scratch ─────────────────────────────
+*.local
+.env
+/scratch/
+/tmp/
