@@ -7,7 +7,7 @@
   <meta name="description" content="End-to-end encrypted P2P mesh messaging for Android that works when cellular networks, internet, and infrastructure fail."/>
   <meta property="og:title" content="DisasterMesh"/>
   <meta property="og:description" content="Encrypted offline emergency messaging. BLE mesh. No internet required."/>
-  <meta property="og:image" content="https://raw.githubusercontent.com/jeiel85/disaster-mesh/main/assets/banner.svg"/>
+  <meta property="og:image" content="https://raw.githubusercontent.com/jeiel85/disaster-mesh/master/assets/banner.svg"/>
   <meta name="theme-color" content="#0d1117"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -349,7 +349,7 @@
     </p>
     <div class="hero-actions">
       <a href="https://github.com/jeiel85/disaster-mesh" class="btn-primary">View on GitHub</a>
-      <a href="https://github.com/jeiel85/disaster-mesh/tree/main/docs" class="btn-secondary">Read the Spec</a>
+      <a href="https://github.com/jeiel85/disaster-mesh/tree/master/docs" class="btn-secondary">Read the Spec</a>
     </div>
     <div class="badge-row">
       <span class="badge"><span class="badge-dot" style="background:var(--blue)"></span>Android 8.0+</span>
@@ -651,43 +651,43 @@
     <p class="section-desc">Complete specification ready for implementation — protocol fields, type lengths, GATT UUIDs, state machines, test cases, and release gates.</p>
 
     <div class="docs-grid">
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/00-product-requirements.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/00-product-requirements.md" class="doc-link">
         <span class="doc-num">00</span>
         <div><div class="doc-title">Product Requirements</div><div class="doc-desc">18 functional + 12 non-functional requirements with acceptance criteria</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/01-system-architecture.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/01-system-architecture.md" class="doc-link">
         <span class="doc-num">01</span>
         <div><div class="doc-title">System Architecture</div><div class="doc-desc">Module boundaries, Rust/Android separation of concerns</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/02-domain-model.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/02-domain-model.md" class="doc-link">
         <span class="doc-num">02</span>
         <div><div class="doc-title">Domain Model</div><div class="doc-desc">IDs, value objects, entities, aggregates, invariants</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/03-protocol-dme-v1.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/03-protocol-dme-v1.md" class="doc-link">
         <span class="doc-num">03</span>
         <div><div class="doc-title">Protocol: DME v1</div><div class="doc-desc">BPv7 profile, DME envelope, HPKE AAD, Ed25519</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/04-protocol-ble-cla-v1.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/04-protocol-ble-cla-v1.md" class="doc-link">
         <span class="doc-num">04</span>
         <div><div class="doc-title">Protocol: BLE CLA v1</div><div class="doc-desc">GATT UUIDs, frames, Noise handshake, timeouts</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/05-routing-and-queue.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/05-routing-and-queue.md" class="doc-link">
         <span class="doc-num">05</span>
         <div><div class="doc-title">Routing &amp; Queue</div><div class="doc-desc">Spray-and-Wait, token escrow, priority queue, TTL rules</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/06-security-and-threat-model.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/06-security-and-threat-model.md" class="doc-link">
         <span class="doc-num">06</span>
         <div><div class="doc-title">Security &amp; Threat Model</div><div class="doc-desc">Key wrapping, threat enumeration, mitigations, gates</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/07-storage-schema.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/07-storage-schema.md" class="doc-link">
         <span class="doc-num">07</span>
         <div><div class="doc-title">Storage Schema</div><div class="doc-desc">DB tables, indexes, transactions, encryption boundaries</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/11-testing-and-acceptance.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/11-testing-and-acceptance.md" class="doc-link">
         <span class="doc-num">11</span>
         <div><div class="doc-title">Testing &amp; Acceptance</div><div class="doc-desc">Unit, integration, real-device, and security test matrix</div></div>
       </a>
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/16-design-review-v1.0.1.md" class="doc-link">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/16-design-review-v1.0.1.md" class="doc-link">
         <span class="doc-num">16</span>
         <div><div class="doc-title">Design Review v1.0.1</div><div class="doc-desc">Multi-agent adversarial review — zero start-blockers found</div></div>
       </a>
@@ -786,11 +786,11 @@
     <p style="margin-bottom:12px">
       <a href="https://github.com/jeiel85/disaster-mesh">DisasterMesh</a>
       &nbsp;·&nbsp;
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/LICENSE">Apache 2.0</a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/LICENSE">Apache 2.0</a>
       &nbsp;·&nbsp;
-      <a href="https://github.com/jeiel85/disaster-mesh/tree/main/docs">Specification</a>
+      <a href="https://github.com/jeiel85/disaster-mesh/tree/master/docs">Specification</a>
       &nbsp;·&nbsp;
-      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/14-known-limitations.md">Known Limitations</a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/14-known-limitations.md">Known Limitations</a>
     </p>
     <p>Copyright 2026 The DisasterMesh Authors · Design Baseline v1.0.1</p>
   </div>
