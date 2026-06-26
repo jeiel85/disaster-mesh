@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1280 640" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#0d1117"/>
+    <stop offset="100%" stop-color="#0f1923"/>
+  </linearGradient>
+  <linearGradient id="titleGrad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#58a6ff"/>
+    <stop offset="55%" stop-color="#79c0ff"/>
+    <stop offset="100%" stop-color="#56d364"/>
+  </linearGradient>
+  <linearGradient id="sosLine" x1="0" y1="1" x2="1" y2="0" gradientUnits="objectBoundingBox">
+    <stop offset="0%" stop-color="#f85149"/>
+    <stop offset="100%" stop-color="#f78166"/>
+  </linearGradient>
+  <pattern id="dotGrid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="20" cy="20" r="1.2" fill="#58a6ff"/>
+  </pattern>
+  <filter id="relayGlow" x="-100%" y="-100%" width="300%" height="300%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="devGlow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="lineGlow" x="-5%" y="-30%" width="110%" height="160%">
+    <feGaussianBlur stdDeviation="3" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="sosGlow" x="-100%" y="-100%" width="300%" height="300%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="titleGlow" x="-5%" y="-20%" width="110%" height="140%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<!-- BACKGROUND -->
+<rect fill="url(#bg)" width="1280" height="640"/>
+
+<!-- Dot grid (left panel) -->
+<rect x="0" y="0" width="632" height="640" fill="url(#dotGrid)" opacity="0.07"/>
+
+<!-- Panel separator -->
+<line x1="635" y1="20" x2="635" y2="620" stroke="#21262d" stroke-width="1"/>
+<line x1="635" y1="20" x2="635" y2="620" stroke="#58a6ff" stroke-width="0.5" opacity="0.25"/>
+
+<!-- ======== LEFT PANEL: MESH NETWORK ======== -->
+
+<!-- DIM background connections -->
+<g stroke="#1e2530" stroke-width="1.5" fill="none">
+  <line x1="100" y1="120" x2="240" y2="65"/>
+  <line x1="240" y1="65" x2="380" y2="130"/>
+  <line x1="380" y1="130" x2="480" y2="195"/>
+  <line x1="240" y1="65" x2="165" y2="270"/>
+  <line x1="320" y1="285" x2="480" y2="195"/>
+  <line x1="480" y1="195" x2="560" y2="330"/>
+  <line x1="560" y1="330" x2="490" y2="435"/>
+  <line x1="165" y1="270" x2="90" y2="400"/>
+  <line x1="90" y1="400" x2="225" y2="450"/>
+  <line x1="265" y1="555" x2="430" y2="555"/>
+  <line x1="430" y1="555" x2="490" y2="435"/>
+  <line x1="320" y1="285" x2="225" y2="450"/>
+  <line x1="90" y1="400" x2="100" y2="555"/>
+</g>
+
+<!-- ACTIVE REGULAR PATH: R1 -> R2 -> D3 (blue) -->
+<g filter="url(#lineGlow)">
+  <line x1="100" y1="120" x2="165" y2="270" stroke="#58a6ff" stroke-width="2.5" opacity="0.9"/>
+  <line x1="165" y1="270" x2="320" y2="285" stroke="#58a6ff" stroke-width="2.5" opacity="0.9"/>
+</g>
+
+<!-- ACTIVE SOS PATH: D7 -> D8 -> D6 -> R5 (red/orange P0) -->
+<g filter="url(#lineGlow)">
+  <line x1="100" y1="555" x2="265" y2="555" stroke="#f85149" stroke-width="3.5" opacity="0.95"/>
+  <line x1="265" y1="555" x2="370" y2="475" stroke="#f85149" stroke-width="3.5" opacity="0.95"/>
+  <line x1="370" y1="475" x2="490" y2="435" stroke="#f78166" stroke-width="3" opacity="0.85"/>
+  <line x1="225" y1="450" x2="370" y2="475" stroke="#f78166" stroke-width="2" opacity="0.7"/>
+</g>
+
+<!-- Message packet on SOS path (visual indicator) -->
+<circle cx="190" cy="555" r="5" fill="#f85149" filter="url(#sosGlow)" opacity="0.9"/>
+<circle cx="300" cy="527" r="4" fill="#f78166" filter="url(#devGlow)" opacity="0.8"/>
+
+<!-- Message packet on regular path -->
+<circle cx="133" cy="195" r="4" fill="#58a6ff" filter="url(#devGlow)" opacity="0.85"/>
+
+<!-- ===== RELAY NODES (blue, larger) ===== -->
+<!-- R1 (100, 120) - active relay -->
+<circle cx="100" cy="120" r="30" fill="#58a6ff" opacity="0.08" filter="url(#relayGlow)"/>
+<circle cx="100" cy="120" r="22" fill="#0d1117" stroke="#58a6ff" stroke-width="2.5"/>
+<circle cx="100" cy="120" r="8" fill="#58a6ff" filter="url(#relayGlow)"/>
+<circle cx="100" cy="120" r="34" fill="none" stroke="#58a6ff" stroke-width="0.7" opacity="0.35"/>
+<circle cx="100" cy="120" r="48" fill="none" stroke="#58a6ff" stroke-width="0.4" opacity="0.15"/>
+
+<!-- R2 (165, 270) - active relay -->
+<circle cx="165" cy="270" r="30" fill="#58a6ff" opacity="0.1" filter="url(#relayGlow)"/>
+<circle cx="165" cy="270" r="22" fill="#0d1117" stroke="#58a6ff" stroke-width="2.5"/>
+<circle cx="165" cy="270" r="8" fill="#58a6ff" filter="url(#relayGlow)"/>
+<circle cx="165" cy="270" r="34" fill="none" stroke="#58a6ff" stroke-width="0.7" opacity="0.35"/>
+<circle cx="165" cy="270" r="48" fill="none" stroke="#58a6ff" stroke-width="0.4" opacity="0.15"/>
+
+<!-- R3 (480, 195) - inactive relay -->
+<circle cx="480" cy="195" r="22" fill="#0d1117" stroke="#21262d" stroke-width="2"/>
+<circle cx="480" cy="195" r="7" fill="#21262d"/>
+
+<!-- R4 (90, 400) - inactive relay -->
+<circle cx="90" cy="400" r="22" fill="#0d1117" stroke="#21262d" stroke-width="2"/>
+<circle cx="90" cy="400" r="7" fill="#21262d"/>
+
+<!-- R5 (490, 435) - SOS receiving relay (red glow) -->
+<circle cx="490" cy="435" r="36" fill="#f85149" opacity="0.12" filter="url(#sosGlow)"/>
+<circle cx="490" cy="435" r="24" fill="#0d1117" stroke="#f85149" stroke-width="2.5"/>
+<circle cx="490" cy="435" r="10" fill="#f85149" filter="url(#sosGlow)"/>
+<circle cx="490" cy="435" r="40" fill="none" stroke="#f85149" stroke-width="0.8" opacity="0.4"/>
+<circle cx="490" cy="435" r="56" fill="none" stroke="#f85149" stroke-width="0.5" opacity="0.2"/>
+
+<!-- ===== DEVICE NODES (green, smaller) ===== -->
+<!-- D1 (240, 65) -->
+<circle cx="240" cy="65" r="14" fill="#0d1117" stroke="#21262d" stroke-width="1.5"/>
+<circle cx="240" cy="65" r="4" fill="#21262d"/>
+
+<!-- D2 (380, 130) -->
+<circle cx="380" cy="130" r="14" fill="#0d1117" stroke="#21262d" stroke-width="1.5"/>
+<circle cx="380" cy="130" r="4" fill="#21262d"/>
+
+<!-- D3 (320, 285) - active (receiving) -->
+<circle cx="320" cy="285" r="20" fill="#56d364" opacity="0.1" filter="url(#devGlow)"/>
+<circle cx="320" cy="285" r="15" fill="#0d1117" stroke="#56d364" stroke-width="2"/>
+<circle cx="320" cy="285" r="6" fill="#56d364" filter="url(#devGlow)"/>
+<circle cx="320" cy="285" r="26" fill="none" stroke="#56d364" stroke-width="0.6" opacity="0.3"/>
+
+<!-- D4 (560, 330) -->
+<circle cx="560" cy="330" r="14" fill="#0d1117" stroke="#21262d" stroke-width="1.5"/>
+<circle cx="560" cy="330" r="4" fill="#21262d"/>
+
+<!-- D5 (225, 450) -->
+<circle cx="225" cy="450" r="14" fill="#0d1117" stroke="#21262d" stroke-width="1.5"/>
+<circle cx="225" cy="450" r="4" fill="#21262d"/>
+
+<!-- D6 (370, 475) - SOS relay node -->
+<circle cx="370" cy="475" r="18" fill="#f78166" opacity="0.1" filter="url(#devGlow)"/>
+<circle cx="370" cy="475" r="15" fill="#0d1117" stroke="#f78166" stroke-width="2"/>
+<circle cx="370" cy="475" r="6" fill="#f78166"/>
+
+<!-- D7 (100, 555) - SOS SENDER (bright red) -->
+<circle cx="100" cy="555" r="26" fill="#f85149" opacity="0.2" filter="url(#sosGlow)"/>
+<circle cx="100" cy="555" r="18" fill="#0d1117" stroke="#f85149" stroke-width="2.5"/>
+<circle cx="100" cy="555" r="9" fill="#f85149" filter="url(#sosGlow)"/>
+<circle cx="100" cy="555" r="34" fill="none" stroke="#f85149" stroke-width="1" opacity="0.45"/>
+<circle cx="100" cy="555" r="46" fill="none" stroke="#f85149" stroke-width="0.6" opacity="0.22"/>
+<!-- SOS exclamation mark -->
+<line x1="100" y1="550" x2="100" y2="557" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="100" cy="561" r="1.8" fill="white"/>
+
+<!-- D8 (265, 555) - SOS relay -->
+<circle cx="265" cy="555" r="18" fill="#f78166" opacity="0.1" filter="url(#devGlow)"/>
+<circle cx="265" cy="555" r="15" fill="#0d1117" stroke="#f78166" stroke-width="2"/>
+<circle cx="265" cy="555" r="6" fill="#f78166"/>
+
+<!-- D9 (430, 555) -->
+<circle cx="430" cy="555" r="14" fill="#0d1117" stroke="#21262d" stroke-width="1.5"/>
+<circle cx="430" cy="555" r="4" fill="#21262d"/>
+
+<!-- Node labels -->
+<text x="100" y="150" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="8" opacity="0.75">RELAY</text>
+<text x="165" y="300" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="8" opacity="0.75">RELAY</text>
+<text x="490" y="472" text-anchor="middle" fill="#f78166" font-family="monospace" font-size="8" opacity="0.85">SOS RX</text>
+<text x="100" y="593" text-anchor="middle" fill="#f85149" font-family="monospace" font-size="8" font-weight="bold">SOS P0</text>
+<text x="320" y="313" text-anchor="middle" fill="#56d364" font-family="monospace" font-size="8" opacity="0.8">RCVD</text>
+
+<!-- Legend -->
+<circle cx="28" cy="610" r="6" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
+<circle cx="28" cy="610" r="2.5" fill="#58a6ff"/>
+<text x="40" y="614" fill="#484f58" font-family="monospace" font-size="9">Relay</text>
+<circle cx="90" cy="610" r="5" fill="#0d1117" stroke="#21262d" stroke-width="1.5"/>
+<circle cx="90" cy="610" r="2" fill="#21262d"/>
+<text x="102" y="614" fill="#484f58" font-family="monospace" font-size="9">Device</text>
+<circle cx="158" cy="610" r="5" fill="#0d1117" stroke="#f85149" stroke-width="1.5"/>
+<circle cx="158" cy="610" r="2" fill="#f85149"/>
+<text x="170" y="614" fill="#484f58" font-family="monospace" font-size="9">SOS P0</text>
+<line x1="230" y1="610" x2="255" y2="610" stroke="#58a6ff" stroke-width="2"/>
+<text x="262" y="614" fill="#484f58" font-family="monospace" font-size="9">Active path</text>
+<line x1="340" y1="610" x2="365" y2="610" stroke="#f85149" stroke-width="2"/>
+<text x="372" y="614" fill="#484f58" font-family="monospace" font-size="9">SOS routing</text>
+
+<!-- ======== RIGHT PANEL: BRANDING ======== -->
+
+<!-- Background accent for right panel -->
+<rect x="635" y="0" width="645" height="640" fill="#0a0d13" opacity="0.4"/>
+
+<!-- Shield decoration (top right) -->
+<path d="M 1170 55 L 1220 55 L 1235 70 L 1235 135 L 1195 160 L 1155 135 L 1155 70 Z"
+      fill="#58a6ff" opacity="0.04" stroke="#21262d" stroke-width="1"/>
+<path d="M 1180 85 L 1210 85 L 1220 95 L 1220 130 L 1195 145 L 1170 130 L 1170 95 Z"
+      fill="none" stroke="#58a6ff" stroke-width="0.8" opacity="0.3"/>
+<!-- Lock icon inside shield -->
+<rect x="1185" y="107" width="20" height="15" rx="3" fill="none" stroke="#58a6ff" stroke-width="1.5" opacity="0.5"/>
+<path d="M 1189 107 L 1189 102 Q 1195 96 1201 102 L 1201 107" fill="none" stroke="#58a6ff" stroke-width="1.5" opacity="0.5"/>
+<circle cx="1195" cy="115" r="2.5" fill="#58a6ff" opacity="0.5"/>
+
+<!-- MAIN TITLE -->
+<text x="660" y="205" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif"
+      font-size="74" font-weight="800" letter-spacing="-2" fill="url(#titleGrad)" filter="url(#titleGlow)">
+  DisasterMesh
+</text>
+
+<!-- Subtitle decoration line -->
+<rect x="660" y="218" width="4" height="4" rx="1" fill="#58a6ff" opacity="0.6"/>
+<rect x="668" y="218" width="4" height="4" rx="1" fill="#79c0ff" opacity="0.4"/>
+<rect x="676" y="218" width="4" height="4" rx="1" fill="#56d364" opacity="0.3"/>
+
+<!-- Korean tagline -->
+<text x="660" y="252" font-family="system-ui, -apple-system, sans-serif"
+      font-size="15" fill="#8b949e" letter-spacing="0.3">
+  재난 상황에서 인터넷 없이 작동하는 종단간 암호화 P2P 메시지 시스템
+</text>
+
+<!-- English tagline -->
+<text x="660" y="275" font-family="system-ui, -apple-system, sans-serif"
+      font-size="13.5" fill="#484f58">
+  End-to-end encrypted offline mesh messaging · No internet · No server · No compromise
+</text>
+
+<!-- Thin separator -->
+<rect x="660" y="292" width="580" height="1" fill="#21262d"/>
+
+<!-- FEATURE PILLS (2 rows x 4) -->
+<!-- Row 1 -->
+<rect x="660" y="306" width="122" height="28" rx="14" fill="#0d1f36" stroke="#58a6ff" stroke-width="1" opacity="0.9"/>
+<text x="721" y="324" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="11" font-weight="600">BLE Mesh</text>
+
+<rect x="791" y="306" width="140" height="28" rx="14" fill="#0d2918" stroke="#56d364" stroke-width="1" opacity="0.9"/>
+<text x="861" y="324" text-anchor="middle" fill="#56d364" font-family="monospace" font-size="11" font-weight="600">E2E Encrypted</text>
+
+<rect x="940" y="306" width="118" height="28" rx="14" fill="#2a1010" stroke="#f85149" stroke-width="1" opacity="0.9"/>
+<text x="999" y="324" text-anchor="middle" fill="#f85149" font-family="monospace" font-size="11" font-weight="600">SOS Priority</text>
+
+<rect x="1067" y="306" width="150" height="28" rx="14" fill="#1a1a0d" stroke="#f0883e" stroke-width="1" opacity="0.9"/>
+<text x="1142" y="324" text-anchor="middle" fill="#f0883e" font-family="monospace" font-size="11" font-weight="600">HPKE + Ed25519</text>
+
+<!-- Row 2 -->
+<rect x="660" y="343" width="122" height="28" rx="14" fill="#0d1f36" stroke="#79c0ff" stroke-width="1" opacity="0.9"/>
+<text x="721" y="361" text-anchor="middle" fill="#79c0ff" font-family="monospace" font-size="11" font-weight="600">Multi-hop</text>
+
+<rect x="791" y="343" width="140" height="28" rx="14" fill="#0d1f36" stroke="#58a6ff" stroke-width="1" opacity="0.9"/>
+<text x="861" y="361" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="11" font-weight="600">Store + Forward</text>
+
+<rect x="940" y="343" width="118" height="28" rx="14" fill="#0d2918" stroke="#56d364" stroke-width="1" opacity="0.9"/>
+<text x="999" y="361" text-anchor="middle" fill="#56d364" font-family="monospace" font-size="11" font-weight="600">No Internet</text>
+
+<rect x="1067" y="343" width="150" height="28" rx="14" fill="#1a0d1a" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+<text x="1142" y="361" text-anchor="middle" fill="#bc8cff" font-family="monospace" font-size="11" font-weight="600">Rust + Kotlin</text>
+
+<!-- MINI ARCHITECTURE DIAGRAM -->
+<text x="660" y="398" font-family="monospace" font-size="10" fill="#484f58" letter-spacing="2">ARCHITECTURE</text>
+<rect x="660" y="403" width="580" height="0.5" fill="#21262d"/>
+
+<!-- Android layer box -->
+<rect x="660" y="412" width="178" height="54" rx="5" fill="#0d1f36" stroke="#30363d" stroke-width="1"/>
+<text x="749" y="428" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="9" font-weight="700">Android · Kotlin</text>
+<text x="749" y="443" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Jetpack Compose</text>
+<text x="749" y="457" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">BLE GATT · Foreground Svc</text>
+
+<!-- Arrow -->
+<line x1="749" y1="467" x2="749" y2="483" stroke="#30363d" stroke-width="1.5"/>
+<polygon points="745,483 753,483 749,489" fill="#30363d"/>
+<text x="755" y="479" fill="#30363d" font-family="monospace" font-size="8">UniFFI</text>
+
+<!-- Rust Core box -->
+<rect x="660" y="489" width="178" height="54" rx="5" fill="#0f1f0f" stroke="#30363d" stroke-width="1"/>
+<text x="749" y="505" text-anchor="middle" fill="#56d364" font-family="monospace" font-size="9" font-weight="700">Rust Core (2024)</text>
+<text x="749" y="520" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Protocol · Crypto · Routing</text>
+<text x="749" y="534" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">SQLite · BPv7 · HPKE</text>
+
+<!-- Protocol box -->
+<rect x="852" y="412" width="168" height="131" rx="5" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+<text x="936" y="428" text-anchor="middle" fill="#79c0ff" font-family="monospace" font-size="9" font-weight="700">Protocol Stack</text>
+<text x="936" y="445" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">BPv7 (RFC 9171)</text>
+<text x="936" y="459" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">CBOR + CDDL</text>
+<text x="936" y="473" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">HPKE Base X25519</text>
+<text x="936" y="487" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Ed25519 Signature</text>
+<text x="936" y="501" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Noise_XX BLE Link</text>
+<text x="936" y="515" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Spray-and-Wait</text>
+<text x="936" y="529" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Token Escrow</text>
+
+<!-- Priority box -->
+<rect x="1033" y="412" width="168" height="131" rx="5" fill="#0d1117" stroke="#30363d" stroke-width="1"/>
+<text x="1117" y="428" text-anchor="middle" fill="#f0883e" font-family="monospace" font-size="9" font-weight="700">Message Priority</text>
+<text x="1117" y="445" text-anchor="middle" fill="#f85149" font-family="monospace" font-size="8">P0  SOS · ACK · Cancel</text>
+<text x="1117" y="459" text-anchor="middle" fill="#f0883e" font-family="monospace" font-size="8">P1  Check-In · Location</text>
+<text x="1117" y="473" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="8">P2  Direct Text</text>
+<text x="1117" y="487" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">TTL  24h – 72h</text>
+<text x="1117" y="501" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Hops  12 – 16 max</text>
+<text x="1117" y="515" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">Android 8.0+ / API 26</text>
+<text x="1117" y="529" text-anchor="middle" fill="#484f58" font-family="monospace" font-size="8">No INTERNET permission</text>
+
+<!-- BOTTOM STATUS BAR -->
+<rect x="635" y="580" width="645" height="1" fill="#21262d"/>
+<text x="660" y="601" font-family="monospace" font-size="9.5" fill="#30363d">
+  Apache 2.0  ·  Android 8.0+ (API 26)  ·  Rust 2024 Edition  ·  BPv7 RFC 9171  ·  Design Review v1.0.1
+</text>
+<rect x="1140" y="592" width="85" height="16" rx="8" fill="#1c2a1c" stroke="#238636" stroke-width="1"/>
+<text x="1182" y="603" text-anchor="middle" fill="#56d364" font-family="monospace" font-size="8.5">Design Complete</text>
+
+</svg>
