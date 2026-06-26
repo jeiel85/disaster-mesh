@@ -1,143 +1,311 @@
-# Disaster Mesh — Implementation Design Bundle v1.0.1
+<div align="center">
 
-> 목적: 이동통신망·인터넷·공유기 없이, 주변 스마트폰과 고정 릴레이만으로 종단간 암호화된 재난 메시지를 저장·운반·전달하는 Android 우선 오픈소스 시스템을 구현한다.
->
-> 문서 상태: **구현 기준선(Implementation Baseline)**  
-> 기준일: 2026-06-25  
-> 코드명: `DisasterMesh`  
-> 예시 Application ID: `org.disastermesh.android`
+<img src="assets/banner.svg" alt="DisasterMesh — Encrypted Offline Emergency Messaging" width="100%"/>
 
-v1.0.1은 최초 교차검토에서 확인된 BPv7 block numbering, token ACK 유실,
-수신 routing slot 저장, endpoint-only receipt/cancel, BLE legacy advertising 크기
-문제를 수정한 기준선이다.
+# DisasterMesh
 
-## 이 묶음이 이전 설계서와 다른 점
+**종단간 암호화 · 오프라인 우선 · BLE 전용 · 서버 없음 · 인터넷 불필요**
 
-이전 문서는 제품 방향과 아키텍처의 타당성을 설명하는 수준이었다. 이 묶음은 개발자가 별도 해석 없이 첫 커밋부터 기능 구현을 시작하도록 다음 항목을 고정한다.
+*End-to-end encrypted offline mesh messaging when infrastructure fails*
 
-- 모듈 경계와 책임
-- 프로토콜 필드, 타입, 길이, 검증 규칙
-- BLE 광고·GATT 서비스·프레임 레이아웃·타임아웃
-- 라우팅, 복제 토큰, 큐 우선순위, 삭제 규칙
-- 키 생성·QR 연락처·메시지 암호화 절차
-- SQLite 테이블·인덱스·트랜잭션 경계
-- Rust Core와 Kotlin 플랫폼 계층의 API 계약
-- 서비스·세션·메시지·전송 상태 머신
-- 단계별 `/goal`과 각 단계의 완료 조건
-- 단위·통합·실기기·보안 테스트 케이스
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B%20%28API%2026%29-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com)
+[![Kotlin](https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7F52FF.svg?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Rust](https://img.shields.io/badge/Rust-2024%20Edition-orange.svg?logo=rust&logoColor=white)](https://rust-lang.org)
+[![Encryption](https://img.shields.io/badge/Encryption-HPKE%20%2B%20Ed25519-red.svg?logo=letsencrypt&logoColor=white)](docs/06-security-and-threat-model.md)
+[![Protocol](https://img.shields.io/badge/Protocol-BPv7%20RFC%209171-informational.svg)](docs/03-protocol-dme-v1.md)
+[![Transport](https://img.shields.io/badge/Transport-BLE%20GATT%20Only-blue.svg?logo=bluetooth&logoColor=white)](docs/04-protocol-ble-cla-v1.md)
+[![Status](https://img.shields.io/badge/Status-Design%20Complete%20v1.0.1-success.svg)](docs/16-design-review-v1.0.1.md)
 
-## 고정된 1.0 기술 기준
+[**Landing Page**](https://jeiel85.github.io/disaster-mesh)&nbsp;·&nbsp;[**Specification**](docs/)&nbsp;·&nbsp;[**Architecture**](docs/01-system-architecture.md)&nbsp;·&nbsp;[**Security Model**](docs/06-security-and-threat-model.md)&nbsp;·&nbsp;[**Known Limitations**](docs/14-known-limitations.md)
 
-| 항목 | 결정 |
+</div>
+
+---
+
+DisasterMesh is an **Android-first, serverless, offline-first** emergency communication system that works when cellular networks, internet, and infrastructure fail. Using Bluetooth Low Energy (BLE), devices form a self-organizing peer-to-peer mesh network that stores, carries, and relays end-to-end encrypted messages across multiple hops — with no server, no internet, and no plaintext visible to relays.
+
+> **재난 상황에서** 기지국·인터넷·공유기 없이, 주변 스마트폰과 고정 릴레이만으로  
+> 종단간 암호화된 재난 메시지를 **저장·운반·전달**하는 Android 우선 오픈소스 시스템.  
+> Bluetooth 전용 · 서버 없음 · 중계 노드가 내용을 읽을 수 없음.
+
+---
+
+## Why This Exists
+
+When earthquakes, floods, hurricanes, or power failures strike, cellular networks become congested or go offline entirely — right when people need to communicate about safety, location, and rescue needs. Standard messaging apps stop working. **DisasterMesh continues working:**
+
+| Problem | DisasterMesh |
 |---|---|
-| 1차 플랫폼 | Android 8.0/API 26 이상 |
-| 빌드 기준 | compile SDK 37, target SDK 36, JDK 17 |
-| UI | Kotlin + Jetpack Compose |
-| 플랫폼 통신 | Android BLE Central + Peripheral(GATT Server) |
-| 공유 코어 | Rust 2024 Edition |
-| FFI | UniFFI 한 개의 통합 facade crate |
-| 번들 | BPv7의 제한된 프로파일 + DME v1 payload |
-| 앱 직렬화 | Core Deterministic CBOR |
-| 스키마 | CDDL |
-| 메시지 암호화 | RFC 9180 HPKE Base: X25519/HKDF-SHA256/ChaCha20Poly1305 |
-| 송신자 인증 | Ed25519 서명, 암호문 내부 포함 |
-| 링크 보안 | `Noise_XX_25519_ChaChaPoly_BLAKE2s` |
-| 라우팅 | Direct Delivery + Binary Spray-and-Wait + persistent token grant escrow |
-| 저장 | SQLite; 키는 Android Keystore로 감싼 DB master key 사용 |
-| 네트워크 권한 | BLE-only release에는 `INTERNET` 미선언 |
-| 첨부 | 1.0 미지원; encoded DME payload 8 KiB 이하 |
+| Cellular tower is down | BLE radio in your pocket still works |
+| No internet connection | No internet permission declared in release APK |
+| Server is unreachable | No server — pure peer-to-peer mesh |
+| Messages may be intercepted | HPKE + Ed25519 end-to-end encryption |
+| Relay may peek at content | Relay nodes only forward ciphertext they cannot decrypt |
+| Process killed mid-transfer | SQLite store-and-forward survives restarts |
+| SOS drowned in regular traffic | P0 priority + 12 copy tokens for emergency messages |
 
-> 암호 라이브러리와 BPv7 라이브러리는 외부 감사 여부를 확인하고 잠금 파일·SBOM에 고정한다. 라이브러리를 사용한다고 시스템 전체가 자동으로 감사 완료되는 것은 아니다.
+---
 
-## 문서 읽는 순서
+## Features
 
-1. `docs/00-product-requirements.md`
-2. `docs/01-system-architecture.md`
-3. `docs/02-domain-model.md`
-4. `docs/03-protocol-dme-v1.md`
-5. `docs/04-protocol-ble-cla-v1.md`
-6. `docs/05-routing-and-queue.md`
-7. `docs/06-security-and-threat-model.md`
-8. `docs/07-storage-schema.md`
-9. `docs/08-rust-core-contract.md`
-10. `docs/09-android-implementation.md`
-11. `docs/10-state-machines.md`
-12. `docs/11-testing-and-acceptance.md`
-13. `docs/12-release-and-operations.md`
-14. `docs/13-development-goals.md`
-15. `docs/14-known-limitations.md`
-16. `docs/15-references.md`
-17. `docs/16-design-review-v1.0.1.md`
+| Feature | Detail |
+|---|---|
+| **BLE Mesh Transport** | Android BLE Central + Peripheral (GATT Server), Noise_XX handshake per link |
+| **End-to-End Encryption** | RFC 9180 HPKE Base: X25519 / HKDF-SHA256 / ChaCha20Poly1305 |
+| **Sender Authentication** | Ed25519 signatures embedded inside ciphertext |
+| **Multi-hop Routing** | Binary Spray-and-Wait with persistent token grant escrow |
+| **SOS Priority (P0)** | Highest priority queue, 12 copy tokens, 16 hop limit, 24h TTL |
+| **Store and Forward** | SQLite persistence survives process kills; delivers when peers meet later |
+| **Privacy by Default** | No INTERNET permission in release; relay nodes see only ciphertext |
+| **Contact Verification** | QR code in-person exchange with Ed25519 public keys |
+| **Delivery Receipts** | Signed receipts route back to sender through the mesh |
+| **No Dependencies** | Pure BLE; no TCP, no UDP, no Wi-Fi, no cloud |
 
-## 구현 시작 명령
+---
 
-첫 번째 구현 단계는 Bluetooth가 아니다. 아래 순서로 시작한다.
+## Architecture
 
-```text
-Goal 0: repository/bootstrap
-Goal 1: deterministic protocol core + simulator
-Goal 2: identity/contact/E2EE test vectors
-Goal 3: Android direct BLE transfer
-Goal 4: multi-hop relay
-Goal 5: disaster UX and persistent relay
-Goal 6: hardening and beta
+```
+┌──────────────────── Android App (Kotlin) ───────────────────────┐
+│                                                                   │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │           Jetpack Compose UI Screens                        │ │
+│  │  SendMessage · CheckIn · SOS · ContactBook · RelayStatus    │ │
+│  └─────────────────────────┬───────────────────────────────────┘ │
+│                             │                                     │
+│  ┌──────────────┐  ┌────────▼──────────┐  ┌────────────────────┐ │
+│  │  Foreground  │  │   MeshCoordinator │  │   BlePlatformAdap  │ │
+│  │   Service    │  │   (Kotlin bridge) │  │   Central/Periph   │ │
+│  └──────────────┘  └────────┬──────────┘  └────────────────────┘ │
+│                             │  UniFFI FFI                         │
+├─────────────────────────────┼───────────────────────────────────-┤
+│                    ┌────────▼──────────┐                          │
+│                    │    MeshEngine     │  (Rust 2024)             │
+│  ┌─────────────────┴─────────────────────────────────────────┐   │
+│  │  mesh-types  │  mesh-codec  │  mesh-crypto  │  mesh-bundle │   │
+│  │  mesh-routing│  mesh-store  │  mesh-engine  │  mesh-sim    │   │
+│  │                          mesh-ffi                          │   │
+│  └────────────────────────────────────────────────────────────┘   │
+│                                                                   │
+└────────────────┬──────────────────────────────┬──────────────────┘
+                 │                              │
+          ┌──────▼───────┐             ┌────────▼────────┐
+          │    SQLite    │             │  Android        │
+          │  (Rust owns) │             │  Keystore       │
+          └──────────────┘             └─────────────────┘
 ```
 
-첫 커밋에서 생성할 최상위 구조:
+**Key principle:** Rust owns everything below the FFI boundary — protocol encoding, cryptography, routing decisions, and the database. Kotlin handles only platform surfaces: BLE radio, UI, and key-wrapping via Android Keystore.
 
-```text
-/
-├─ Cargo.toml
-├─ rust-toolchain.toml
-├─ gradle/
-├─ gradlew
-├─ settings.gradle.kts
-├─ apps/android/
-├─ core/
-│  ├─ mesh-types/
-│  ├─ mesh-codec/
-│  ├─ mesh-crypto/
-│  ├─ mesh-bundle/
-│  ├─ mesh-routing/
-│  ├─ mesh-store/
-│  ├─ mesh-engine/
-│  ├─ mesh-sim/
-│  └─ mesh-ffi/
-├─ spec/
-├─ test-vectors/
-└─ docs/
+---
+
+## Tech Stack
+
+| Layer | Technology | Rationale |
+|---|---|---|
+| **UI** | Kotlin + Jetpack Compose | Modern Android-native declarative UI |
+| **Core** | Rust 2024 Edition | Memory safety, deterministic codec, no GC pauses |
+| **FFI** | UniFFI (single facade crate) | Type-safe Rust ↔ Kotlin binding |
+| **Transport** | Android BLE GATT Central + Peripheral | Sole transport; zero internet permission in release |
+| **Link Security** | Noise_XX_25519_ChaChaPoly_BLAKE2s | Mutual auth + forward secrecy per BLE session |
+| **Message Encryption** | RFC 9180 HPKE Base: X25519/HKDF-SHA256/ChaCha20Poly1305 | Asymmetric E2EE; relay sees only ciphertext |
+| **Authentication** | Ed25519 signatures | Compact, fast, embedded in ciphertext |
+| **Bundle Protocol** | BPv7 (RFC 9171) — DM-BP7-1 profile | DTN standard; store-and-forward semantics |
+| **Serialization** | Deterministic CBOR (RFC 8949) | Compact binary; canonical form for signature coverage |
+| **Schema** | CDDL | Machine-verifiable protocol schema |
+| **Routing** | Binary Spray-and-Wait + Direct Delivery | Proven DTN algorithm with copy-token escrow |
+| **Storage** | SQLite — Rust-owned | Persistent across restarts; encrypted master key |
+| **Key Storage** | Android Keystore AES-256 | DB master key never leaves secure enclave |
+
+---
+
+## Message Types
+
+| Type | Priority | TTL | Copy Tokens | Max Payload |
+|---|---|---|---|---|
+| `PRIVATE_SOS` | **P0** | 24 h | 12 | 7,800 bytes |
+| `DELIVERY_RECEIPT` | **P0** | 7 d | — | — |
+| `CANCEL` | **P0** | 7 d | — | — |
+| `CHECK_IN` | P1 | 48 h | 8 | 7,800 bytes |
+| `LOCATION_UPDATE` | P1 | 24 h | 6 | — |
+| `DIRECT_TEXT` | P2 | 72 h | 6 | 7,800 bytes |
+
+> P0 messages are always scheduled before P1, P1 before P2. The relay queue enforces this at every BLE transfer opportunity.
+
+---
+
+## Project Structure
+
+```
+disaster-mesh/
+│
+├── docs/                          # 17 technical specification documents
+│   ├── adr/                       # 8 locked Architectural Decision Records
+│   │   ├── ADR-001-android-first.md
+│   │   ├── ADR-002-rust-owns-protocol-db.md
+│   │   ├── ADR-003-bpv7-profile.md
+│   │   ├── ADR-004-message-security.md
+│   │   ├── ADR-005-ble-gatt.md
+│   │   ├── ADR-006-spray-and-wait.md
+│   │   ├── ADR-007-token-grant-escrow.md
+│   │   └── ADR-008-endpoint-only-control.md
+│   ├── 00-product-requirements.md
+│   ├── 01-system-architecture.md
+│   ├── 02-domain-model.md
+│   ├── 03-protocol-dme-v1.md
+│   ├── 04-protocol-ble-cla-v1.md
+│   ├── 05-routing-and-queue.md
+│   ├── 06-security-and-threat-model.md
+│   ├── 07-storage-schema.md
+│   ├── 08-rust-core-contract.md
+│   ├── 09-android-implementation.md
+│   ├── 10-state-machines.md
+│   ├── 11-testing-and-acceptance.md
+│   ├── 12-release-and-operations.md
+│   ├── 13-development-goals.md
+│   ├── 14-known-limitations.md
+│   ├── 15-references.md
+│   ├── 16-design-review-v1.0.1.md
+│   └── index.html                 # Landing page (GitHub Pages)
+│
+├── spec/                          # CDDL schema definitions
+│   ├── dme-v1.cddl                # Disaster Message Envelope
+│   ├── ble-control-v1.cddl        # BLE control frames
+│   ├── contact-card-v1.cddl       # QR contact exchange
+│   └── disaster-routing-block-v1.cddl
+│
+├── schemas/
+│   └── sqlite_v1.sql              # Initial SQLite schema (19 tables)
+│
+├── contracts/                     # Platform-agnostic interface stubs
+│   ├── protocol_constants.toml    # BLE UUIDs, timeouts, TTLs, limits
+│   ├── rust_facade.rs             # Rust engine API sketch
+│   └── android_interfaces.kt      # Kotlin coordinator/adapter interfaces
+│
+├── prompts/                       # Implementation goal prompts
+│   ├── goal-00-bootstrap.md
+│   ├── goal-01-protocol-core.md
+│   ├── goal-02-security.md
+│   ├── goal-03-android-direct-ble.md
+│   ├── goal-04-multihop.md
+│   ├── goal-05-disaster-product.md
+│   └── goal-06-hardening.md
+│
+├── test-vectors/                  # Cryptographic test vector specs
+├── assets/
+│   └── banner.svg                 # Project banner image
+├── IMPLEMENTATION_CHECKLIST.md
+├── LICENSE                        # Apache 2.0
+└── README.md
 ```
 
-## Definition of Ready
+---
 
-기능 구현 티켓은 다음 조건을 충족해야 시작할 수 있다.
+## Documentation
 
-- 관련 요구사항 ID가 있다.
-- 입력·출력·오류가 정의되어 있다.
-- 저장소 변경과 마이그레이션 여부가 정해져 있다.
-- 로그에 남겨도 되는 값과 금지 값이 정해져 있다.
-- 단위 테스트와 실기기 완료 조건이 있다.
-- 배터리·권한·백그라운드 영향이 검토되었다.
+| # | Document | Description |
+|---|---|---|
+| 00 | [Product Requirements](docs/00-product-requirements.md) | 18 FR + 12 NFR with acceptance criteria |
+| 01 | [System Architecture](docs/01-system-architecture.md) | Module boundaries, Rust/Android separation |
+| 02 | [Domain Model](docs/02-domain-model.md) | IDs, entities, aggregates, invariants |
+| 03 | [Protocol: DME v1](docs/03-protocol-dme-v1.md) | BPv7 profile, DME envelope, HPKE, Ed25519 |
+| 04 | [Protocol: BLE CLA v1](docs/04-protocol-ble-cla-v1.md) | GATT UUIDs, frames, Noise handshake |
+| 05 | [Routing & Queue](docs/05-routing-and-queue.md) | Spray-and-Wait, token escrow, TTL/hop rules |
+| 06 | [Security & Threat Model](docs/06-security-and-threat-model.md) | Threats, mitigations, key management, release gates |
+| 07 | [Storage Schema](docs/07-storage-schema.md) | 19-table SQLite schema, transactions, encryption |
+| 08 | [Rust Core Contract](docs/08-rust-core-contract.md) | FFI API signatures, engine commands, event model |
+| 09 | [Android Implementation](docs/09-android-implementation.md) | Manifest, BLE permissions, module structure |
+| 10 | [State Machines](docs/10-state-machines.md) | Service, link, transfer, message lifecycle FSMs |
+| 11 | [Testing & Acceptance](docs/11-testing-and-acceptance.md) | Unit, integration, real-device, security test matrix |
+| 12 | [Release & Operations](docs/12-release-and-operations.md) | CI gates, field relay setup, incident response |
+| 13 | [Development Goals](docs/13-development-goals.md) | 7-phase implementation plan with completion criteria |
+| 14 | [Known Limitations](docs/14-known-limitations.md) | 13 public limitations and forbidden marketing claims |
+| 15 | [References](docs/15-references.md) | Verified primary sources for all standards cited |
+| 16 | [Design Review v1.0.1](docs/16-design-review-v1.0.1.md) | Multi-agent adversarial review — zero start-blockers |
 
-## Definition of Done
+---
 
-- happy path와 실패 경로 테스트가 통과한다.
-- 프로토콜 변경이면 CDDL, 테스트 벡터, 버전 정책이 함께 갱신된다.
-- DB 변경이면 migration 및 downgrade 거부 테스트가 있다.
-- 메시지 본문·정확한 위치·개인키가 로그에 남지 않는다.
-- Android lint, Rust fmt/clippy/test, cargo deny/audit가 통과한다.
-- 실기기 BLE 검증이 필요한 기능은 에뮬레이터 테스트만으로 완료 처리하지 않는다.
+## Implementation Roadmap
 
-## 중요한 제품 문구
+| Goal | Focus | Key Completion Test |
+|---|---|---|
+| **Goal 0** | Rust workspace · Android modules · CI · no logic | `cargo test` passes; instrumentation test invokes Rust facade |
+| **Goal 1** | Types · CBOR codec · routing · 100-node simulator | A→B→C simulated delivery; token conservation verified |
+| **Goal 2** | Identity · HPKE · Ed25519 · QR contact · test vectors | Golden cryptographic test vectors pass |
+| **Goal 3** | Direct BLE transfer · GATT · Noise handshake | Two physical Android devices exchange E2EE message |
+| **Goal 4** | Multi-hop relay · token escrow · ACK recovery · receipts | 50× A→B→C cycles; B cannot decrypt payload |
+| **Goal 5** | Check-in/SOS UX · battery · foreground service · relay mode | 8h battery report; process kill recovery; thermal test |
+| **Goal 6** | Fuzz targets · SBOM · external audit · beta packaging | External review clearance; Play Store / F-Droid ready |
 
-> 이 앱은 재난 상황에서 주변 기기를 이용해 메시지 전달 가능성을 높이는 보조 수단입니다. 주변 중계 경로가 없거나 기기가 꺼져 있으면 메시지가 전달되지 않을 수 있으며, 구조 요청의 접수와 대응을 보장하지 않습니다.
+**Current status:** Design review complete (v1.0.1) — zero start-blockers. Goal 0 is next.
 
-## 라이선스
+---
 
-이 프로젝트는 [Apache License 2.0](LICENSE) 하에 배포되는 오픈소스다.
+## Architectural Decisions
+
+Eight locked ADRs define the constraints that everything else is built around:
+
+| ADR | Decision | Rationale |
+|---|---|---|
+| [ADR-001](docs/adr/ADR-001-android-first.md) | Android first; iOS/Linux relay in v1.1 | Maximize initial reach on single platform |
+| [ADR-002](docs/adr/ADR-002-rust-owns-protocol-db.md) | Rust core owns protocol, crypto, and SQLite | Single source of truth; no Kotlin/Rust drift |
+| [ADR-003](docs/adr/ADR-003-bpv7-profile.md) | BPv7 constrained profile; private block type 192 | DTN standard; interoperability foundation |
+| [ADR-004](docs/adr/ADR-004-message-security.md) | HPKE Base + Ed25519; no Double Ratchet in v1 | Simplicity + external audit feasibility |
+| [ADR-005](docs/adr/ADR-005-ble-gatt.md) | BLE GATT exclusively; no TCP/UDP fallback | Zero INTERNET permission; minimal attack surface |
+| [ADR-006](docs/adr/ADR-006-spray-and-wait.md) | Binary Spray-and-Wait with copy tokens | Proven DTN algorithm; bounded resource use |
+| [ADR-007](docs/adr/ADR-007-token-grant-escrow.md) | Persistent token grant escrow | Prevents token inflation after ACK loss |
+| [ADR-008](docs/adr/ADR-008-endpoint-only-control.md) | Only sender can revoke; relays ignore cancel targets | Prevents relay-level censorship of messages |
+
+---
+
+## Security Notes
+
+> **This app is a delivery probability aid, not a guaranteed emergency communication system.**
+
+- Messages may not arrive if no relay path exists or all devices are off
+- Forward secrecy is **not** provided in v1.0 (HPKE single-shot; not ratcheting)
+- Metadata is not anonymous — message size, priority, and timestamps are visible to relays
+- GPS requires clear sky and a recent fix; indoors it may be unavailable
+- Cancellation does not guarantee removal from already-relayed copies
+
+The design passed an internal multi-agent adversarial review (v1.0.1) with zero start-blockers. **External cryptographic and protocol audit is required before any production deployment.** See [`docs/06-security-and-threat-model.md`](docs/06-security-and-threat-model.md) and [`docs/14-known-limitations.md`](docs/14-known-limitations.md).
+
+**Forbidden marketing claims:** "guaranteed delivery", "real-time without networks", "completely anonymous", "unhackable", "official emergency response", "equal to Signal", "zero battery impact".
+
+---
+
+## Contributing
+
+This project is in the design phase. All protocol changes require:
+
+- Updated CDDL schema in `spec/`
+- Updated test vectors in `test-vectors/`
+- ADR amendment or new ADR if the decision is architectural
+- Updated `IMPLEMENTATION_CHECKLIST.md` completion gates
+
+See [`docs/13-development-goals.md`](docs/13-development-goals.md) for the full implementation guide.
+
+1. Fork the repository
+2. Review the [specification](docs/) and [implementation checklist](IMPLEMENTATION_CHECKLIST.md)
+3. Pick a goal from [`docs/13-development-goals.md`](docs/13-development-goals.md)
+4. Open a pull request referencing the relevant requirement IDs
+
+---
+
+## License
 
 Copyright 2026 The DisasterMesh Authors
 
-설계는 아직 외부 crypto/protocol 리뷰 전이다(`docs/14-known-limitations.md`,
-`docs/06-security-and-threat-model.md`의 출시 게이트 참고). 안정 1.0 이전에는
-프로토콜·보안 속성이 변경될 수 있다.
+Licensed under the [Apache License 2.0](LICENSE).
+
+> Protocol and security properties may change before stable v1.0. See [`docs/14-known-limitations.md`](docs/14-known-limitations.md) for the complete list of limitations and [`docs/06-security-and-threat-model.md`](docs/06-security-and-threat-model.md) for the full release gate requirements.
+
+---
+
+<div align="center">
+<sub>
+BLE Service UUID: <code>6f1d0001-8f6b-4d5b-9c61-57c43d4d4d31</code> &nbsp;·&nbsp;
+Android API 26+ &nbsp;·&nbsp; Rust 2024 Edition &nbsp;·&nbsp; Apache 2.0
+</sub>
+</div>

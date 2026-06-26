@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DisasterMesh — Encrypted Offline Emergency Messaging</title>
+  <meta name="description" content="End-to-end encrypted P2P mesh messaging for Android that works when cellular networks, internet, and infrastructure fail."/>
+  <meta property="og:title" content="DisasterMesh"/>
+  <meta property="og:description" content="Encrypted offline emergency messaging. BLE mesh. No internet required."/>
+  <meta property="og:image" content="https://raw.githubusercontent.com/jeiel85/disaster-mesh/main/assets/banner.svg"/>
+  <meta name="theme-color" content="#0d1117"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --bg2:       #161b22;
+      --bg3:       #1c2130;
+      --border:    #21262d;
+      --border2:   #30363d;
+      --text:      #e6edf3;
+      --text2:     #8b949e;
+      --text3:     #484f58;
+      --blue:      #58a6ff;
+      --blue2:     #79c0ff;
+      --green:     #56d364;
+      --red:       #f85149;
+      --orange:    #f78166;
+      --orange2:   #f0883e;
+      --purple:    #bc8cff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── CANVAS BACKGROUND ─── */
+    #mesh-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    /* ─── LAYOUT ─── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(13,17,23,0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      padding: 14px 0;
+    }
+    nav .inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .nav-logo span { background: linear-gradient(90deg, var(--blue), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: navPulse 2s ease-in-out infinite; }
+    @keyframes navPulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-btn {
+      background: var(--blue); color: #0d1117; border: none; padding: 8px 18px;
+      border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-btn:hover { opacity: 0.85; }
+
+    /* ─── HERO ─── */
+    .hero { padding: 140px 0 80px; text-align: center; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.25);
+      border-radius: 100px; padding: 6px 16px; margin-bottom: 32px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue);
+      letter-spacing: 1px;
+    }
+    .hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+    h1 {
+      font-size: clamp(48px, 7vw, 88px);
+      font-weight: 800;
+      letter-spacing: -3px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 40%, var(--green) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 18px; color: var(--text2); max-width: 640px; margin: 0 auto 16px;
+      font-weight: 400; line-height: 1.65;
+    }
+    .hero-sub-ko {
+      font-size: 15px; color: var(--text3); max-width: 640px; margin: 0 auto 40px;
+    }
+
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), #3d8bfd);
+      color: #0d1117; padding: 14px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 700; text-decoration: none;
+      box-shadow: 0 4px 24px rgba(88,166,255,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(88,166,255,0.4); }
+    .btn-secondary {
+      background: transparent; color: var(--text); padding: 14px 28px;
+      border-radius: 10px; font-size: 15px; font-weight: 600;
+      text-decoration: none; border: 1px solid var(--border2);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--blue); background: rgba(88,166,255,0.05); }
+
+    /* Status badges row */
+    .badge-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 5px 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text2);
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* ─── SECTION ─── */
+    section { padding: 80px 0; }
+    .section-label {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      color: var(--text3); letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h2 { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
+    .section-desc { font-size: 16px; color: var(--text2); max-width: 560px; margin-bottom: 48px; }
+
+    /* ─── FEATURES GRID ─── */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .feature-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--card-accent, var(--blue)), transparent);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .feature-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; font-size: 20px; }
+    .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+    .feature-card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+    .feature-tag {
+      display: inline-block; margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      background: rgba(88,166,255,0.08); color: var(--blue); border: 1px solid rgba(88,166,255,0.2);
+      border-radius: 4px; padding: 2px 8px;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0; position: relative; }
+    .steps::before {
+      content: ''; position: absolute; top: 32px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    }
+    .step { padding: 32px 24px; text-align: center; }
+    .step-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--bg2); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700;
+      color: var(--blue); margin: 0 auto 20px; position: relative; z-index: 1;
+      background: var(--bg);
+    }
+    .step h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+    .step p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    /* ─── ARCHITECTURE ─── */
+    .arch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media(max-width:700px){ .arch-grid { grid-template-columns: 1fr; } }
+    .arch-box {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; font-family: 'JetBrains Mono', monospace;
+    }
+    .arch-box h4 { font-size: 12px; color: var(--text3); letter-spacing: 2px; margin-bottom: 16px; }
+    .arch-layer {
+      border-radius: 8px; padding: 12px 16px; margin-bottom: 8px;
+      font-size: 12px; border: 1px solid;
+    }
+    .arch-layer-title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+    .arch-layer-desc { font-size: 11px; opacity: 0.7; }
+    .arch-arrow { text-align: center; color: var(--border2); font-size: 18px; margin: 4px 0; }
+
+    /* ─── TECH STACK ─── */
+    .stack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .stack-item {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px;
+      display: flex; align-items: center; gap: 14px;
+      transition: border-color 0.2s;
+    }
+    .stack-item:hover { border-color: var(--border2); }
+    .stack-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .stack-info { }
+    .stack-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+    .stack-role { font-size: 12px; color: var(--text2); }
+
+    /* ─── MESSAGE TYPES ─── */
+    .msg-table { width: 100%; border-collapse: collapse; }
+    .msg-table th {
+      text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 600;
+      color: var(--text3); font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;
+      border-bottom: 1px solid var(--border); background: var(--bg2);
+    }
+    .msg-table th:first-child { border-radius: 8px 0 0 0; }
+    .msg-table th:last-child { border-radius: 0 8px 0 0; }
+    .msg-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .msg-table tr:last-child td { border-bottom: none; }
+    .msg-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .priority-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    }
+
+    /* ─── DOCS ─── */
+    .docs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .doc-link {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; text-decoration: none;
+      color: var(--text); transition: border-color 0.2s, background 0.2s;
+    }
+    .doc-link:hover { border-color: var(--blue); background: rgba(88,166,255,0.04); }
+    .doc-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); flex-shrink: 0; margin-top: 2px; }
+    .doc-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .doc-desc { font-size: 12px; color: var(--text2); }
+
+    /* ─── ROADMAP ─── */
+    .roadmap { display: flex; flex-direction: column; gap: 12px; }
+    .roadmap-item {
+      display: flex; align-items: flex-start; gap: 20px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 24px;
+    }
+    .roadmap-num {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+      color: var(--text3); min-width: 52px; padding-top: 2px;
+    }
+    .roadmap-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .roadmap-info p { font-size: 13px; color: var(--text2); }
+    .roadmap-status {
+      margin-left: auto; flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      padding: 3px 10px; border-radius: 100px;
+    }
+
+    /* ─── CTA ─── */
+    .cta {
+      text-align: center; padding: 100px 0 80px;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(88,166,255,0.06), transparent);
+      border-top: 1px solid var(--border);
+    }
+    .cta h2 { font-size: 40px; margin-bottom: 16px; }
+    .cta p { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
+    .cta-disclaimer {
+      font-size: 12px; color: var(--text3); max-width: 560px; margin: 32px auto 0;
+      line-height: 1.7; border: 1px solid var(--border); border-radius: 8px; padding: 16px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border); padding: 36px 0;
+      text-align: center; color: var(--text3); font-size: 13px;
+    }
+    footer a { color: var(--text2); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ─── UTILS ─── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+    .text-blue  { color: var(--blue); }
+    .text-green { color: var(--green); }
+    .text-red   { color: var(--red); }
+    .text-orange{ color: var(--orange2); }
+    .text-purple{ color: var(--purple); }
+
+    @media(max-width:640px){
+      h1 { letter-spacing: -2px; }
+      .nav-links { display: none; }
+      .steps::before { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="mesh-canvas"></canvas>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-dot"></div>
+      <span>DisasterMesh</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#docs">Docs</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+    <a href="https://github.com/jeiel85/disaster-mesh" class="nav-btn">GitHub</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      DESIGN COMPLETE · v1.0.1 · GOAL 0 READY
+    </div>
+    <h1>DisasterMesh</h1>
+    <p class="hero-sub">
+      End-to-end encrypted peer-to-peer emergency messaging.
+      Works when cellular networks, internet, and all infrastructure fail.
+      Bluetooth only. No server. No compromise.
+    </p>
+    <p class="hero-sub-ko">
+      재난 상황에서 기지국·인터넷·공유기 없이, 주변 스마트폰과 고정 릴레이만으로
+      종단간 암호화 재난 메시지를 저장·운반·전달하는 Android 오픈소스 시스템
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/jeiel85/disaster-mesh" class="btn-primary">View on GitHub</a>
+      <a href="https://github.com/jeiel85/disaster-mesh/tree/main/docs" class="btn-secondary">Read the Spec</a>
+    </div>
+    <div class="badge-row">
+      <span class="badge"><span class="badge-dot" style="background:var(--blue)"></span>Android 8.0+</span>
+      <span class="badge"><span class="badge-dot" style="background:var(--orange2)"></span>Rust 2024</span>
+      <span class="badge"><span class="badge-dot" style="background:var(--green)"></span>Apache 2.0</span>
+      <span class="badge"><span class="badge-dot" style="background:var(--purple)"></span>HPKE + Ed25519</span>
+      <span class="badge"><span class="badge-dot" style="background:var(--blue2)"></span>BLE GATT Only</span>
+      <span class="badge"><span class="badge-dot" style="background:var(--red)"></span>No Internet Required</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHY ─── -->
+<section id="features">
+  <div class="container">
+    <p class="section-label">Why DisasterMesh</p>
+    <h2>When everything else fails, <span class="text-blue">mesh works</span></h2>
+    <p class="section-desc">
+      Earthquakes, floods, hurricanes, and power outages take down cellular infrastructure right when people need to communicate most.
+    </p>
+
+    <div class="features-grid">
+
+      <div class="feature-card" style="--card-accent: var(--blue)">
+        <div class="feature-icon" style="background:rgba(88,166,255,0.1)">📡</div>
+        <h3>BLE Mesh Network</h3>
+        <p>Devices form a peer-to-peer network via Bluetooth Low Energy. Messages hop through nearby devices with no central infrastructure.</p>
+        <span class="feature-tag">BLE GATT · Noise_XX · GATT Server</span>
+      </div>
+
+      <div class="feature-card" style="--card-accent: var(--green)">
+        <div class="feature-icon" style="background:rgba(86,211,100,0.1)">🔒</div>
+        <h3>End-to-End Encrypted</h3>
+        <p>HPKE Base (X25519/HKDF-SHA256/ChaCha20Poly1305) with Ed25519 signatures. Relay nodes forward ciphertext they cannot read.</p>
+        <span class="feature-tag" style="color:var(--green);border-color:rgba(86,211,100,0.2);background:rgba(86,211,100,0.08)">RFC 9180 HPKE · Ed25519</span>
+      </div>
+
+      <div class="feature-card" style="--card-accent: var(--red)">
+        <div class="feature-icon" style="background:rgba(248,81,73,0.1)">🆘</div>
+        <h3>SOS Priority Routing</h3>
+        <p>PRIVATE_SOS messages receive P0 priority, 12-copy tokens, and 16-hop limits. Emergency requests get maximum delivery effort.</p>
+        <span class="feature-tag" style="color:var(--red);border-color:rgba(248,81,73,0.2);background:rgba(248,81,73,0.08)">P0 Priority · 24h TTL</span>
+      </div>
+
+      <div class="feature-card" style="--card-accent: var(--orange2)">
+        <div class="feature-icon" style="background:rgba(240,136,62,0.1)">↗</div>
+        <h3>Multi-hop Relay</h3>
+        <p>Binary Spray-and-Wait distributes copy tokens across the network. Messages travel through up to 12–16 hops to reach their destination.</p>
+        <span class="feature-tag" style="color:var(--orange2);border-color:rgba(240,136,62,0.2);background:rgba(240,136,62,0.08)">Spray-and-Wait · Token Escrow</span>
+      </div>
+
+      <div class="feature-card" style="--card-accent: var(--blue2)">
+        <div class="feature-icon" style="background:rgba(121,192,255,0.1)">💾</div>
+        <h3>Store and Forward</h3>
+        <p>Persistent SQLite storage survives process kills. Messages are held and forwarded when devices come into BLE range later.</p>
+        <span class="feature-tag" style="color:var(--blue2);border-color:rgba(121,192,255,0.2);background:rgba(121,192,255,0.08)">SQLite · Android Keystore</span>
+      </div>
+
+      <div class="feature-card" style="--card-accent: var(--purple)">
+        <div class="feature-icon" style="background:rgba(188,140,255,0.1)">🛡</div>
+        <h3>Zero INTERNET Permission</h3>
+        <p>Release builds declare no INTERNET permission. The attack surface is minimized to BLE only — no TCP, no UDP, no Wi-Fi.</p>
+        <span class="feature-tag" style="color:var(--purple);border-color:rgba(188,140,255,0.2);background:rgba(188,140,255,0.08)">BLE-only · Minimal permissions</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <p class="section-label" style="text-align:center">How It Works</p>
+    <h2 style="text-align:center;margin-bottom:48px">Message flows without the internet</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Contact Exchange</h3>
+        <p>Users exchange contact cards via QR code in person. Ed25519 public keys enable mutual verification and trusted messaging.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Encrypt Locally</h3>
+        <p>The Rust core encrypts each message with the recipient's HPKE public key. Only the recipient's private key can decrypt it.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>BLE Broadcast</h3>
+        <p>Devices discover each other over BLE. The Noise_XX handshake secures each link. Encrypted bundles are exchanged.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Mesh Relay</h3>
+        <p>Relay nodes carry ciphertext without reading it. Binary Spray-and-Wait distributes copies across the network.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <h3>Deliver + Receipt</h3>
+        <p>When the bundle reaches the recipient, a signed delivery receipt flows back to the sender through the same mesh.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ARCHITECTURE ─── -->
+<section id="architecture">
+  <div class="container">
+    <p class="section-label">Architecture</p>
+    <h2>Rust core + Kotlin surface</h2>
+    <p class="section-desc">The Rust crate owns all protocol logic, cryptography, routing, and SQLite storage. Kotlin handles Android platform APIs and UI.</p>
+
+    <div class="arch-grid">
+      <div class="arch-box">
+        <h4>LAYER STACK</h4>
+
+        <div class="arch-layer" style="border-color:rgba(88,166,255,0.3);background:rgba(88,166,255,0.05)">
+          <div class="arch-layer-title text-blue">Android · Kotlin</div>
+          <div class="arch-layer-desc">Jetpack Compose · BLE GATT Central/Peripheral · Foreground Service · Android Keystore</div>
+        </div>
+
+        <div class="arch-arrow">⬍ UniFFI FFI</div>
+
+        <div class="arch-layer" style="border-color:rgba(86,211,100,0.3);background:rgba(86,211,100,0.05)">
+          <div class="arch-layer-title text-green">Rust Core (2024 Edition)</div>
+          <div class="arch-layer-desc">mesh-types · mesh-codec · mesh-crypto · mesh-bundle · mesh-routing · mesh-store · mesh-engine · mesh-ffi</div>
+        </div>
+
+        <div class="arch-arrow">⬍ Direct calls</div>
+
+        <div class="arch-layer" style="border-color:var(--border);background:rgba(255,255,255,0.02)">
+          <div class="arch-layer-title" style="color:var(--text2)">SQLite + Android Keystore</div>
+          <div class="arch-layer-desc">DB master key in Keystore · All data encrypted at rest · No plaintext in relay store</div>
+        </div>
+      </div>
+
+      <div class="arch-box">
+        <h4>PROTOCOL STACK</h4>
+
+        <div class="arch-layer" style="border-color:rgba(121,192,255,0.3);background:rgba(121,192,255,0.05)">
+          <div class="arch-layer-title text-blue">Bundle Protocol v7 (RFC 9171)</div>
+          <div class="arch-layer-desc">DM-BP7-1 constrained profile · CBOR (RFC 8949) · CDDL schemas</div>
+        </div>
+
+        <div class="arch-layer" style="border-color:rgba(188,140,255,0.3);background:rgba(188,140,255,0.05)">
+          <div class="arch-layer-title text-purple">Message Security</div>
+          <div class="arch-layer-desc">HPKE Base: X25519/HKDF-SHA256/ChaCha20Poly1305 · Ed25519 signatures</div>
+        </div>
+
+        <div class="arch-layer" style="border-color:rgba(88,166,255,0.3);background:rgba(88,166,255,0.05)">
+          <div class="arch-layer-title text-blue">BLE Transport</div>
+          <div class="arch-layer-desc">Noise_XX_25519_ChaChaPoly_BLAKE2s · GATT Server · Frame segmentation · MTU 512</div>
+        </div>
+
+        <div class="arch-layer" style="border-color:rgba(240,136,62,0.3);background:rgba(240,136,62,0.05)">
+          <div class="arch-layer-title text-orange">Routing</div>
+          <div class="arch-layer-desc">Direct Delivery + Binary Spray-and-Wait · Token grant escrow · P0–P2 priority queue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TECH STACK ─── -->
+<section style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <p class="section-label">Tech Stack</p>
+    <h2>Built on proven standards</h2>
+    <div class="stack-grid" style="margin-top:40px">
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(240,136,62,0.1)">🦀</div>
+        <div class="stack-info">
+          <div class="stack-name text-orange">Rust 2024</div>
+          <div class="stack-role">Protocol core, crypto, routing, storage</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(188,140,255,0.1)">🤖</div>
+        <div class="stack-info">
+          <div class="stack-name text-purple">Kotlin + Compose</div>
+          <div class="stack-role">Android UI, BLE adapter, service</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(88,166,255,0.1)">📶</div>
+        <div class="stack-info">
+          <div class="stack-name text-blue">BLE GATT</div>
+          <div class="stack-role">Sole transport; Central + Peripheral</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(86,211,100,0.1)">🔐</div>
+        <div class="stack-info">
+          <div class="stack-name text-green">HPKE + Ed25519</div>
+          <div class="stack-role">RFC 9180 end-to-end encryption</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(121,192,255,0.1)">📦</div>
+        <div class="stack-info">
+          <div class="stack-name text-blue">Bundle Protocol v7</div>
+          <div class="stack-role">RFC 9171 · DM-BP7-1 profile</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(240,136,62,0.1)">🔗</div>
+        <div class="stack-info">
+          <div class="stack-name text-orange">UniFFI</div>
+          <div class="stack-role">Rust ↔ Kotlin FFI binding</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(188,140,255,0.1)">🗃</div>
+        <div class="stack-info">
+          <div class="stack-name text-purple">SQLite + Keystore</div>
+          <div class="stack-role">Encrypted persistent store</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(86,211,100,0.1)">🔇</div>
+        <div class="stack-info">
+          <div class="stack-name text-green">Noise Protocol</div>
+          <div class="stack-role">Noise_XX BLE link security</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MESSAGE TYPES ─── -->
+<section>
+  <div class="container">
+    <p class="section-label">Message Types</p>
+    <h2>Six message types, four priorities</h2>
+    <div style="overflow-x:auto; border:1px solid var(--border); border-radius:12px; margin-top:40px">
+      <table class="msg-table">
+        <thead>
+          <tr>
+            <th>TYPE</th>
+            <th>PRIORITY</th>
+            <th>TTL</th>
+            <th>COPY TOKENS</th>
+            <th>USE CASE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span style="font-family:monospace;font-size:12px;color:var(--red)">PRIVATE_SOS</span></td>
+            <td><span class="priority-badge" style="background:rgba(248,81,73,0.12);color:var(--red);border:1px solid rgba(248,81,73,0.3)">P0</span></td>
+            <td style="color:var(--text2)">24 hours</td>
+            <td style="color:var(--text2)">12</td>
+            <td style="color:var(--text2)">Emergency rescue request with category, description, location</td>
+          </tr>
+          <tr>
+            <td><span style="font-family:monospace;font-size:12px;color:var(--red)">DELIVERY_RECEIPT</span></td>
+            <td><span class="priority-badge" style="background:rgba(248,81,73,0.12);color:var(--red);border:1px solid rgba(248,81,73,0.3)">P0</span></td>
+            <td style="color:var(--text2)">7 days</td>
+            <td style="color:var(--text2)">—</td>
+            <td style="color:var(--text2)">Signed confirmation returned to original sender</td>
+          </tr>
+          <tr>
+            <td><span style="font-family:monospace;font-size:12px;color:var(--red)">CANCEL</span></td>
+            <td><span class="priority-badge" style="background:rgba(248,81,73,0.12);color:var(--red);border:1px solid rgba(248,81,73,0.3)">P0</span></td>
+            <td style="color:var(--text2)">7 days</td>
+            <td style="color:var(--text2)">—</td>
+            <td style="color:var(--text2)">Sender-only message revocation</td>
+          </tr>
+          <tr>
+            <td><span style="font-family:monospace;font-size:12px;color:var(--orange)">CHECK_IN</span></td>
+            <td><span class="priority-badge" style="background:rgba(247,129,102,0.1);color:var(--orange);border:1px solid rgba(247,129,102,0.3)">P1</span></td>
+            <td style="color:var(--text2)">48 hours</td>
+            <td style="color:var(--text2)">8</td>
+            <td style="color:var(--text2)">Safety status: SAFE / INJURED / NEED_ASSISTANCE / EVACUATING</td>
+          </tr>
+          <tr>
+            <td><span style="font-family:monospace;font-size:12px;color:var(--orange)">LOCATION_UPDATE</span></td>
+            <td><span class="priority-badge" style="background:rgba(247,129,102,0.1);color:var(--orange);border:1px solid rgba(247,129,102,0.3)">P1</span></td>
+            <td style="color:var(--text2)">24 hours</td>
+            <td style="color:var(--text2)">6</td>
+            <td style="color:var(--text2)">GPS or manually entered position</td>
+          </tr>
+          <tr>
+            <td><span style="font-family:monospace;font-size:12px;color:var(--blue)">DIRECT_TEXT</span></td>
+            <td><span class="priority-badge" style="background:rgba(88,166,255,0.1);color:var(--blue);border:1px solid rgba(88,166,255,0.3)">P2</span></td>
+            <td style="color:var(--text2)">72 hours</td>
+            <td style="color:var(--text2)">6</td>
+            <td style="color:var(--text2)">Personal text message, up to 2,000 Unicode scalars</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DOCS ─── -->
+<section id="docs" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container">
+    <p class="section-label">Specification</p>
+    <h2>17 technical documents, production-grade</h2>
+    <p class="section-desc">Complete specification ready for implementation — protocol fields, type lengths, GATT UUIDs, state machines, test cases, and release gates.</p>
+
+    <div class="docs-grid">
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/00-product-requirements.md" class="doc-link">
+        <span class="doc-num">00</span>
+        <div><div class="doc-title">Product Requirements</div><div class="doc-desc">18 functional + 12 non-functional requirements with acceptance criteria</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/01-system-architecture.md" class="doc-link">
+        <span class="doc-num">01</span>
+        <div><div class="doc-title">System Architecture</div><div class="doc-desc">Module boundaries, Rust/Android separation of concerns</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/02-domain-model.md" class="doc-link">
+        <span class="doc-num">02</span>
+        <div><div class="doc-title">Domain Model</div><div class="doc-desc">IDs, value objects, entities, aggregates, invariants</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/03-protocol-dme-v1.md" class="doc-link">
+        <span class="doc-num">03</span>
+        <div><div class="doc-title">Protocol: DME v1</div><div class="doc-desc">BPv7 profile, DME envelope, HPKE AAD, Ed25519</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/04-protocol-ble-cla-v1.md" class="doc-link">
+        <span class="doc-num">04</span>
+        <div><div class="doc-title">Protocol: BLE CLA v1</div><div class="doc-desc">GATT UUIDs, frames, Noise handshake, timeouts</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/05-routing-and-queue.md" class="doc-link">
+        <span class="doc-num">05</span>
+        <div><div class="doc-title">Routing &amp; Queue</div><div class="doc-desc">Spray-and-Wait, token escrow, priority queue, TTL rules</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/06-security-and-threat-model.md" class="doc-link">
+        <span class="doc-num">06</span>
+        <div><div class="doc-title">Security &amp; Threat Model</div><div class="doc-desc">Key wrapping, threat enumeration, mitigations, gates</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/07-storage-schema.md" class="doc-link">
+        <span class="doc-num">07</span>
+        <div><div class="doc-title">Storage Schema</div><div class="doc-desc">DB tables, indexes, transactions, encryption boundaries</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/11-testing-and-acceptance.md" class="doc-link">
+        <span class="doc-num">11</span>
+        <div><div class="doc-title">Testing &amp; Acceptance</div><div class="doc-desc">Unit, integration, real-device, and security test matrix</div></div>
+      </a>
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/16-design-review-v1.0.1.md" class="doc-link">
+        <span class="doc-num">16</span>
+        <div><div class="doc-title">Design Review v1.0.1</div><div class="doc-desc">Multi-agent adversarial review — zero start-blockers found</div></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ROADMAP ─── -->
+<section id="roadmap">
+  <div class="container">
+    <p class="section-label">Implementation Roadmap</p>
+    <h2>Seven goals to production</h2>
+    <p class="section-desc">Design review is complete. Implementation begins at Goal 0.</p>
+    <div class="roadmap" style="margin-top:40px">
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 0</div>
+        <div class="roadmap-info">
+          <h4>Repository Bootstrap</h4>
+          <p>Rust workspace, Android multi-module project, CI pipeline, UniFFI skeleton. No protocol logic yet.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(88,166,255,0.12);color:var(--blue);border:1px solid rgba(88,166,255,0.3)">NEXT</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 1</div>
+        <div class="roadmap-info">
+          <h4>Protocol Core + Simulator</h4>
+          <p>Types, CBOR codec, BPv7 bundle, routing state machine, 100-node network simulator.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(48,54,61,0.5);color:var(--text3);border:1px solid var(--border)">PENDING</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 2</div>
+        <div class="roadmap-info">
+          <h4>Identity, Crypto &amp; Test Vectors</h4>
+          <p>Ed25519 identity, HPKE encryption, contact QR, golden cryptographic test vectors.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(48,54,61,0.5);color:var(--text3);border:1px solid var(--border)">PENDING</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 3</div>
+        <div class="roadmap-info">
+          <h4>Android Direct BLE Transfer</h4>
+          <p>Real Bluetooth — two Android devices exchange an end-to-end encrypted message over BLE GATT.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(48,54,61,0.5);color:var(--text3);border:1px solid var(--border)">PENDING</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 4</div>
+        <div class="roadmap-info">
+          <h4>Multi-hop Relay + Receipts</h4>
+          <p>A→B→C relay with B unable to decrypt, token escrow, delivery receipts returning to sender.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(48,54,61,0.5);color:var(--text3);border:1px solid var(--border)">PENDING</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 5</div>
+        <div class="roadmap-info">
+          <h4>Disaster UX + Persistent Relay</h4>
+          <p>Check-in/SOS UI, foreground service, relay mode, battery optimization, process kill recovery.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(48,54,61,0.5);color:var(--text3);border:1px solid var(--border)">PENDING</div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">GOAL 6</div>
+        <div class="roadmap-info">
+          <h4>Hardening &amp; Beta</h4>
+          <p>Fuzz targets, SBOM, external crypto audit, Play Store / F-Droid readiness.</p>
+        </div>
+        <div class="roadmap-status" style="background:rgba(48,54,61,0.5);color:var(--text3);border:1px solid var(--border)">PENDING</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="cta">
+  <div class="container">
+    <h2>Build the mesh that <span class="text-blue">saves lives</span></h2>
+    <p>DisasterMesh is open source. Contributions, reviews, and forks welcome.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/jeiel85/disaster-mesh" class="btn-primary">Star on GitHub</a>
+      <a href="https://github.com/jeiel85/disaster-mesh/issues" class="btn-secondary">Open an Issue</a>
+    </div>
+    <div class="cta-disclaimer">
+      <strong>Important:</strong> This app improves message delivery probability in disaster scenarios — it does not guarantee delivery.
+      If no relay path exists or devices are off, messages may not arrive.
+      This is not a substitute for official emergency response systems.
+      The design has not yet undergone external cryptographic audit.
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom:12px">
+      <a href="https://github.com/jeiel85/disaster-mesh">DisasterMesh</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/LICENSE">Apache 2.0</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/jeiel85/disaster-mesh/tree/main/docs">Specification</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/jeiel85/disaster-mesh/blob/main/docs/14-known-limitations.md">Known Limitations</a>
+    </p>
+    <p>Copyright 2026 The DisasterMesh Authors · Design Baseline v1.0.1</p>
+  </div>
+</footer>
+
+<script>
+// ─── ANIMATED MESH CANVAS BACKGROUND ───
+const canvas = document.getElementById('mesh-canvas');
+const ctx = canvas.getContext('2d');
+
+let nodes = [], W, H, animId;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initNodes() {
+  nodes = [];
+  const count = Math.min(60, Math.floor(W * H / 20000));
+  for (let i = 0; i < count; i++) {
+    const relay = Math.random() < 0.3;
+    nodes.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: relay ? 4 : 2.5,
+      relay,
+      color: relay ? '#58a6ff' : '#56d364',
+    });
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  const maxDist = 200;
+
+  // connections
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < maxDist) {
+        const alpha = (1 - d / maxDist) * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(88,166,255,${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+
+  // nodes
+  for (const n of nodes) {
+    if (n.relay) {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r + 6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(88,166,255,0.06)';
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = n.color;
+    ctx.globalAlpha = n.relay ? 0.85 : 0.6;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // move
+  for (const n of nodes) {
+    n.x += n.vx;
+    n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  }
+
+  animId = requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => { resize(); initNodes(); });
+resize();
+initNodes();
+draw();
+</script>
+
+</body>
+</html>
