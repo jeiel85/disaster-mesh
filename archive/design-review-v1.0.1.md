@@ -4,6 +4,8 @@ Date: 2026-06-25
 
 ## Status
 
+이 문서는 역사적 v1.0.1 review record다. v2.0.0-rc1에서는 당시 “Goal별 후속 처리”로 남겼던 항목을 상용 launch blocker로 승격해 해결했다. 현재 구현 기준은 README의 normative source order를 따른다.
+
 v1.0.1 separated documents, CDDL, contracts, and `schemas/sqlite_v1.sql` are the
 implementation baseline. `FULL_IMPLEMENTATION_DESIGN.md` is a superseded v1.0
 snapshot and must not be used for implementation.

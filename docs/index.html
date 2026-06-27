@@ -339,7 +339,7 @@
       <div class="section-head">
         <p class="kicker">Specification</p>
         <h2>구현을 바로 시작할 수 있는 문서 세트</h2>
-        <p>프로토콜 필드, GATT UUID, 상태 머신, 테스트 매트릭스, 릴리스 게이트까지 포함합니다.</p>
+        <p>프로토콜 필드, GATT UUID, 상태 머신, 테스트 매트릭스, 상용 운영·출시 게이트까지 포함합니다.</p>
       </div>
       <div class="docs-grid">
         <a class="doc-card" href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/00-product-requirements.md"><small>00</small><b>Product Requirements</b><span>요구사항과 수용 기준</span></a>
@@ -347,6 +347,8 @@
         <a class="doc-card" href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/03-protocol-dme-v1.md"><small>03</small><b>DME Protocol v1</b><span>BPv7 profile, envelope</span></a>
         <a class="doc-card" href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/04-protocol-ble-cla-v1.md"><small>04</small><b>BLE CLA v1</b><span>GATT, frames, Noise</span></a>
         <a class="doc-card" href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/11-testing-and-acceptance.md"><small>11</small><b>Testing & Acceptance</b><span>테스트와 릴리스 게이트</span></a>
+        <a class="doc-card" href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/16-design-review-v2.0.0-rc1.md"><small>16</small><b>Commercial Design Review</b><span>v2.0.0-rc1 해결 항목</span></a>
+        <a class="doc-card" href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/22-go-live-checklist.md"><small>22</small><b>Go-Live Checklist</b><span>출시 증거와 승인 서명</span></a>
       </div>
     </div>
   </section>
@@ -359,9 +361,10 @@
       </div>
       <div class="roadmap">
         <article class="roadmap-item"><span class="goal">GOAL 0</span><div><h3>Repository Bootstrap</h3><p>Rust workspace, Android multi-module, CI, UniFFI skeleton.</p></div><span class="badge next">NEXT</span></article>
+        <article class="roadmap-item"><span class="goal">GOAL 0.5</span><div><h3>Normative Contract Freeze</h3><p>Wire, state, schema, command correlation을 구현 전에 고정합니다.</p></div><span class="badge">REQUIRED</span></article>
         <article class="roadmap-item"><span class="goal">GOAL 1</span><div><h3>Protocol Core + Simulator</h3><p>CBOR codec, BPv7 bundle, routing state machine, simulator.</p></div><span class="badge">PENDING</span></article>
         <article class="roadmap-item"><span class="goal">GOAL 2</span><div><h3>Identity, Crypto & Test Vectors</h3><p>Ed25519 identity, HPKE encryption, contact QR, golden vectors.</p></div><span class="badge">PENDING</span></article>
-        <article class="roadmap-item"><span class="goal">GOAL 3–6</span><div><h3>BLE transfer, multi-hop, disaster UX, hardening</h3><p>실기기 전송부터 베타 릴리스 준비까지 단계적으로 검증합니다.</p></div><span class="badge">PLANNED</span></article>
+        <article class="roadmap-item"><span class="goal">GOAL 3–7</span><div><h3>BLE transfer, multi-hop, disaster UX, commercial release</h3><p>실기기 전송부터 상용 출시 증거와 롤백 훈련까지 단계적으로 검증합니다.</p></div><span class="badge">PLANNED</span></article>
       </div>
     </div>
   </section>
@@ -379,7 +382,7 @@
 
 <footer>
   <div class="container">
-    <span>Copyright 2026 The DisasterMesh Authors · Design Baseline v1.0.1</span>
+    <span>Copyright 2026 The DisasterMesh Authors · Commercial Baseline v2.0.0-rc1</span>
     <span><a href="https://github.com/jeiel85/disaster-mesh/blob/master/LICENSE">Apache 2.0</a> · <a href="https://github.com/jeiel85/disaster-mesh/tree/master/docs">Specification</a> · <a href="https://github.com/jeiel85/disaster-mesh/blob/master/docs/14-known-limitations.md">Known Limitations</a></span>
   </div>
 </footer>

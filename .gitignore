@@ -16,7 +16,6 @@ local.properties
 captures/
 .cxx/
 output.json
-release/
 # Keep wrapper; ignore generated keystores and signing secrets.
 *.jks
 *.keystore

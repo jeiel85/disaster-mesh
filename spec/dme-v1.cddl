@@ -113,3 +113,8 @@ dme-ciphertext = [
 ; CHECK_IN/SOS/location/receipt text to obey their documented Unicode scalar
 ; limits, PRIVATE_SOS severe-injury-count <= people-count, and body shape to
 ; match message-type.
+
+; Semantic control rules:
+; - DELIVERY_RECEIPT never causes another receipt.
+; - CANCEL may cause one receipt addressed to the cancel sender; that receipt is terminal.
+; - cancel/original ordering is arbitrary and must be handled by pending-controls storage.

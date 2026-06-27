@@ -48,6 +48,7 @@ CREATE TABLE contacts (
     encrypted_display_name BLOB NOT NULL,
     trust_state INTEGER NOT NULL CHECK (trust_state BETWEEN 0 AND 3),
     safety_verified INTEGER NOT NULL CHECK (safety_verified IN (0,1)),
+    capabilities INTEGER NOT NULL DEFAULT 0 CHECK (capabilities BETWEEN 0 AND 31),
     outbound_sender_sequence INTEGER NOT NULL DEFAULT 0 CHECK (outbound_sender_sequence >= 0),
     key_version INTEGER NOT NULL,
     created_at_ms INTEGER NOT NULL,
@@ -59,7 +60,10 @@ CREATE INDEX idx_contacts_routing_slot ON contacts(destination_routing_slot);
 CREATE TABLE contact_replay_state (
     contact_id BLOB PRIMARY KEY NOT NULL REFERENCES contacts(contact_id) ON DELETE CASCADE,
     max_sender_sequence INTEGER NOT NULL DEFAULT 0 CHECK (max_sender_sequence >= 0),
-    updated_at_ms INTEGER NOT NULL
+    window_base_sequence INTEGER NOT NULL DEFAULT 0 CHECK (window_base_sequence >= 0),
+    seen_bitmap BLOB NOT NULL DEFAULT (zeroblob(512)) CHECK (length(seen_bitmap) = 512),
+    updated_at_ms INTEGER NOT NULL,
+    CHECK (window_base_sequence <= max_sender_sequence)
 );
 
 CREATE TABLE contact_replay_window (
@@ -97,11 +101,14 @@ CREATE TABLE local_messages (
     message_type INTEGER NOT NULL CHECK (message_type BETWEEN 1 AND 6),
     send_group_id BLOB REFERENCES send_groups(send_group_id),
     encrypted_body BLOB NOT NULL,
-    delivery_state INTEGER NOT NULL,
+    delivery_state INTEGER NOT NULL CHECK (
+        (direction = 0 AND delivery_state IN (0,1,2,3,4,5,6,9,10)) OR
+        (direction = 1 AND delivery_state IN (7,8,10))
+    ),
     created_at_ms INTEGER NOT NULL,
     received_at_ms INTEGER,
     expires_at_estimate_ms INTEGER NOT NULL,
-    reply_to_message_id BLOB,
+    reply_to_message_id BLOB CHECK (reply_to_message_id IS NULL OR length(reply_to_message_id) = 16),
     cancel_reason INTEGER
 );
 CREATE INDEX idx_messages_conversation_time ON local_messages(conversation_id, created_at_ms DESC);
@@ -125,11 +132,11 @@ CREATE TABLE bundles (
     payload_size INTEGER NOT NULL CHECK (payload_size BETWEEN 1 AND 8192),
     payload_sha256 BLOB NOT NULL CHECK (length(payload_sha256) = 32),
     wire_sha256 BLOB NOT NULL CHECK (length(wire_sha256) = 32),
-    state INTEGER NOT NULL,
+    state INTEGER NOT NULL CHECK (state BETWEEN 0 AND 6),
     origin INTEGER NOT NULL CHECK (origin BETWEEN 0 AND 2),
     created_local_ms INTEGER NOT NULL,
     last_offered_ms INTEGER,
-    ingress_peer_hash BLOB,
+    ingress_peer_hash BLOB CHECK (ingress_peer_hash IS NULL OR length(ingress_peer_hash) = 32),
     failure_count INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX idx_bundles_queue ON bundles(state, priority, created_local_ms);
@@ -146,9 +153,14 @@ CREATE TABLE transfers (
     transfer_id BLOB PRIMARY KEY NOT NULL CHECK (length(transfer_id) = 16),
     packet_id BLOB NOT NULL CHECK (length(packet_id) = 16),
     token_grant_id BLOB CHECK (token_grant_id IS NULL OR length(token_grant_id) = 16),
-    link_id INTEGER NOT NULL,
+    active_link_id INTEGER,
+    peer_link_hash BLOB NOT NULL CHECK (length(peer_link_hash) = 32),
     direction INTEGER NOT NULL CHECK (direction IN (0,1)),
-    state INTEGER NOT NULL,
+    state INTEGER NOT NULL CHECK (state BETWEEN 0 AND 9),
+    protocol_major INTEGER NOT NULL DEFAULT 1 CHECK (protocol_major = 1),
+    protocol_minor INTEGER NOT NULL DEFAULT 0 CHECK (protocol_minor >= 0),
+    expected_wire_sha256 BLOB NOT NULL CHECK (length(expected_wire_sha256) = 32),
+    meta_fingerprint BLOB NOT NULL CHECK (length(meta_fingerprint) = 32),
     total_size INTEGER NOT NULL CHECK (total_size BETWEEN 1 AND 12288),
     chunk_size INTEGER NOT NULL CHECK (chunk_size > 0),
     chunk_count INTEGER NOT NULL CHECK (chunk_count BETWEEN 1 AND 1024),
@@ -157,14 +169,16 @@ CREATE TABLE transfers (
     sender_tokens_after_reservation INTEGER,
     started_elapsed_ms INTEGER NOT NULL,
     updated_elapsed_ms INTEGER NOT NULL,
-    temp_path TEXT
+    resume_expires_at_ms INTEGER NOT NULL,
+    temp_path TEXT,
+    CHECK (received_bitmap IS NULL OR length(received_bitmap) = ((chunk_count + 7) / 8))
 );
 CREATE INDEX idx_transfers_updated ON transfers(updated_elapsed_ms);
 
 CREATE TABLE token_grants (
     grant_id BLOB PRIMARY KEY NOT NULL CHECK (length(grant_id) = 16),
     packet_id BLOB NOT NULL CHECK (length(packet_id) = 16),
-    peer_link_hash BLOB NOT NULL,
+    peer_link_hash BLOB NOT NULL CHECK (length(peer_link_hash) = 32),
     direction INTEGER NOT NULL CHECK (direction IN (0,1)),
     state INTEGER NOT NULL CHECK (state BETWEEN 0 AND 3),
     token_count INTEGER NOT NULL CHECK (token_count BETWEEN 1 AND 16),
@@ -172,6 +186,16 @@ CREATE TABLE token_grants (
     created_at_ms INTEGER NOT NULL,
     updated_at_ms INTEGER NOT NULL,
     retain_until_ms INTEGER NOT NULL,
+    committed_payload_sha256 BLOB CHECK (committed_payload_sha256 IS NULL OR length(committed_payload_sha256) = 32),
+    committed_wire_sha256 BLOB CHECK (committed_wire_sha256 IS NULL OR length(committed_wire_sha256) = 32),
+    accepted_tokens INTEGER CHECK (accepted_tokens IS NULL OR accepted_tokens BETWEEN 1 AND 16),
+    committed_at_ms INTEGER,
+    CHECK (state <> 2 OR (
+        committed_payload_sha256 IS NOT NULL AND
+        committed_wire_sha256 IS NOT NULL AND
+        accepted_tokens IS NOT NULL AND
+        committed_at_ms IS NOT NULL
+    )),
     UNIQUE(packet_id, grant_id, direction)
 );
 CREATE INDEX idx_token_grants_packet_state
@@ -181,10 +205,30 @@ CREATE INDEX idx_token_grants_peer_state
 
 CREATE TABLE receipts (
     original_packet_id BLOB PRIMARY KEY NOT NULL CHECK (length(original_packet_id) = 16),
+    original_message_id BLOB NOT NULL CHECK (length(original_message_id) = 16),
     receipt_packet_id BLOB NOT NULL UNIQUE CHECK (length(receipt_packet_id) = 16),
+    receipt_message_id BLOB NOT NULL UNIQUE CHECK (length(receipt_message_id) = 16),
+    receipt_kind INTEGER NOT NULL CHECK (receipt_kind IN (0,1)), -- 0 original delivery, 1 cancel confirmation
     verified INTEGER NOT NULL CHECK (verified IN (0,1)),
     received_at_ms INTEGER NOT NULL
 );
+
+
+CREATE TABLE pending_controls (
+    cancel_packet_id BLOB PRIMARY KEY NOT NULL CHECK (length(cancel_packet_id) = 16),
+    cancel_message_id BLOB NOT NULL UNIQUE CHECK (length(cancel_message_id) = 16),
+    target_packet_id BLOB NOT NULL CHECK (length(target_packet_id) = 16),
+    target_message_id BLOB NOT NULL CHECK (length(target_message_id) = 16),
+    verified_sender_identity_hash BLOB NOT NULL CHECK (length(verified_sender_identity_hash) = 32),
+    recipient_contact_id BLOB REFERENCES contacts(contact_id),
+    cancel_reason INTEGER NOT NULL CHECK (cancel_reason BETWEEN 1 AND 4),
+    state INTEGER NOT NULL DEFAULT 0 CHECK (state BETWEEN 0 AND 3),
+    received_at_ms INTEGER NOT NULL,
+    expires_at_ms INTEGER NOT NULL,
+    UNIQUE(target_packet_id, target_message_id, verified_sender_identity_hash)
+);
+CREATE INDEX idx_pending_controls_target ON pending_controls(target_packet_id, target_message_id, state);
+CREATE INDEX idx_pending_controls_expiry ON pending_controls(expires_at_ms, state);
 
 CREATE TABLE tombstones (
     packet_id BLOB PRIMARY KEY NOT NULL CHECK (length(packet_id) = 16),
@@ -197,8 +241,8 @@ CREATE INDEX idx_tombstones_expiry ON tombstones(expires_at_ms);
 
 CREATE TABLE peer_encounters (
     encounter_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    peer_link_hash BLOB NOT NULL,
-    beacon_id BLOB,
+    peer_link_hash BLOB NOT NULL CHECK (length(peer_link_hash) = 32),
+    beacon_id BLOB CHECK (beacon_id IS NULL OR length(beacon_id) = 8),
     first_seen_elapsed_ms INTEGER NOT NULL,
     last_seen_elapsed_ms INTEGER NOT NULL,
     connect_result INTEGER NOT NULL,
@@ -210,20 +254,20 @@ CREATE TABLE peer_encounters (
 CREATE INDEX idx_peer_encounters_peer_time ON peer_encounters(peer_link_hash, last_seen_elapsed_ms DESC);
 
 CREATE TABLE peer_limits (
-    peer_link_hash BLOB PRIMARY KEY NOT NULL,
+    peer_link_hash BLOB PRIMARY KEY NOT NULL CHECK (length(peer_link_hash) = 32),
     window_start_ms INTEGER NOT NULL,
-    ingested_bytes INTEGER NOT NULL DEFAULT 0,
-    unverified_direct_bytes INTEGER NOT NULL DEFAULT 0,
-    invalid_packets INTEGER NOT NULL DEFAULT 0,
-    consecutive_failures INTEGER NOT NULL DEFAULT 0,
+    ingested_bytes INTEGER NOT NULL DEFAULT 0 CHECK (ingested_bytes >= 0),
+    unverified_direct_bytes INTEGER NOT NULL DEFAULT 0 CHECK (unverified_direct_bytes >= 0),
+    invalid_packets INTEGER NOT NULL DEFAULT 0 CHECK (invalid_packets >= 0),
+    consecutive_failures INTEGER NOT NULL DEFAULT 0 CHECK (consecutive_failures >= 0),
     cooldown_until_elapsed_ms INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE diagnostic_events (
     event_id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at_ms INTEGER NOT NULL,
-    category INTEGER NOT NULL,
-    severity INTEGER NOT NULL,
+    category INTEGER NOT NULL CHECK (category >= 0),
+    severity INTEGER NOT NULL CHECK (severity BETWEEN 0 AND 3),
     redacted_ref TEXT,
     numeric_value INTEGER,
     detail_code INTEGER

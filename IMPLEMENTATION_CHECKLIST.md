@@ -2,11 +2,11 @@
 
 ## Before coding
 
-- [ ] Read README and docs 00–10
+- [ ] Read README and docs 00–22; archive is non-normative
 - [ ] Accept or replace each ADR explicitly
 - [ ] Generate final project UUIDs only if intentionally changing specified UUIDs
-- [ ] Select and record dependency versions/audit status
-- [ ] Create protocol version constants in one crate
+- [ ] Populate `docs/dependency-review.md` from actual Cargo/Gradle lockfiles and approve every critical dependency
+- [ ] Generate/check constants and persisted state codes from contracts/*.toml
 - [ ] Configure offlineRelease manifest assertion
 - [ ] Configure OS/OEM backup and data-transfer exclusion assertion
 
@@ -16,7 +16,7 @@
 - [ ] Deterministic CBOR enforced on encode and validated on decode
 - [ ] DM-BP7-1 block order/flags/CRC fixed
 - [ ] Packet/body size limits checked before allocation
-- [ ] HPKE AAD and Ed25519 signature inputs match the specification
+- [ ] HPKE AAD includes immutable hop_limit and matches spec/dme-aad-v1.cddl
 - [ ] Golden vectors committed
 
 ## Routing
@@ -26,7 +26,7 @@
 - [ ] same-grant reconciliation is idempotent
 - [ ] Direct destination bypasses token restriction
 - [ ] hop/age never decrease
-- [ ] receipt/cancel idempotent
+- [ ] receipt terminal/non-recursive; cancel reorder/pending control/idempotency tested
 - [ ] verified local P0/P1 protected pool
 - [ ] ingress peer quota
 
@@ -38,7 +38,7 @@
 - [ ] single coordinator actor owns core calls
 - [ ] foreground service user-started and visible
 - [ ] permission revoke/BT off paths tested
-- [ ] physical-device BLE tests performed
+- [ ] physical-device BLE tests performed; command_id correlation and Android 14+ MTU rule verified
 
 ## Security
 
@@ -57,3 +57,16 @@
 - [ ] threat model updated
 - [ ] external review findings handled
 - [ ] safety wording reviewed
+
+## Commercial release
+
+- [ ] privacy policy/Data Safety/manifest/SBOM are mutually consistent
+- [ ] external protocol/crypto review closed
+- [ ] MASVS mapping and penetration evidence complete
+- [ ] 8h normal + 24h fixed relay soak complete
+- [ ] migration, interrupted migration, downgrade, Keystore loss tested
+- [ ] staged rollout/rollback/support/incident drill complete
+- [ ] `SECURITY.md` private reporting route and `SUPPORT.md` real owner/channel tested
+- [ ] privacy draft publisher/contact/effective-date fields completed and legally reviewed
+- [ ] signed release evidence manifest validates against `release/release-manifest.schema.json`
+- [ ] `docs/22-go-live-checklist.md` signed

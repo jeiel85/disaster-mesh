@@ -127,8 +127,8 @@ padding은 쓰지 않는다. 양쪽 앱이 동일한 public-key 정렬 규칙을
 - HPKE Base는 recipient confidentiality를 제공한다.
 - Ed25519 signature는 sender authentication을 제공한다.
 - sender identity/signature는 ciphertext 내부라 relay에 노출되지 않는다.
-- AAD가 destination, lifetime, priority, packet ID를 묶는다.
-- copy token/hop/age는 mutable이라 AAD 제외.
+- AAD가 destination, lifetime, priority, packet ID, immutable `hop_limit`을 묶는다.
+- copy token, hop count, age는 mutable이라 AAD에서 제외한다.
 - receipt/cancel target과 sender identity도 ciphertext 내부이므로 v1 relay는 control
   message를 검증하거나 대상 원본을 삭제하지 않는다.
 
@@ -195,7 +195,32 @@ Noise XX는 연결 시 양쪽 static link key를 교환하고 forward-secret tra
 - ACK 유실 후 uncertain token grant를 다른 peer에게 재사용 금지
 - 테스트 전용 고정 key/nonce는 production feature flag에서 컴파일 불가
 
-## 12. 보안 출시 게이트
+## 12. Local encrypted-value envelope
+
+민감 column은 다음 versioned binary envelope를 사용한다.
+
+```text
+magic "DMEV" (4) | version u8=1 | key_version u16-be | nonce24 | ciphertext_and_tag
+```
+
+- primitive: XChaCha20-Poly1305
+- per-column key: `HKDF-SHA256(db_master_key, salt=identity_hash, info="DisasterMesh/DB/1" || table || 0x00 || column || 0x00 || key_version)`
+- AAD: deterministic CBOR `[schema_version, table_name, column_name, primary_key_bytes, key_version]`
+- 같은 nonce/key 조합 재사용 금지; nonce는 CSPRNG 24 bytes
+- row/column 간 ciphertext 복사는 AAD mismatch로 실패해야 한다.
+- decrypt failure는 빈 값으로 대체하지 않고 row를 `CORRUPT_ENCRYPTED_VALUE`로 격리한다.
+- key rotation은 새 key_version으로 re-encrypt 후 transaction commit, 이전 wrapped key는 전체 migration 검증 후 폐기한다.
+- DB가 있고 Keystore/wrapped master key가 없으면 자동 초기화하지 않는다. read-only recovery 안내와 명시적 reset만 제공한다.
+
+## 13. Contact capabilities and display-name safety
+
+Contact card의 `capabilities`는 서명 대상이다. bit registry는 `contracts/protocol_constants.toml`에 고정하며 reserved bit는 송신 시 0, 수신 시 ignore-but-preserve 하지 않고 reject한다. 표시 이름은 NFC normalization 후 저장하고 bidi override/isolate control, NUL, 비표시 제어문자를 제거한다. 네트워크 신뢰 판단에는 표시 이름을 사용하지 않는다.
+
+## 14. Mobile security verification baseline
+
+상용 release는 OWASP MASVS의 STORAGE, CRYPTO, AUTH, NETWORK, PLATFORM, CODE, RESILIENCE, PRIVACY 범주를 `docs/20-security-verification-plan.md`에 매핑한다. 체크리스트 자체가 보안 인증을 의미하지 않으며 외부 리뷰 결과와 재현 증거를 release artifact로 보존한다.
+
+## 15. 보안 출시 게이트
 
 - protocol test vector 공개
 - cargo-fuzz 최소 24시간 campaign 결과

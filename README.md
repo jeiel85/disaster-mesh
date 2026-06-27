@@ -15,7 +15,7 @@
 [![Encryption](https://img.shields.io/badge/Encryption-HPKE%20%2B%20Ed25519-red.svg?logo=letsencrypt&logoColor=white)](docs/06-security-and-threat-model.md)
 [![Protocol](https://img.shields.io/badge/Protocol-BPv7%20RFC%209171-informational.svg)](docs/03-protocol-dme-v1.md)
 [![Transport](https://img.shields.io/badge/Transport-BLE%20GATT%20Only-blue.svg?logo=bluetooth&logoColor=white)](docs/04-protocol-ble-cla-v1.md)
-[![Status](https://img.shields.io/badge/Status-Design%20Complete%20v1.0.1-success.svg)](docs/16-design-review-v1.0.1.md)
+[![Status](https://img.shields.io/badge/Status-Commercial%20Baseline%20v2.0.0--rc1-success.svg)](docs/16-design-review-v2.0.0-rc1.md)
 
 [**Landing Page**](https://jeiel85.github.io/disaster-mesh)&nbsp;·&nbsp;[**Specification**](docs/)&nbsp;·&nbsp;[**Architecture**](docs/01-system-architecture.md)&nbsp;·&nbsp;[**Security Model**](docs/06-security-and-threat-model.md)&nbsp;·&nbsp;[**Known Limitations**](docs/14-known-limitations.md)
 
@@ -24,6 +24,11 @@
 ---
 
 DisasterMesh is an **Android-first, serverless, offline-first** emergency communication system that works when cellular networks, internet, and infrastructure fail. Using Bluetooth Low Energy (BLE), devices form a self-organizing peer-to-peer mesh network that stores, carries, and relays end-to-end encrypted messages across multiple hops — with no server, no internet, and no plaintext visible to relays.
+
+The current design baseline is **v2.0.0-rc1**. It closes the protocol, storage,
+transport, and operational contracts needed to begin a commercial-grade
+implementation. Goal 0 bootstrap may start; protocol feature work must first pass
+the Goal 0.5 normative contract freeze.
 
 > **재난 상황에서** 기지국·인터넷·공유기 없이, 주변 스마트폰과 고정 릴레이만으로  
 > 종단간 암호화된 재난 메시지를 **저장·운반·전달**하는 Android 우선 오픈소스 시스템.  
@@ -140,62 +145,48 @@ When earthquakes, floods, hurricanes, or power failures strike, cellular network
 ```
 disaster-mesh/
 │
-├── docs/                          # 17 technical specification documents
-│   ├── adr/                       # 8 locked Architectural Decision Records
-│   │   ├── ADR-001-android-first.md
-│   │   ├── ADR-002-rust-owns-protocol-db.md
-│   │   ├── ADR-003-bpv7-profile.md
-│   │   ├── ADR-004-message-security.md
-│   │   ├── ADR-005-ble-gatt.md
-│   │   ├── ADR-006-spray-and-wait.md
-│   │   ├── ADR-007-token-grant-escrow.md
-│   │   └── ADR-008-endpoint-only-control.md
+├── docs/                          # 23 numbered specifications + readiness docs
+│   ├── adr/                       # ADR-001 through ADR-016
 │   ├── 00-product-requirements.md
 │   ├── 01-system-architecture.md
-│   ├── 02-domain-model.md
-│   ├── 03-protocol-dme-v1.md
-│   ├── 04-protocol-ble-cla-v1.md
-│   ├── 05-routing-and-queue.md
-│   ├── 06-security-and-threat-model.md
-│   ├── 07-storage-schema.md
-│   ├── 08-rust-core-contract.md
-│   ├── 09-android-implementation.md
-│   ├── 10-state-machines.md
-│   ├── 11-testing-and-acceptance.md
-│   ├── 12-release-and-operations.md
-│   ├── 13-development-goals.md
-│   ├── 14-known-limitations.md
-│   ├── 15-references.md
-│   ├── 16-design-review-v1.0.1.md
+│   ├── ...
+│   ├── 16-design-review-v2.0.0-rc1.md
+│   ├── 17-commercial-readiness.md
+│   ├── 18-privacy-and-data-governance.md
+│   ├── 19-operational-readiness.md
+│   ├── 20-security-verification-plan.md
+│   ├── 21-requirements-traceability.md
+│   ├── 22-go-live-checklist.md
+│   ├── dependency-review.md
 │   └── index.html                 # Landing page (GitHub Pages)
 │
-├── spec/                          # CDDL schema definitions
-│   ├── dme-v1.cddl                # Disaster Message Envelope
-│   ├── ble-control-v1.cddl        # BLE control frames
-│   ├── contact-card-v1.cddl       # QR contact exchange
+├── spec/                          # Exact DME/BLE wire and CDDL contracts
+│   ├── dme-v1.cddl
+│   ├── dme-aad-v1.cddl
+│   ├── ble-control-v1.cddl
+│   ├── ble-wire-v1.md
+│   ├── contact-card-v1.cddl
 │   └── disaster-routing-block-v1.cddl
 │
 ├── schemas/
-│   └── sqlite_v1.sql              # Initial SQLite schema (19 tables)
+│   ├── sqlite_v1.sql              # Initial SQLite schema (20 tables)
+│   └── schema_invariants.sql      # Queries that must return zero rows
 │
-├── contracts/                     # Platform-agnostic interface stubs
-│   ├── protocol_constants.toml    # BLE UUIDs, timeouts, TTLs, limits
-│   ├── rust_facade.rs             # Rust engine API sketch
-│   └── android_interfaces.kt      # Kotlin coordinator/adapter interfaces
+├── contracts/                     # Machine-readable constants and FFI sketches
+│   ├── protocol_constants.toml
+│   ├── state_codes.toml
+│   ├── rust_facade.rs
+│   └── android_interfaces.kt
 │
-├── prompts/                       # Implementation goal prompts
-│   ├── goal-00-bootstrap.md
-│   ├── goal-01-protocol-core.md
-│   ├── goal-02-security.md
-│   ├── goal-03-android-direct-ble.md
-│   ├── goal-04-multihop.md
-│   ├── goal-05-disaster-product.md
-│   └── goal-06-hardening.md
-│
-├── test-vectors/                  # Cryptographic test vector specs
-├── assets/
-│   └── banner.svg                 # Project banner image
+├── prompts/                       # Goal 0, 0.5, 1–7 implementation prompts
+├── test-vectors/                  # Required cases and manifest schemas
+├── policies/                      # Privacy and store-disclosure release inputs
+├── release/                       # Signed release-evidence manifest schema
+├── tools/validate_design_bundle.py
+├── SECURITY.md
+├── SUPPORT.md
 ├── IMPLEMENTATION_CHECKLIST.md
+├── CHANGELOG.md
 ├── LICENSE                        # Apache 2.0
 └── README.md
 ```
@@ -213,16 +204,23 @@ disaster-mesh/
 | 04 | [Protocol: BLE CLA v1](docs/04-protocol-ble-cla-v1.md) | GATT UUIDs, frames, Noise handshake |
 | 05 | [Routing & Queue](docs/05-routing-and-queue.md) | Spray-and-Wait, token escrow, TTL/hop rules |
 | 06 | [Security & Threat Model](docs/06-security-and-threat-model.md) | Threats, mitigations, key management, release gates |
-| 07 | [Storage Schema](docs/07-storage-schema.md) | 19-table SQLite schema, transactions, encryption |
+| 07 | [Storage Schema](docs/07-storage-schema.md) | 20-table SQLite schema, transactions, encryption |
 | 08 | [Rust Core Contract](docs/08-rust-core-contract.md) | FFI API signatures, engine commands, event model |
 | 09 | [Android Implementation](docs/09-android-implementation.md) | Manifest, BLE permissions, module structure |
 | 10 | [State Machines](docs/10-state-machines.md) | Service, link, transfer, message lifecycle FSMs |
 | 11 | [Testing & Acceptance](docs/11-testing-and-acceptance.md) | Unit, integration, real-device, security test matrix |
 | 12 | [Release & Operations](docs/12-release-and-operations.md) | CI gates, field relay setup, incident response |
-| 13 | [Development Goals](docs/13-development-goals.md) | 7-phase implementation plan with completion criteria |
+| 13 | [Development Goals](docs/13-development-goals.md) | Contract freeze, Android implementation, commercial release, post-1.0 expansion |
 | 14 | [Known Limitations](docs/14-known-limitations.md) | 13 public limitations and forbidden marketing claims |
 | 15 | [References](docs/15-references.md) | Verified primary sources for all standards cited |
-| 16 | [Design Review v1.0.1](docs/16-design-review-v1.0.1.md) | Multi-agent adversarial review — zero start-blockers |
+| 16 | [Design Review v2.0.0-rc1](docs/16-design-review-v2.0.0-rc1.md) | Resolved commercial implementation blockers and remaining gates |
+| 17 | [Commercial Readiness](docs/17-commercial-readiness.md) | Product, release, support, and evidence boundaries |
+| 18 | [Privacy & Data Governance](docs/18-privacy-and-data-governance.md) | Data inventory, retention, deletion, and disclosure rules |
+| 19 | [Operational Readiness](docs/19-operational-readiness.md) | Recovery, monitoring, rollout, and incident operations |
+| 20 | [Security Verification Plan](docs/20-security-verification-plan.md) | MASVS mapping, review scope, and exit evidence |
+| 21 | [Requirements Traceability](docs/21-requirements-traceability.md) | Requirement-to-contract-to-test mapping |
+| 22 | [Go-Live Checklist](docs/22-go-live-checklist.md) | Required owners, evidence, and release signatures |
+| — | [Dependency Review](docs/dependency-review.md) | Lockfile/SBOM-based dependency approval register |
 
 ---
 
@@ -231,20 +229,24 @@ disaster-mesh/
 | Goal | Focus | Key Completion Test |
 |---|---|---|
 | **Goal 0** | Rust workspace · Android modules · CI · no logic | `cargo test` passes; instrumentation test invokes Rust facade |
+| **Goal 0.5** | Freeze wire, state, schema, and command contracts | Validator passes; Goal 1–4 have zero P0 open decisions |
 | **Goal 1** | Types · CBOR codec · routing · 100-node simulator | A→B→C simulated delivery; token conservation verified |
 | **Goal 2** | Identity · HPKE · Ed25519 · QR contact · test vectors | Golden cryptographic test vectors pass |
 | **Goal 3** | Direct BLE transfer · GATT · Noise handshake | Two physical Android devices exchange E2EE message |
 | **Goal 4** | Multi-hop relay · token escrow · ACK recovery · receipts | 50× A→B→C cycles; B cannot decrypt payload |
 | **Goal 5** | Check-in/SOS UX · battery · foreground service · relay mode | 8h battery report; process kill recovery; thermal test |
-| **Goal 6** | Fuzz targets · SBOM · external audit · beta packaging | External review clearance; Play Store / F-Droid ready |
+| **Goal 6** | Fuzz targets · SBOM · external review · public beta | Release thresholds and dependency/security gates pass |
+| **Goal 7** | Commercial release readiness | Go-live checklist complete; rollout and rollback rehearsed |
+| **Goal 8** | iOS and fixed relay expansion after Android 1.0 | Shared-core compatibility and field tooling validated |
 
-**Current status:** Design review complete (v1.0.1) — zero start-blockers. Goal 0 is next.
+**Current status:** Commercial implementation baseline **v2.0.0-rc1**. Goal 0 may
+start now; Goal 1–4 feature work requires Goal 0.5 acceptance evidence.
 
 ---
 
 ## Architectural Decisions
 
-Eight locked ADRs define the constraints that everything else is built around:
+Sixteen locked ADRs define the constraints that everything else is built around:
 
 | ADR | Decision | Rationale |
 |---|---|---|
@@ -256,6 +258,14 @@ Eight locked ADRs define the constraints that everything else is built around:
 | [ADR-006](docs/adr/ADR-006-spray-and-wait.md) | Binary Spray-and-Wait with copy tokens | Proven DTN algorithm; bounded resource use |
 | [ADR-007](docs/adr/ADR-007-token-grant-escrow.md) | Persistent token grant escrow | Prevents token inflation after ACK loss |
 | [ADR-008](docs/adr/ADR-008-endpoint-only-control.md) | Only sender can revoke; relays ignore cancel targets | Prevents relay-level censorship of messages |
+| [ADR-009](docs/adr/ADR-009-authenticated-hop-limit.md) | Authenticate immutable hop limit in DME AAD | Prevents relay-side route-budget escalation |
+| [ADR-010](docs/adr/ADR-010-control-message-terminal-rules.md) | Receipt and cancel terminal rules | Prevents recursive control traffic |
+| [ADR-011](docs/adr/ADR-011-persisted-replay-bitmap.md) | Persist a 4096-bit replay bitmap | Survives reordering and process restarts |
+| [ADR-012](docs/adr/ADR-012-exact-ble-wire-format.md) | Fix the BLE byte-level wire contract | Makes independent implementations interoperable |
+| [ADR-013](docs/adr/ADR-013-platform-command-correlation.md) | Correlate async platform commands by ID | Prevents cross-link callback confusion |
+| [ADR-014](docs/adr/ADR-014-local-encryption-envelope.md) | Version and bind local encrypted columns | Defines recovery and corruption behavior |
+| [ADR-015](docs/adr/ADR-015-commercial-release-governance.md) | Require signed commercial release evidence | Makes launch approval auditable |
+| [ADR-016](docs/adr/ADR-016-no-delivery-guarantee.md) | Forbid delivery-guarantee claims | Keeps safety messaging truthful |
 
 ---
 
@@ -269,9 +279,30 @@ Eight locked ADRs define the constraints that everything else is built around:
 - GPS requires clear sky and a recent fix; indoors it may be unavailable
 - Cancellation does not guarantee removal from already-relayed copies
 
-The design passed an internal multi-agent adversarial review (v1.0.1) with zero start-blockers. **External cryptographic and protocol audit is required before any production deployment.** See [`docs/06-security-and-threat-model.md`](docs/06-security-and-threat-model.md) and [`docs/14-known-limitations.md`](docs/14-known-limitations.md).
+The v2.0.0-rc1 design closes the known implementation-contract blockers, but it is
+not production certification. **External cryptographic/protocol review, Android
+device and soak evidence, privacy/legal review, field exercises, and every required
+go-live signature remain mandatory before stable release.** See
+[`docs/20-security-verification-plan.md`](docs/20-security-verification-plan.md) and
+[`docs/22-go-live-checklist.md`](docs/22-go-live-checklist.md).
 
 **Forbidden marketing claims:** "guaranteed delivery", "real-time without networks", "completely anonymous", "unhackable", "official emergency response", "equal to Signal", "zero battery impact".
+
+---
+
+## Normative Source Order
+
+When files disagree, implementation follows this order:
+
+1. `spec/` wire and CDDL contracts
+2. `contracts/state_codes.toml` and `contracts/protocol_constants.toml`
+3. `schemas/sqlite_v1.sql`
+4. Numbered `docs/` and `docs/dependency-review.md`
+5. `SECURITY.md`, `SUPPORT.md`, `policies/`, and `release/`
+6. `prompts/` and historical material in `archive/`
+
+Protocol, database, or persisted-state changes must update the ADR, machine-readable
+contract, and test-vector requirements together in one pull request.
 
 ---
 
@@ -280,6 +311,7 @@ The design passed an internal multi-agent adversarial review (v1.0.1) with zero 
 This project is in the design phase. All protocol changes require:
 
 - Updated CDDL schema in `spec/`
+- Updated machine-readable state/constants and SQLite invariants where applicable
 - Updated test vectors in `test-vectors/`
 - ADR amendment or new ADR if the decision is architectural
 - Updated `IMPLEMENTATION_CHECKLIST.md` completion gates

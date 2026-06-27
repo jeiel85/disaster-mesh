@@ -58,6 +58,11 @@
 | FR-017 | iOS 직접 통신 및 best-effort relay를 지원한다. | 1.1 |
 | FR-018 | 서명된 기관 공지를 지원한다. | 1.1 |
 | FR-019 | Linux/Raspberry Pi 릴레이를 지원한다. | 1.2 |
+| FR-020 | 사용자가 모든 로컬 메시지·연락처·중계 데이터를 앱 안에서 삭제하고 설치 신원을 초기화할 수 있다. | 필수 |
+| FR-021 | 진단 내보내기 전 포함 항목과 민감정보 제외 결과를 사용자에게 미리 보여준다. | 필수 |
+| FR-022 | protocol/DB 호환 불가 상태에서 자동 파괴적 초기화하지 않고 읽기 전용 복구 또는 사용자 선택 경로를 제공한다. | 필수 |
+| FR-023 | 긴급 메시지 전송은 오조작 방지 확인과 접근성 대체 입력을 제공한다. | 필수 |
+| FR-024 | 연락처 키 변경·폐기·재설치 상태를 명확히 표시하고 자동 신뢰 승격하지 않는다. | 필수 |
 
 ## 5. 비기능 요구사항
 
@@ -75,6 +80,14 @@
 | NFR-010 | 접근성 | TalkBack, 48dp 터치, 색상 외 상태 표현 |
 | NFR-011 | 공급망 | SBOM, dependency lock, cargo deny/audit |
 | NFR-012 | 안전 문구 | 전달·구조 보장으로 오인할 표현 금지 |
+| NFR-013 | 데이터 최소화 | 서버 telemetry/광고 ID/계정 없이 동작하고 위치는 사용자가 선택한 E2EE payload에만 포함 |
+| NFR-014 | 삭제 가능성 | 사용자 삭제 후 local plaintext/key reference가 정상 경로에서 다시 노출되지 않음 |
+| NFR-015 | 운영 복구 | DB corruption·Keystore loss·업데이트 실패를 분류하고 데이터 덮어쓰기 없이 복구 안내 |
+| NFR-016 | 보안 검증 | OWASP MASVS 범주 기반 검증표와 외부 protocol/crypto review 완료 |
+| NFR-017 | 출시 재현성 | 서명된 artifact, SBOM, provenance, source commit, protocol vector를 release별 보존 |
+| NFR-018 | 현장 신뢰성 | 제조사별 BLE/background matrix와 8h/24h soak 결과를 release evidence로 보존 |
+| NFR-019 | 지원 가능성 | 공개 지원 범위, 보안 신고 채널, 장애·데이터 손실 대응 절차를 문서화 |
+| NFR-020 | 국제화 안전 | Unicode normalization, bidi control 제한, locale-independent protocol encoding 적용 |
 
 ## 6. 1.0 메시지 종류
 
@@ -166,7 +179,7 @@
 - 악성 무선 방해 해결
 - 경로가 전혀 없을 때 전달
 
-## 9. 1.0 출시 승인 조건
+## 9. 상용 1.0 출시 승인 조건
 
 - 3대 Android 기기로 A→B, 이후 B→C 전달을 50회 연속 재현한다.
 - ACK 유실 시험에서 token grant 총량이 증가하지 않는다.
@@ -175,3 +188,8 @@
 - 화면 꺼짐 8시간 시험에서 relay 상태와 중단 원인을 기록한다.
 - 최소 API 26, 30, 31, 34, 36, 37 실기기 호환 결과를 문서화한다.
 - 외부 보안 리뷰 전에는 stable 1.0으로 홍보하지 않는다.
+- P0/P1 defect가 0이고, 미해결 P2는 사용자 안전·데이터 손실·프로토콜 호환성에 영향을 주지 않는다는 서면 승인을 받는다.
+- Play/F-Droid 각 배포 채널의 최신 target SDK·권한·개인정보 정책을 release candidate 시점에 다시 검증한다.
+- 개인정보 처리방침, 지원 정책, 보안 신고 정책, 데이터 삭제·초기화 UX를 실제 artifact와 대조한다.
+- 24시간 고정 릴레이 soak, 8시간 일반 단말 screen-off 시험, 강제 종료·재부팅·저장공간 부족·Keystore 손실 복구 시험을 통과한다.
+- `docs/22-go-live-checklist.md`의 제품·보안·QA·운영·법률 필수 승인 항목을 모두 충족한다.

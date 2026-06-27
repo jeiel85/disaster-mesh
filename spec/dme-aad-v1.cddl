@@ -1,0 +1,17 @@
+; DME v1 HPKE AAD. RFC 8949 Core Deterministic CBOR only.
+packet-id = bstr .size 16
+routing-slot = bstr .size 16
+random-source-id = bstr .size 16
+creation-sequence = bstr .size 8
+
+dme-aad-v1 = [
+  protocol-major: 1,
+  packet-id: packet-id,
+  destination-slot: routing-slot,
+  message-class-hint: 1..5,
+  priority: 0..3,
+  lifetime-millis: 60000..604800000,
+  hop-limit: 1..32,
+  random-source-id: random-source-id,
+  creation-sequence: creation-sequence
+]

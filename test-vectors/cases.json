@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {"id":"VEC-001","layer":"contact","expected":"accept","requirement":"FR-001/FR-002","description":"canonical signed contact card and QR framing"},
+    {"id":"VEC-002","layer":"contact","expected":"reject","requirement":"NFR-003","description":"contact signature, CRC, key length and non-canonical CBOR failures"},
+    {"id":"VEC-003","layer":"dme","expected":"accept","requirement":"FR-004","description":"direct text HPKE payload with sender signature"},
+    {"id":"VEC-004","layer":"security","expected":"reject","requirement":"NFR-003","description":"wrong recipient, AAD, hop limit, signature and ciphertext mutation"},
+    {"id":"VEC-005","layer":"dme","expected":"accept","requirement":"FR-007/FR-008","description":"check-in with consented location and bounded fields"},
+    {"id":"VEC-006","layer":"dme","expected":"accept","requirement":"FR-007","description":"private SOS without location"},
+    {"id":"VEC-007","layer":"state","expected":"idempotent","requirement":"FR-010","description":"delivery receipt terminates and never creates a receipt-of-receipt"},
+    {"id":"VEC-008","layer":"state","expected":"idempotent","requirement":"FR-011","description":"cancel after original, cancel before original and duplicate cancel"},
+    {"id":"VEC-009","layer":"security","expected":"reject","requirement":"FR-011/NFR-003","description":"cancel signed by identity other than original sender"},
+    {"id":"VEC-010","layer":"security","expected":"reject","requirement":"NFR-003","description":"replayed sender sequence inside and outside 4096-bit window"},
+    {"id":"VEC-011","layer":"bpv7","expected":"accept","requirement":"FR-009","description":"supported BPv7 profile with authenticated immutable hop limit"},
+    {"id":"VEC-012","layer":"bpv7","expected":"reject","requirement":"FR-009","description":"expired, hop-exhausted, malformed block and unsupported critical block"},
+    {"id":"VEC-013","layer":"state","expected":"idempotent","requirement":"FR-009","description":"lost ACK same-grant reconciliation without token inflation"},
+    {"id":"VEC-014","layer":"state","expected":"reject","requirement":"FR-009/NFR-003","description":"grant replay with changed payload or wire hash"},
+    {"id":"VEC-015","layer":"ble","expected":"accept","requirement":"FR-003/FR-004","description":"every control frame canonical encoding and length boundary"},
+    {"id":"VEC-016","layer":"ble","expected":"reject","requirement":"NFR-003/NFR-005","description":"unknown critical control, oversized segment, bad sequence and credit violation"},
+    {"id":"VEC-017","layer":"ble","expected":"resume","requirement":"FR-012","description":"partial resume bound to peer identity, packet ID, exact wire hash and meta fingerprint"},
+    {"id":"VEC-018","layer":"ble","expected":"reject","requirement":"FR-012/NFR-003","description":"resume request with changed peer, hash, version or expired partial"},
+    {"id":"VEC-019","layer":"security","expected":"reject","requirement":"NFR-020","description":"display-name bidi controls, disallowed control characters and invalid normalization"},
+    {"id":"VEC-020","layer":"dme","expected":"reject","requirement":"NFR-005","description":"encoded DME and plaintext field sizes at limit plus one byte over"}
+  ]
+}

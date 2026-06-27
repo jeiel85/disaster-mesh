@@ -130,6 +130,15 @@ App start
 - 설정 이동 버튼 제공
 - 반복 팝업 금지
 
+### API 29–30 background BLE policy
+
+Android 10–11에서 background scan이 location으로 간주되는 조합은 `ACCESS_BACKGROUND_LOCATION`이 필요할 수 있다. 상용 1.0은 다음 두 variant를 명확히 분리한다.
+
+- Play `offlineRelease`: background location 승인 없이 정책상 가능한 foreground connected-device relay만 제공하고, API 29–30에서 OS가 scan을 중단하면 UI에 제한을 표시한다.
+- 별도 기관/현장 배포 `fieldTestRelease`: 법률·스토어 정책 검토와 명시적 사용자 교육을 거쳐 background location을 선언할 수 있다.
+
+`neverForLocation`은 일부 beacon 결과를 필터링할 수 있으므로 필수 device matrix에서 service UUID 광고 발견률을 측정한다. permission이 없을 때 기능을 몰래 degrade하지 않고 상태와 해결 방법을 표시한다.
+
 ## 5. Foreground service
 
 ### Start 조건
@@ -198,17 +207,14 @@ BlePlatformAdapterImpl
 
 ### Byte segmentation
 
-GATT characteristic operation당 Android가 허용한 payload 크기로 outer segment:
-
-```text
-segment header:
-magic 1 | logical_frame_id 4 | segment_index 2 | segment_count 2 | bytes
-```
+GATT characteristic operation당 Android가 허용한 payload 크기로 outer segment한다. 구현은 임의 레이아웃을 만들지 않고 `spec/ble-wire-v1.md`의 16-byte header와 big-endian 규칙을 그대로 사용한다.
 
 - logical frame 최대 64 KiB
 - segment count 최대 1024
 - reassembly timeout 10초
-- 같은 frame ID collision 시 link 종료
+- frame ID는 link 안에서 재사용하지 않음
+- duplicate segment는 bytes가 같을 때만 idempotent 허용
+- gap/out-of-order는 bitmap으로 수용하되 conflicting segment, length mismatch, reserved bit는 link 종료
 
 ## 7. Coordinator actor
 
@@ -227,8 +233,12 @@ class MeshCoordinatorImpl(
                 is CoordinatorEvent.System -> engine.handleSystemEvent(event.value)
             }
             commands.forEach { command ->
-                val result = adapter.execute(command)
-                result.toFollowUpEvent()?.let { events.send(it) }
+                when (val accepted = adapter.enqueue(command)) {
+                    is CommandEnqueueResult.Accepted -> Unit
+                    is CommandEnqueueResult.Rejected -> events.send(
+                        CoordinatorEvent.Transport(accepted.toFailureEvent(command.commandId))
+                    )
+                }
             }
         }
     }
@@ -345,7 +355,7 @@ zero Kotlin buffer
 
 `AndroidBleQuirkRegistry`는 모델별 hardcode보다 capability/실패 기반 fallback 우선.
 
-- MTU 517 실패 → 247 → default
+- 연결당 MTU 요청 1회. Android 14+ 후속 요청 무시 동작을 고려해 협상 callback 또는 기본 ATT payload를 사용하고 다단계 재요청 fallback 금지
 - write without response stall → write with response fallback
 - advertise unsupported → scan-only node; UI 표시
 - simultaneous scan/advertise failure → time slicing

@@ -175,18 +175,13 @@ CHECK_IN과 PRIVATE_SOS에서 여러 수신자를 선택하면 한 사용자 동
 `SendGroup`으로 묶되, 수신자마다 별도의 `MessageId`, `PacketId`, HPKE ciphertext,
 BP bundle을 만든다. 하나의 ciphertext를 여러 수신자에게 재사용하지 않는다.
 
-`delivery_state`:
+`delivery_state`의 numeric value는 `contracts/state_codes.toml`이 유일한 기준이다.
 
-- `DRAFT`
-- `STORED_LOCAL`
-- `RELAYED_AT_LEAST_ONCE`
-- `RECEIVED_BY_DESTINATION_LOCAL_KNOWLEDGE`
-- `RECEIPT_CONFIRMED`
-- `CANCEL_PROPAGATING`
-- `EXPIRED`
-- `FAILED_LOCAL`
+- outbound: `OUTBOUND_STORED`, `OUTBOUND_RELAYED`, `OUTBOUND_RECEIPT_CONFIRMED`, `OUTBOUND_CANCEL_PROPAGATING`, `OUTBOUND_CANCELED_CONFIRMED`, `OUTBOUND_CANCELED_UNCONFIRMED`, `OUTBOUND_EXPIRED`, `FAILED_LOCAL`
+- inbound: `INBOUND_RECEIVED`, `INBOUND_CANCELED`
+- security/error: `QUARANTINED`
 
-일반적으로 발신자는 `RECEIVED_BY_DESTINATION_LOCAL_KNOWLEDGE`를 직접 알 수 없으므로 receipt가 도착하기 전 UI에는 사용하지 않는다. 수신자 로컬에서만 원본 상태 추적에 활용한다.
+발신자는 receipt를 검증하기 전 목적지 수신을 추정하지 않는다. UI의 “전달됨”은 오직 `OUTBOUND_RECEIPT_CONFIRMED`에만 사용한다.
 
 ## 4. 상태 불변식
 
@@ -200,7 +195,11 @@ BP bundle을 만든다. 하나의 ciphertext를 여러 수신자에게 재사용
 8. relay token grant 생성 시 sender의 available token을 같은 DB transaction에서 escrow로 이동한다.
 9. uncertain grant는 ACK 유실 후 다른 peer에게 재사용하지 않는다.
 10. priority는 relay가 상향 조정할 수 없다.
-11. lifetime, hop limit, source route, destination slot은 immutable header로 취급한다.
+11. lifetime, hop limit, source route, destination slot은 immutable header로 취급하고 DME AAD에 인증한다.
+12. `DELIVERY_RECEIPT`는 어떤 경우에도 다시 receipt를 생성하지 않는다.
+13. `CANCEL`은 원본보다 먼저 도착할 수 있으며 검증된 sender/target을 pending control로 보존한다.
+14. replay 수락 여부는 contact별 4096-bit persisted sliding window로 판정한다.
+15. 상태·오류의 numeric code는 machine-readable contract와 DB CHECK를 거치지 않고 추가하지 않는다.
 
 ## 5. 오류 taxonomy
 

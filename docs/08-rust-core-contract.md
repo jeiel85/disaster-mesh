@@ -94,7 +94,8 @@ pub enum TransportEvent {
         channel: LinkChannel,
         bytes: Vec<u8>,
     },
-    LinkWritable { link_id: u64, channel: LinkChannel },
+    CommandCompleted { command_id: u64, link_id: Option<u64>, result: CommandCompletion },
+    CommandFailed { command_id: u64, link_id: Option<u64>, category: TransportFailure },
     LinkClosed { link_id: u64, reason: LinkCloseReason },
     ConnectFailed { peer_handle: String, category: TransportFailure },
 }
@@ -121,35 +122,40 @@ pub enum SystemEvent {
 
 ```rust
 pub enum PlatformCommand {
-    StartScan(ScanPolicy),
-    StopScan,
-    StartAdvertising(AdvertisementData),
-    UpdateAdvertising(AdvertisementData),
-    StopAdvertising,
-    Connect { peer_handle: String },
-    Disconnect { link_id: u64, reason: String },
-    SendBytes { link_id: u64, channel: LinkChannel, bytes: Vec<u8>, with_response: bool },
-    RequestConnectionPriority { link_id: u64, high: bool },
-    RequestLocation { request_id: Id16, timeout_seconds: u32 },
-    ShowIncomingMessage { message_id: Id16 },
-    UpdatePersistentNotification(NotificationModel),
-    ShowLocalAlert(LocalAlert),
-    ScheduleWake { after_ms: u64, reason: WakeReason },
+    StartScan { command_id: u64, policy: ScanPolicy },
+    StopScan { command_id: u64 },
+    StartAdvertising { command_id: u64, data: AdvertisementData },
+    UpdateAdvertising { command_id: u64, data: AdvertisementData },
+    StopAdvertising { command_id: u64 },
+    Connect { command_id: u64, peer_handle: String },
+    Disconnect { command_id: u64, link_id: u64, reason: LinkCloseReason },
+    RequestMtu { command_id: u64, link_id: u64, requested: u16 },
+    ConfigureNotifications { command_id: u64, link_id: u64, channel: LinkChannel, enabled: bool },
+    SendBytes { command_id: u64, link_id: u64, channel: LinkChannel, bytes: Vec<u8>, with_response: bool },
+    RequestConnectionPriority { command_id: u64, link_id: u64, high: bool },
+    RequestLocation { command_id: u64, request_id: Id16, timeout_seconds: u32 },
+    ShowIncomingMessage { command_id: u64, message_id: Id16 },
+    UpdatePersistentNotification { command_id: u64, model: NotificationModel },
+    ShowLocalAlert { command_id: u64, model: LocalAlert },
+    ScheduleWake { command_id: u64, after_ms: u64, reason: WakeReason },
 }
 ```
 
-platform은 command 실행 결과를 다시 event로 돌려준다. 실행 성공을 core가 추측하지 않는다.
-`execute(command)`는 Android API 호출이 접수되거나 즉시 실패한 시점에 반환하며,
-GATT operation 완료까지 coordinator actor를 block하지 않는다. 실제 write/notify/
-connect completion은 별도 TransportEvent로 돌아온다.
+모든 비동기 platform command는 session 내 단조 증가 `command_id`를 가진다. platform은 command 접수 여부와 실제 완료를 구분한다.
+
+- `enqueue(command)`는 큐 삽입 또는 즉시 거부만 반환한다.
+- 실제 GATT/scan/advertise 완료는 동일 `command_id`의 `CommandCompleted` 또는 `CommandFailed`로 돌아온다.
+- link별 GATT operation은 최대 1개만 in-flight이며 callback이 일치하지 않으면 protocol violation으로 link를 닫는다.
+- process restart 후 이전 command ID는 재사용하지 않으며 모든 link command는 실패로 복구한다.
+- core는 completion event 없이 write 성공을 추측하거나 credit를 차감 확정하지 않는다.
 
 ## 7. Command execution order
 
 하나의 return batch는 배열 순서대로 실행한다.
 
-- `SendBytes` 실패 시 이후 같은 link command를 중단하고 LinkClosed/ConnectFailed event를 보낸다.
+- `SendBytes`/MTU/notification command 실패 시 이후 같은 link의 queued GATT command를 중단하고 각 command에 실패 event를 반환한 뒤 LinkClosed event를 보낸다.
 - notification 실패는 transport command를 중단하지 않는다.
-- Start/Stop scan/advertise는 idempotent adapter가 처리한다.
+- Start/Stop scan/advertise는 idempotent adapter가 처리하고 같은 command_id를 두 번 완료하지 않는다.
 
 ## 8. Core error
 

@@ -1,28 +1,26 @@
-# Bundle Contents
+# Bundle Contents — v2.0.0-rc1
 
-- `README.md` — implementation baseline and navigation
-- `IMPLEMENTATION_CHECKLIST.md` — coding/release checklist
-- `docs/00-product-requirements.md` — numbered requirements and acceptance
-- `docs/01-system-architecture.md` — modules, process, concurrency and recovery
-- `docs/02-domain-model.md` — entities, IDs, invariants and errors
-- `docs/03-protocol-dme-v1.md` — BPv7 profile, DME, AAD and signatures
-- `docs/04-protocol-ble-cla-v1.md` — UUIDs, GATT, frames, transfer and timeout
-- `docs/05-routing-and-queue.md` — routing, scoring, tokens, quota and battery policy
-- `docs/06-security-and-threat-model.md` — keys, threats and secure coding
-- `docs/07-storage-schema.md` — DB ownership, transactions and migration
-- `docs/08-rust-core-contract.md` — engine and FFI APIs
-- `docs/09-android-implementation.md` — manifest, service, BLE adapter and UI
-- `docs/10-state-machines.md` — service/link/transfer/message state machines
-- `docs/11-testing-and-acceptance.md` — tests, simulator, device matrix and gates
-- `docs/12-release-and-operations.md` — CI, artifacts, field relay and incident response
-- `docs/13-development-goals.md` — phased implementation plan
-- `docs/14-known-limitations.md` — public limitations and forbidden claims
-- `docs/15-references.md` — verified primary references
-- `docs/16-design-review-v1.0.1.md` — resolved review blockers and validation record
-- `docs/adr/` — locked architectural decisions, including token escrow and endpoint-only control handling
-- `spec/` — CDDL schemas
-- `schemas/sqlite_v1.sql` — exact initial database schema
-- `contracts/` — Rust/Kotlin facade sketches
-- `prompts/` — executable vibe-coding goal prompts
-- `test-vectors/` — vector requirements and manifest schema
-- `archive/design_v0.1.md` — previous design for comparison
+## Normative implementation baseline
+
+- `README.md` — source-of-truth order and implementation entry
+- `docs/00-product-requirements.md` through `docs/22-go-live-checklist.md`
+- `docs/adr/` — accepted architectural decisions
+- `spec/` — exact DME/BLE wire and CDDL contracts
+- `contracts/` — protocol constants, persisted states, Rust/Kotlin facade contracts
+- `schemas/sqlite_v1.sql` — initial production schema
+- `schemas/schema_invariants.sql` — integrity assertions
+- `test-vectors/` — vector generation/manifest requirements and required case catalog
+- `prompts/` — implementation goals, including Goal 0.5 contract freeze and Goal 7 launch
+- `docs/dependency-review.md` — lockfile/SBOM 기반 의존성 승인 register
+- `SECURITY.md`, `SUPPORT.md` — 공개 보안 신고·지원 경계
+- `policies/` — 개인정보 초안과 store disclosure consistency gate
+- `release/` — signed release evidence manifest schema
+- `tools/validate_design_bundle.py` — mechanical validation and inventory/hash generation;
+  pass `--distribution` when validating a packaged artifact that must not contain `.git`
+
+## Non-normative
+
+- `archive/` — superseded design snapshots for history only
+- `docs/16-design-review-v2.0.0-rc1.md` — current resolved review and implementation gates
+
+Implementation must not use an archived monolithic design when a separated normative file exists.

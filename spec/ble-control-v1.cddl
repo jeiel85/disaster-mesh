@@ -1,7 +1,9 @@
+; BLE-CLA v1 control payloads. Every payload is Core Deterministic CBOR.
 beacon-id = bstr .size 8
 id16 = bstr .size 16
 hash32 = bstr .size 32
 slot16 = bstr .size 16
+nonce8 = bstr .size 8
 
 version-hello = [
   protocol-major: 1,
@@ -66,3 +68,24 @@ transfer-ack = [
   accepted-tokens: 0..16,
   committed-payload-sha256: null / hash32
 ]
+
+credit-update = [ stream-id: uint, granted-bytes: 1..262144, credit-sequence: uint ]
+ping = [ nonce: nonce8 ]
+pong = [ nonce: nonce8 ]
+error-frame = [ error-code: 1..12, related-frame-type: null / uint, retry-after-ms: null / 0..600000 ]
+goodbye = [ reason: 1..9, retry-after-ms: null / 0..600000 ]
+
+resume-query = [ packet-id: id16, expected-total-sha256: hash32 ]
+resume-state = [
+  packet-id: id16,
+  total-sha256: hash32,
+  chunk-size: 1..4096,
+  chunk-count: 1..1024,
+  received-bitmap: bstr .size (1..128),
+  bitmap-sha256: hash32
+]
+
+; Semantic validation:
+; - bitmap length == ceil(chunk-count / 8)
+; - unused high bits in the final bitmap byte are zero
+; - capabilities contains no bit outside contracts/protocol_constants.toml known_mask

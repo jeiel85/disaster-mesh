@@ -2,10 +2,10 @@
 
 ## 1. Branch/release
 
-- `main`: always releasable
+- `main`: protected, release-candidate quality; required checks와 2-person review 없이는 merge 금지
 - feature branch + PR
 - protocol change는 `protocol-change` label과 ADR 필수
-- release tag: `android-v0.x.y`, protocol은 별도 `dme-v1`
+- release tag: `android-v0.x.y`, protocol은 별도 `dme-v1`; signed annotated tag와 immutable release manifest 사용
 
 ## 2. CI jobs
 
@@ -141,10 +141,32 @@ protocol major가 다른 peer와는 연결하지 않는다.
 - 제한된 현장 훈련
 - 안전 문구 법률 검토
 
-## 10. Incident response
+## 10. Commercial distribution gates
+
+- Play Console/F-Droid metadata와 실제 manifest·Data Safety·privacy policy를 release마다 대조
+- latest target SDK requirement는 release candidate 날짜 기준 공식 문서에서 재검증
+- 앱 서명 key는 offline/HSM-backed 보관, upload key와 분리, recovery procedure 연 1회 점검
+- internal → closed beta → staged production 순서; 5%/20%/50%/100% 단계별 최소 관찰 window와 rollback owner 지정
+- protocol-major를 올린 release는 mixed-version field test 없이 production 확대 금지
+- 심각한 offline-only defect는 서버 kill switch가 없으므로 store halt, signed advisory, in-app local notice bundle 전략을 사전에 준비
+- 지원 범위, 데이터 복구 불가 조건, 기기/OEM 제한을 store listing과 앱 안에서 동일하게 표시
+
+## 11. Incident response
 
 - SECURITY.md에 private report 경로
 - 취약점 triage severity
 - protocol key compromise 시 key update/revoke 안내
 - 위험한 version의 peer 연결 차단 capability
 - offline 환경을 고려한 앱 내 security notice package는 향후 signed authority message로 검토
+
+## 12. Release evidence retention
+
+각 release에 다음을 최소 5년 또는 프로젝트 운영 기간 중 더 긴 기간 보존한다.
+
+- source commit, signed tag, build environment lock, artifact SHA-256
+- AAB/APK, symbols, SBOM, provenance, dependency review
+- protocol golden vectors와 compatibility report
+- migration/soak/device-matrix/security/field-exercise 결과
+- 승인자, 승인 시각, known-risk waiver, rollback 판단
+
+민감한 test data는 합성 데이터만 사용하고 실제 사용자 메시지·위치는 release evidence에 포함하지 않는다.

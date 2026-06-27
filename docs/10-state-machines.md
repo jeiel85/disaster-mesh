@@ -128,21 +128,21 @@ available token으로 계산하지 않는다.
 ## 5. Outbound message
 
 ```text
-DRAFT
-  ├─ validation/encryption success → STORED_LOCAL
+DRAFT (memory-only; DB에 저장하지 않음)
+  ├─ validation/encryption success → OUTBOUND_STORED
   └─ error → FAILED_LOCAL
-STORED_LOCAL
-  ├─ first relay commit → RELAYED
-  ├─ receipt → RECEIPT_CONFIRMED
-  ├─ user cancel → CANCEL_PROPAGATING
-  └─ expiry → EXPIRED
-RELAYED
-  ├─ receipt → RECEIPT_CONFIRMED
-  ├─ cancel → CANCEL_PROPAGATING
-  └─ expiry → EXPIRED
-CANCEL_PROPAGATING
-  ├─ cancel receipt optional → CANCELED
-  └─ cancel expiry → CANCELED_UNCONFIRMED
+OUTBOUND_STORED
+  ├─ first relay commit → OUTBOUND_RELAYED
+  ├─ verified receipt → OUTBOUND_RECEIPT_CONFIRMED
+  ├─ user cancel → OUTBOUND_CANCEL_PROPAGATING
+  └─ expiry → OUTBOUND_EXPIRED
+OUTBOUND_RELAYED
+  ├─ verified receipt → OUTBOUND_RECEIPT_CONFIRMED
+  ├─ user cancel → OUTBOUND_CANCEL_PROPAGATING
+  └─ expiry → OUTBOUND_EXPIRED
+OUTBOUND_CANCEL_PROPAGATING
+  ├─ verified receipt for cancel packet → OUTBOUND_CANCELED_CONFIRMED
+  └─ cancel expiry → OUTBOUND_CANCELED_UNCONFIRMED
 ```
 
 ## 6. Contact trust
@@ -176,3 +176,7 @@ CLOSED → OPENING_DB → MIGRATING → LOADING_KEYS → RECOVERING_TRANSFERS �
 - corruption → `RECOVERY_MODE`
 - reboot age checkpoint invalid → affected bundles `AGE_UNCERTAIN`, engine remains READY
 - READY 이전 transport event는 bounded queue에 보관하거나 adapter 시작을 지연한다.
+
+## 8. Numeric state ownership
+
+모든 persisted state numeric code는 `contracts/state_codes.toml`이 유일한 기준이다. Rust/Kotlin enum과 SQL CHECK는 이 파일에서 생성하거나 CI에서 대조한다. unknown persisted code는 default branch로 흡수하지 않고 DB open을 `UNSUPPORTED_STATE_CODE`로 중단한다.

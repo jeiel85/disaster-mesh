@@ -156,9 +156,12 @@ Dedup key는 `packet_id16`과 BP identity hash를 모두 사용한다.
 수신자:
 
 1. payload decrypt/signature verify
-2. local message commit
-3. receipt bundle 생성
-4. original packet tombstone을 즉시 만들지 않는다. 다른 copy가 도착해도 duplicate 처리한다.
+2. local message와 replay bitmap을 원자적으로 commit
+3. `should_generate_receipt(message_type)` 평가
+4. DIRECT_TEXT/CHECK_IN/PRIVATE_SOS/LOCATION_UPDATE에는 receipt를 1회 생성
+5. DELIVERY_RECEIPT에는 receipt를 절대 생성하지 않음
+6. CANCEL에는 cancel 확인 정책에 따라 1회 생성 가능
+7. original packet tombstone을 즉시 만들지 않는다. 다른 copy가 도착해도 duplicate 처리한다.
 
 발신 endpoint:
 
@@ -175,8 +178,11 @@ relay:
 ## 9. Cancel 처리
 
 - 발신 endpoint는 cancel 생성 즉시 자신의 원본 offer를 중단하고 local tombstone을 만든다.
-- 최종 수신 endpoint는 decrypt 후 cancel sender identity가 원본 sender identity와 같은지 검증한다.
-- target packet/message ID가 일치하면 수신 UI를 `취소됨`으로 표시한다.
+- 최종 수신 endpoint는 decrypt/signature 검증 후 cancel sender identity를 보존한다.
+- 원본이 이미 있으면 sender identity와 target packet/message ID를 대조하고 `INBOUND_CANCELED`로 전환한다.
+- 원본이 아직 없으면 `pending_controls`에 cancel packet/message, target packet/message, verified sender identity, expiry를 저장한다.
+- 원본이 나중에 도착하면 같은 transaction에서 pending cancel과 대조한 뒤 본문 표시 전에 취소 상태로 commit한다.
+- sender/target이 충돌하는 cancel은 원본 상태를 변경하지 않고 quarantine/diagnostic 처리한다.
 - relay는 cancel을 일반 P0 bundle로 운반하며 원본을 삭제하지 않는다.
 - 이미 읽은 내용의 삭제는 보장하지 않는다.
 - cancel bundle은 원본보다 긴 TTL을 가질 수 있다.

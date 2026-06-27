@@ -1,6 +1,6 @@
 # 15. Verified References
 
-확인일: 2026-06-25
+확인일: 2026-06-27
 
 ## DTN and wire formats
 
@@ -84,3 +84,14 @@
 - Android supports background BLE use cases, but process lifetime and foreground-service restrictions must be handled explicitly.
 - iOS Core Bluetooth background modes do not imply unlimited always-on execution; behavior must be tested and documented by state.
 - HPKE and Noise are building blocks. Using a conforming library does not replace a full protocol/security review.
+
+## Mobile application security
+
+- OWASP Mobile Application Security Verification Standard (MASVS)  
+  https://mas.owasp.org/MASVS/
+- OWASP Mobile Application Security Testing Guide (MASTG)  
+  https://mas.owasp.org/MASTG/
+
+## Release-time verification rule
+
+Target SDK, Play location/background policy, Android behavior 문서는 변경 가능성이 있으므로 설계 문서의 숫자를 그대로 신뢰하지 않는다. 각 release candidate에서 공식 페이지의 최신 요구사항을 확인하고 검증 날짜와 결과를 release evidence에 기록한다.

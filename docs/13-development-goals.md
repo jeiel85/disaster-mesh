@@ -30,6 +30,25 @@
 - release manifest allowlist test 통과
 - dependency versions가 lockfile에 고정
 
+## Goal 0.5 — Normative Contract Freeze
+
+### 결과물
+
+- `spec/dme-aad-v1.cddl`, `spec/ble-wire-v1.md`, complete BLE control CDDL
+- `contracts/state_codes.toml`과 generated enum consistency test
+- patched initial SQLite schema and schema invariant test
+- exact Rust/Android command correlation contract
+- design bundle validator passing
+
+### 완료 조건
+
+- hop-limit tamper vector failure
+- receipt recursion exhaustive test plan
+- cancel reorder storage model review
+- replay bitmap property proof/tests
+- independent implementer가 BLE byte stream을 추가 질문 없이 작성 가능
+- Goal 1–4의 P0 open decision 0
+
 ## Goal 1 — Protocol Core and Simulator
 
 ### 결과물
@@ -155,7 +174,26 @@
 - known limitations와 safety wording 공개
 - critical/high dependency advisory 0 또는 승인 예외
 
-## Goal 7 — iOS and Fixed Relay
+## Goal 7 — Commercial Release Readiness
+
+### 결과물
+
+- privacy policy/data safety/support/security policy
+- OWASP MASVS mapping and external review closure
+- signed SBOM/provenance/reproducible build evidence
+- full device matrix, 24h relay soak, migration/rollback report
+- staged rollout and incident response runbook
+- legal/safety wording review record
+
+### 완료 조건
+
+- `docs/22-go-live-checklist.md` required 항목 100%
+- critical/high security findings 0, P0/P1 defects 0
+- 200/200 controlled direct/multi-hop acceptance
+- production artifact와 문서/manifest/privacy declarations 일치
+- rollback owner와 support escalation 실제 리허설 완료
+
+## Goal 8 — iOS and Fixed Relay
 
 1.0 Android 출시 이후 진행.
 

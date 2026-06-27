@@ -1,0 +1,58 @@
+# Numeric values persisted in SQLite and exposed across FFI. Never renumber.
+version = 1
+
+[direction]
+outbound = 0
+inbound = 1
+
+[message_delivery]
+outbound_stored = 0
+outbound_relayed = 1
+outbound_receipt_confirmed = 2
+outbound_cancel_propagating = 3
+outbound_canceled_confirmed = 4
+outbound_canceled_unconfirmed = 5
+outbound_expired = 6
+inbound_received = 7
+inbound_canceled = 8
+failed_local = 9
+quarantined = 10
+
+[bundle_state]
+committed = 0
+offer_suppressed = 1
+terminal_receipt = 2
+terminal_cancel = 3
+expired = 4
+quarantined = 5
+eviction_pending = 6
+
+[transfer_state]
+receiving_meta = 0
+receiving_chunks = 1
+ready_to_commit = 2
+committed = 3
+sending = 4
+waiting_ack = 5
+uncertain_commit = 6
+rejected = 7
+failed_retryable = 8
+aborted = 9
+
+[token_grant_state]
+reserved = 0
+uncertain = 1
+transferred = 2
+released = 3
+
+[pending_control_state]
+waiting_for_original = 0
+applied = 1
+conflict_quarantined = 2
+expired = 3
+
+[diagnostic_severity]
+info = 0
+warning = 1
+error = 2
+critical = 3

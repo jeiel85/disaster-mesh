@@ -69,3 +69,29 @@ per_ingress_peer_daily_bytes = 8388608
 per_ingress_peer_unverified_direct_daily_bytes = 2097152
 per_source_bytes = 4194304
 partial_total_bytes = 4194304
+
+[capabilities]
+noise_xx = 1
+inventory_paging = 2
+resume_bitmap = 4
+credit_flow = 8
+control_receipt = 16
+known_mask = 31
+
+[ble.wire]
+outer_magic = 216
+outer_version = 1
+outer_header_bytes = 16
+max_logical_frame_bytes = 65536
+max_segment_count = 1024
+max_credit_bytes = 262144
+control_reserve_bytes = 4096
+
+[replay]
+window_bits = 4096
+window_bytes = 512
+
+[local_encryption]
+envelope_version = 1
+nonce_bytes = 24
+tag_bytes = 16

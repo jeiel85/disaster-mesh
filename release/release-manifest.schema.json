@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://disastermesh.invalid/schema/release-manifest-v1.json",
+  "title": "DisasterMesh Release Evidence Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "release_id", "source_commit", "signed_tag",
+    "app_version", "protocol", "db_schema", "artifacts", "sbom",
+    "test_evidence", "approvals", "known_risks"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "release_id": {"type": "string", "pattern": "^android-v[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+    "signed_tag": {"type": "string", "minLength": 1},
+    "build_started_at": {"type": "string", "format": "date-time"},
+    "app_version": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version_name", "version_code", "min_sdk", "target_sdk", "compile_sdk"],
+      "properties": {
+        "version_name": {"type": "string"},
+        "version_code": {"type": "integer", "minimum": 1},
+        "min_sdk": {"type": "integer", "minimum": 26},
+        "target_sdk": {"type": "integer", "minimum": 26},
+        "compile_sdk": {"type": "integer", "minimum": 26}
+      }
+    },
+    "protocol": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dme", "ble_cla", "bp_profile", "state_contract_sha256"],
+      "properties": {
+        "dme": {"type": "string"},
+        "ble_cla": {"type": "string"},
+        "bp_profile": {"type": "string"},
+        "state_contract_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "db_schema": {"type": "integer", "minimum": 1},
+    "artifacts": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "kind", "sha256", "size_bytes", "signature_verified"],
+        "properties": {
+          "name": {"type": "string"},
+          "kind": {"enum": ["aab", "apk", "source", "symbols", "vectors", "report"]},
+          "sha256": {"$ref": "#/$defs/sha256"},
+          "size_bytes": {"type": "integer", "minimum": 1},
+          "signature_verified": {"type": "boolean"}
+        }
+      }
+    },
+    "sbom": {
+      "type": "object", "additionalProperties": false,
+      "required": ["format", "sha256", "dependency_review_id"],
+      "properties": {
+        "format": {"enum": ["CycloneDX", "SPDX"]},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "dependency_review_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "test_evidence": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "result", "evidence_sha256"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "result": {"enum": ["pass", "waived"]},
+          "evidence_sha256": {"$ref": "#/$defs/sha256"},
+          "waiver_id": {"type": "string"}
+        },
+        "allOf": [
+          {"if": {"properties": {"result": {"const": "waived"}}}, "then": {"required": ["waiver_id"]}}
+        ]
+      }
+    },
+    "approvals": {
+      "type": "array", "minItems": 5,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["role", "subject", "approved_at", "signature"],
+        "properties": {
+          "role": {"enum": ["product", "engineering", "qa", "security", "operations", "legal"]},
+          "subject": {"type": "string", "minLength": 1},
+          "approved_at": {"type": "string", "format": "date-time"},
+          "signature": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "known_risks": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "severity", "summary", "owner", "expiry", "decision"],
+        "properties": {
+          "id": {"type": "string"},
+          "severity": {"enum": ["P2", "P3"]},
+          "summary": {"type": "string"},
+          "owner": {"type": "string"},
+          "expiry": {"type": "string", "format": "date"},
+          "decision": {"enum": ["accepted", "mitigated"]}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
