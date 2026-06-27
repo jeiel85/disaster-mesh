@@ -1,4 +1,5 @@
 .gitattributes
+.github/workflows/pages.yml
 .gitignore
 archive/design-review-v1.0.1.md
 archive/design_v0.1.md
