@@ -27,8 +27,8 @@ DisasterMesh is an **Android-first, serverless, offline-first** emergency commun
 
 The current design baseline is **v2.0.0-rc1**. It closes the protocol, storage,
 transport, and operational contracts needed to begin a commercial-grade
-implementation. Goal 0 bootstrap and the Goal 0.5 normative contract freeze are
-complete; protocol-core implementation is now unblocked.
+implementation. Goal 0, Goal 0.5, and Goal 1 protocol-core implementation are
+complete; identity and E2EE implementation is now unblocked.
 
 > **재난 상황에서** 기지국·인터넷·공유기 없이, 주변 스마트폰과 고정 릴레이만으로  
 > 종단간 암호화된 재난 메시지를 **저장·운반·전달**하는 Android 우선 오픈소스 시스템.  
@@ -245,8 +245,8 @@ disaster-mesh/
 | **Goal 7** | Commercial release readiness | Go-live checklist complete; rollout and rollback rehearsed |
 | **Goal 8** | iOS and fixed relay expansion after Android 1.0 | Shared-core compatibility and field tooling validated |
 
-**Current status:** Goal 0 repository bootstrap and Goal 0.5 normative contract
-freeze completed on **2026-06-29**. Goal 1 protocol-core implementation is next.
+**Current status:** Goal 0 bootstrap, Goal 0.5 contract freeze, and Goal 1
+protocol core/simulator completed on **2026-06-29**. Goal 2 identity and E2EE is next.
 
 ---
 

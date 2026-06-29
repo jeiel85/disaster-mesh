@@ -63,6 +63,14 @@ not an open protocol interpretation.
 
 ## Goal 1 — Protocol Core and Simulator
 
+**Status: COMPLETE (2026-06-29).** Validated fixed-size IDs and bounded values,
+Core Deterministic CBOR, canonical Base32 EIDs, the RFC 9171 indefinite outer
+array and DM-BP7-1 block/CRC profile, SQLite v1 forward-only migration and
+persistent grant escrow, routing/quota/eviction rules, and the deterministic
+SIM-001 through SIM-005 suite are implemented. The 100-node seeded scenario,
+lost-ACK token conservation, same-grant idempotency, malformed input, and four
+Android ABI native builds pass.
+
 ### 결과물
 
 - ID/value types

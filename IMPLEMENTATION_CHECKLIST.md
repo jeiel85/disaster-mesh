@@ -13,22 +13,22 @@
 ## Protocol
 
 - [x] CDDL files are used by tests
-- [ ] Deterministic CBOR enforced on encode and validated on decode
-- [ ] DM-BP7-1 block order/flags/CRC fixed
-- [ ] Packet/body size limits checked before allocation
+- [x] Deterministic CBOR enforced on encode and validated on decode
+- [x] DM-BP7-1 block order/flags/CRC fixed
+- [x] Packet/body size limits checked before allocation
 - [ ] HPKE AAD includes immutable hop_limit and matches spec/dme-aad-v1.cddl
 - [ ] Golden vectors committed
 
 ## Routing
 
-- [ ] token grant escrow before relay transfer
-- [ ] uncertain grant is never reused after ACK loss
-- [ ] same-grant reconciliation is idempotent
-- [ ] Direct destination bypasses token restriction
-- [ ] hop/age never decrease
+- [x] token grant escrow before relay transfer
+- [x] uncertain grant is never reused after ACK loss
+- [x] same-grant reconciliation is idempotent
+- [x] Direct destination bypasses token restriction
+- [x] hop/age never decrease
 - [x] receipt terminal/non-recursive; cancel reorder/pending control/idempotency tested
-- [ ] verified local P0/P1 protected pool
-- [ ] ingress peer quota
+- [x] verified local P0/P1 protected pool
+- [x] ingress peer quota
 
 ## Android
 

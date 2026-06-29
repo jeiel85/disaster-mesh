@@ -2,7 +2,7 @@
 
 ## Current status
 
-The design is upgraded from an implementation-oriented v1.0.1 to a commercial implementation baseline. Goal 0 bootstrap and the Goal 0.5 normative contract freeze completed on 2026-06-29. Goal 1 protocol-core work is unblocked.
+The design is upgraded from an implementation-oriented v1.0.1 to a commercial implementation baseline. Goal 0 bootstrap, Goal 0.5 normative contract freeze, and Goal 1 protocol core/simulator completed on 2026-06-29. Goal 2 identity/E2EE work is unblocked.
 
 Goal 0 evidence includes Rust format/clippy/tests, Android release lint and unit
 tests, all three bootstrap variants, a four-ABI UniFFI package, merged-manifest
@@ -31,10 +31,10 @@ policy assertions, and an API 36 emulator instrumentation call to Rust `version(
 
 ## Next command
 
-Execute `/goal 1`. Goal 0.5 acceptance evidence includes generated TOML
-constants, CDDL conformance, SQLite migrations/invariants, BLE golden/invalid
-headers, replay properties, terminal control tests, Android command correlation,
-and source/distribution design-bundle validation.
+Execute `/goal 2`. Goal 1 acceptance evidence includes deterministic CBOR and
+Base32, DM-BP7-1 CRC/block conformance, persistent SQLite token escrow,
+route/quota/eviction properties, SIM-001 through SIM-005, a deterministic
+100-node scenario, and four-ABI Android native linkage.
 
 ## Stable 1.0 boundary
 

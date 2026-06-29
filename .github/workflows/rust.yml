@@ -38,6 +38,8 @@ jobs:
         run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Tests
         run: cargo test --locked --workspace
+      - name: Deterministic 100-node simulator acceptance
+        run: cargo test --locked -p mesh-sim sim_003_one_hundred_nodes_is_seeded_and_deterministic
       - name: Validate source distribution
         run: |
           mkdir "$RUNNER_TEMP/disaster-mesh-distribution"

@@ -11,12 +11,20 @@ pub const SCHEMA_VERSION: i64 = 1;
 pub const SCHEMA_V1_SQL: &str = include_str!("../../../schemas/sqlite_v1.sql");
 pub const SCHEMA_INVARIANTS_SQL: &str = include_str!("../../../schemas/schema_invariants.sql");
 
+mod routing_store;
+pub use routing_store::*;
+
 #[derive(Debug, Eq, PartialEq)]
 pub enum StoreError {
     Sqlite(String),
     NewerSchema { found: i64, supported: i64 },
     SchemaVersionMismatch { pragma: i64, metadata: i64 },
     InvariantViolation { statement: usize },
+    WaitOnly,
+    InvalidGrantTransition,
+    UnknownGrant,
+    TokenOverflow,
+    IntegerOutOfRange,
 }
 
 impl fmt::Display for StoreError {

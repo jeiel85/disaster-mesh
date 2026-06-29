@@ -5,7 +5,14 @@
 /// Identifies this bootstrap crate without defining codec behavior.
 pub const CRATE_NAME: &str = "mesh-codec";
 
+pub mod base32;
 pub mod ble;
+pub mod cbor;
+
+pub use cbor::{
+    CborError, CborValue, DecodeLimits, decode_deterministic, decode_deterministic_prefix,
+    encode_deterministic,
+};
 
 /// Confirms the dependency direction toward `mesh-types`.
 #[must_use]

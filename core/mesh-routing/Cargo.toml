@@ -11,5 +11,8 @@ description = "DisasterMesh routing decision boundary"
 mesh-types.workspace = true
 mesh-bundle.workspace = true
 
+[dev-dependencies]
+proptest.workspace = true
+
 [lints]
 workspace = true

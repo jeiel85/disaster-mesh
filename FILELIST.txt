@@ -92,7 +92,9 @@ contracts/state_codes.toml
 core/mesh-bundle/Cargo.toml
 core/mesh-bundle/src/lib.rs
 core/mesh-codec/Cargo.toml
+core/mesh-codec/src/base32.rs
 core/mesh-codec/src/ble.rs
+core/mesh-codec/src/cbor.rs
 core/mesh-codec/src/lib.rs
 core/mesh-codec/tests/cddl_contracts.rs
 core/mesh-crypto/Cargo.toml
@@ -111,7 +113,9 @@ core/mesh-sim/Cargo.toml
 core/mesh-sim/src/lib.rs
 core/mesh-store/Cargo.toml
 core/mesh-store/src/lib.rs
+core/mesh-store/src/routing_store.rs
 core/mesh-types/Cargo.toml
+core/mesh-types/src/domain.rs
 core/mesh-types/src/generated_contracts.rs
 core/mesh-types/src/lib.rs
 core/README.md

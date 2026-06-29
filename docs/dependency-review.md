@@ -68,6 +68,7 @@
 | Cargo/rusqlite | 0.40.1 | `11438310b19e3109b6446c33d1ed5e889428cf2e278407bc7896bc4aaea43323` | Rust-owned SQLite schema and transactions | critical | MIT | bundled SQLite; forward-only migration, CHECK and invariant tests; advisory gates | approved for implementation; power-loss review remains | automated contract review / 2026-06-29 |
 | Cargo/libsqlite3-sys | 0.38.1 | `f6c19a05435c21ac299d71b6a9c13db3e3f47c520517d58990a462a1397a61db` | Bundled native SQLite boundary | critical/transitive | MIT | exact Cargo checksum; native boundary covered by schema tests and later corruption campaign | approved for implementation; release native review | automated contract review / 2026-06-29 |
 | Cargo/proptest | 1.11.0 | `4b45fcc2344c680f5025fe57779faef368840d0bd1f42f216291f0dc4ace4744` | Replay/routing/parser property tests | dev-only | MIT OR Apache-2.0 | seeded shrinking tests; absent from production dependency graph | approved, dev-only | automated contract review / 2026-06-29 |
+| Cargo/sha2 | 0.11.0 | `446ba717509524cb3f22f17ecc096f10f4822d76ab5c0b9822c5f9c284e825f4` | BP identity, wire and payload SHA-256 | critical | MIT OR Apache-2.0 | RustCrypto upstream; bundle mutation/round-trip tests; advisory gates | approved for implementation; external protocol review remains | automated protocol review / 2026-06-29 |
 
 Checksums for every transitive Gradle artifact are recorded in
 `apps/android/gradle/verification-metadata.xml`; every resolved configuration is

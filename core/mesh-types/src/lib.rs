@@ -5,7 +5,10 @@
 /// Identifies this bootstrap crate without defining protocol behavior.
 pub const CRATE_NAME: &str = "mesh-types";
 
+pub mod domain;
 pub mod generated_contracts;
+
+pub use domain::*;
 
 #[cfg(test)]
 mod tests {

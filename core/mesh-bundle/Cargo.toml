@@ -11,6 +11,8 @@ description = "DisasterMesh bundle profile boundary"
 mesh-types.workspace = true
 mesh-codec.workspace = true
 mesh-crypto.workspace = true
+crc32c.workspace = true
+sha2.workspace = true
 
 [lints]
 workspace = true

@@ -9,6 +9,8 @@ description = "DisasterMesh simulation boundary"
 
 [dependencies]
 mesh-engine.workspace = true
+mesh-routing.workspace = true
+mesh-types.workspace = true
 
 [lints]
 workspace = true

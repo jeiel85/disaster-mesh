@@ -1,8 +1,8 @@
 # Android application
 
 Goal 0 establishes the Android module graph, build variants, release manifest
-policy, and the single UniFFI bridge. Bluetooth, cryptography, routing, storage,
-and messaging behavior are intentionally absent.
+policy, and the single UniFFI bridge. Protocol, routing and SQLite behavior now
+live in the Rust core; Bluetooth product behavior and messaging UI remain absent.
 
 Supported bootstrap variants:
 
