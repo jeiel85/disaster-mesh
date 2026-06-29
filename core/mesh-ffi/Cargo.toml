@@ -1,0 +1,26 @@
+[package]
+name = "mesh-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Single DisasterMesh UniFFI facade"
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "src/bin/uniffi-bindgen.rs"
+required-features = ["bindgen-cli"]
+
+[features]
+bindgen-cli = ["uniffi/cli"]
+
+[dependencies]
+mesh-engine.workspace = true
+uniffi.workspace = true
+
+[lints]
+workspace = true

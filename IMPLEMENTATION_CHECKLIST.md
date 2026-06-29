@@ -7,8 +7,8 @@
 - [ ] Generate final project UUIDs only if intentionally changing specified UUIDs
 - [ ] Populate `docs/dependency-review.md` from actual Cargo/Gradle lockfiles and approve every critical dependency
 - [ ] Generate/check constants and persisted state codes from contracts/*.toml
-- [ ] Configure offlineRelease manifest assertion
-- [ ] Configure OS/OEM backup and data-transfer exclusion assertion
+- [x] Configure offlineRelease manifest assertion
+- [x] Configure OS/OEM backup and data-transfer exclusion assertion
 
 ## Protocol
 

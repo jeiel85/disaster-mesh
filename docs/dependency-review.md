@@ -55,7 +55,32 @@
 
 | Ecosystem/name | Version | Checksum/commit | Purpose | Criticality | License | Security/maintenance evidence | Decision | Reviewer/date |
 |---|---|---|---|---|---|---|---|---|
-| _Generated from lockfile_ |  |  |  |  |  |  |  |  |
+| Cargo/UniFFI | 0.31.2 | `46eefd5468602930da46b1f49d3448c6dfc2e81295f93120f23f8174fd70267f` | Single Rust↔Kotlin facade and binding generation | critical | MPL-2.0 | `Cargo.lock`; `cargo deny` and `cargo audit --deny warnings` pass | conditional — MPL/native boundary review in Goal 0.5 | automated inventory / 2026-06-29 |
+| Gradle/Android Gradle Plugin | 9.2.1 | `582e85078b60eb80669223b34b58200ba034654b2edb1cf9621e62fde7dfc0a3` | Android build and packaging | high | Apache-2.0 | API 37 compatible stable line; Gradle verification metadata | conditional — build tooling | automated inventory / 2026-06-29 |
+| Gradle/Kotlin Gradle Plugin | 2.4.0 | `ca5903a236a19a54a883a8695958d8516f9e39cc333bd1e3077f92ae38271cd6` | Stable Kotlin compiler and Compose compiler plugin | high | Apache-2.0 | Kotlin stable release; Gradle verification metadata | conditional — build tooling | automated inventory / 2026-06-29 |
+| Gradle/Compose BOM | 2026.06.00 | `e4e8235a1f30f5749a37dd1656a51e5ece1053fc3cd7caf99eacb3359b32bedf` | Compose dependency alignment | normal | Apache-2.0 | AndroidX stable BOM; Gradle verification metadata | conditional | automated inventory / 2026-06-29 |
+| Gradle/activity-compose | 1.13.0 | `2b5da3033d4924e833868e140c3edfc0c03208710b6b9fb2c9d9a47560ba55fa` | Minimal Compose activity host | normal | Apache-2.0 | AndroidX stable release; Gradle verification metadata | conditional | automated inventory / 2026-06-29 |
+| Gradle/JNA Android AAR | 5.19.1 | `b57125cb7d16253f0d65a80f7d3a4c3664effa711b8bdbb7f87fb572ce1624ed` | UniFFI Kotlin native loading | critical | Apache-2.0 OR LGPL-2.1-or-later | Gradle verification metadata; four-ABI APK packaging test | conditional — native/unsafe and license review in Goal 0.5 | automated inventory / 2026-06-29 |
+| Gradle/AndroidX Test runner + ext-junit | 1.7.0 / 1.3.0 | `970311c47119928a2e406a88892a3d270387cc5a49a181a1c44511105b41b818` / `3363df84da4540ba8daff02c3f7cd65471037a6a5370591a7e6deba377b36e7f` | Android instrumentation harness | dev-only | Apache-2.0 | API 36 emulator instrumentation passes; Gradle verification metadata | conditional, dev-only | automated inventory / 2026-06-29 |
+| Gradle/JUnit | 4.13.2 | `8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3` | Host unit tests | dev-only | EPL-1.0 | Gradle verification metadata; offlineRelease unit test passes | conditional, dev-only | automated inventory / 2026-06-29 |
+
+Checksums for every transitive Gradle artifact are recorded in
+`apps/android/gradle/verification-metadata.xml`; every resolved configuration is
+locked by the module-local `gradle.lockfile`. The rows above are an automated
+bootstrap inventory, not the human/security approval required by Goal 0.5.
+
+### 4.1 Pinned bootstrap tools
+
+| Tool | Version | Integrity/evidence |
+|---|---:|---|
+| Rust | 1.96.0 | `rust-toolchain.toml`; includes the Cargo symlink-extraction security fix |
+| Gradle | 9.4.1 | wrapper SHA-256 `2ab2958f2a1e51120c326cad6f385153bb11ee93b3c216c5fccebfdfbb7ec6cb` |
+| JDK | 17 | AGP 9.2 compatibility baseline and CI setup |
+| Android SDK | compile 37 / target 36 / min 26 | approved product baseline |
+| Android NDK | 28.2.13676358 | AGP 9.2 default NDK baseline |
+| cargo-ndk | 4.1.2 | exact CI install version |
+| cargo-deny | 0.19.9 | exact CI install version; all policy categories pass |
+| cargo-audit | 0.22.2 | exact CI install version; warnings denied |
 
 ## 5. Automated gates
 

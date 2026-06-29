@@ -2,7 +2,11 @@
 
 ## Current status
 
-The design is upgraded from an implementation-oriented v1.0.1 to a commercial implementation baseline. Goal 0 bootstrap may start, but Goal 1 feature work must pass Goal 0.5 contract freeze first.
+The design is upgraded from an implementation-oriented v1.0.1 to a commercial implementation baseline. Goal 0 bootstrap completed on 2026-06-29. Goal 1 feature work must still pass the Goal 0.5 contract freeze first.
+
+Goal 0 evidence includes Rust format/clippy/tests, Android release lint and unit
+tests, all three bootstrap variants, a four-ABI UniFFI package, merged-manifest
+policy assertions, and an API 36 emulator instrumentation call to Rust `version()`.
 
 ## Closed launch-blocking design gaps
 
@@ -27,7 +31,7 @@ The design is upgraded from an implementation-oriented v1.0.1 to a commercial im
 
 ## Next command
 
-Execute `/goal 0` and `/goal 0.5`. Do not start Bluetooth product behavior until
+Execute `/goal 0.5`. Do not start Bluetooth product behavior until
 `python tools/validate_design_bundle.py` passes and Goal 0.5 acceptance evidence exists.
 For a packaged release artifact, also run
 `python tools/validate_design_bundle.py --distribution` outside a Git checkout.

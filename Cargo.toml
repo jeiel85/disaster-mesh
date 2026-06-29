@@ -1,0 +1,41 @@
+[workspace]
+resolver = "3"
+members = [
+    "core/mesh-types",
+    "core/mesh-codec",
+    "core/mesh-crypto",
+    "core/mesh-bundle",
+    "core/mesh-routing",
+    "core/mesh-store",
+    "core/mesh-engine",
+    "core/mesh-sim",
+    "core/mesh-ffi",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96.0"
+license = "Apache-2.0"
+repository = "https://github.com/jeiel85/disaster-mesh"
+
+[workspace.dependencies]
+mesh-types = { version = "=0.1.0", path = "core/mesh-types" }
+mesh-codec = { version = "=0.1.0", path = "core/mesh-codec" }
+mesh-crypto = { version = "=0.1.0", path = "core/mesh-crypto" }
+mesh-bundle = { version = "=0.1.0", path = "core/mesh-bundle" }
+mesh-routing = { version = "=0.1.0", path = "core/mesh-routing" }
+mesh-store = { version = "=0.1.0", path = "core/mesh-store" }
+mesh-engine = { version = "=0.1.0", path = "core/mesh-engine" }
+uniffi = "=0.31.2"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "warn"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+strip = "debuginfo"

@@ -4,6 +4,10 @@
 
 ## Goal 0 — Repository Bootstrap
 
+**상태: 완료 (2026-06-29).** Rust/Android clean build, release manifest gate,
+4-ABI native packaging, dependency locks, 그리고 API 36 emulator에서 UniFFI
+`version()` instrumentation 호출을 검증했다.
+
 ### 결과물
 
 - Rust workspace와 Android multi-module project

@@ -1,0 +1,16 @@
+[package]
+name = "mesh-bundle"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "DisasterMesh bundle profile boundary"
+
+[dependencies]
+mesh-types.workspace = true
+mesh-codec.workspace = true
+mesh-crypto.workspace = true
+
+[lints]
+workspace = true

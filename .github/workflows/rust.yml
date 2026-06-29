@@ -1,0 +1,33 @@
+name: Rust
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.96.0
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Formatting
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - name: Tests
+        run: cargo test --locked --workspace
+      - name: Verify generated UniFFI bindings
+        run: |
+          ./tools/generate_uniffi_bindings.sh
+          git diff --exit-code -- apps/android/core-bridge/src/main/kotlin

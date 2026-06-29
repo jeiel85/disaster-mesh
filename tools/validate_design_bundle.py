@@ -169,13 +169,27 @@ else:
             errors.append(f'cddl-no-rule:{path.relative_to(ROOT)}')
     notes.append('CDDL executable not installed; lexical balance checks only')
 
-# Generate deterministic inventory before hashing it.
-all_paths = sorted(p for p in ROOT.rglob('*') if p.is_file() and '.git' not in p.parts)
+# Generate deterministic source inventory before hashing it. Goal 0 introduces
+# build trees and generated JNI outputs, none of which belong in a source
+# distribution manifest.
+excluded_inventory_dirs = {'.git', '.gradle', '.kotlin', '__pycache__', 'build', 'target'}
+
+
+def belongs_in_inventory(path: Path) -> bool:
+    relative = path.relative_to(ROOT)
+    if not path.is_file() or any(part in excluded_inventory_dirs for part in relative.parts):
+        return False
+    return relative.parts[:6] != (
+        'apps', 'android', 'core-bridge', 'src', 'main', 'jniLibs'
+    )
+
+
+all_paths = sorted(p for p in ROOT.rglob('*') if belongs_in_inventory(p))
 filelist_lines = [p.relative_to(ROOT).as_posix() for p in all_paths]
 (ROOT / 'FILELIST.txt').write_text('\n'.join(filelist_lines) + '\n', 'utf-8')
 
 manifest: list[str] = []
-for path in sorted(p for p in ROOT.rglob('*') if p.is_file() and '.git' not in p.parts):
+for path in all_paths:
     if path.name == 'FILE_SHA256SUMS.txt':
         continue
     manifest.append(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(ROOT).as_posix()}")

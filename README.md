@@ -145,6 +145,12 @@ When earthquakes, floods, hurricanes, or power failures strike, cellular network
 ```
 disaster-mesh/
 │
+├── core/                          # Rust 2024 workspace (9 crates, one FFI facade)
+├── apps/android/                  # Android 15-module project and Gradle wrapper
+├── Cargo.toml                     # Locked workspace dependency graph
+├── Cargo.lock
+├── rust-toolchain.toml            # Rust 1.96.0 + Android targets
+│
 ├── docs/                          # 23 numbered specifications + readiness docs
 │   ├── adr/                       # ADR-001 through ADR-016
 │   ├── 00-product-requirements.md
@@ -239,8 +245,9 @@ disaster-mesh/
 | **Goal 7** | Commercial release readiness | Go-live checklist complete; rollout and rollback rehearsed |
 | **Goal 8** | iOS and fixed relay expansion after Android 1.0 | Shared-core compatibility and field tooling validated |
 
-**Current status:** Commercial implementation baseline **v2.0.0-rc1**. Goal 0 may
-start now; Goal 1–4 feature work requires Goal 0.5 acceptance evidence.
+**Current status:** Goal 0 repository bootstrap completed on **2026-06-29**.
+Goal 0.5 normative contract freeze is next; Goal 1–4 feature work remains blocked
+until Goal 0.5 acceptance evidence exists.
 
 ---
 

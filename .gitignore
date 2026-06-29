@@ -16,6 +16,7 @@ local.properties
 captures/
 .cxx/
 output.json
+/apps/android/core-bridge/src/main/jniLibs/
 # Keep wrapper; ignore generated keystores and signing secrets.
 *.jks
 *.keystore
@@ -43,3 +44,7 @@ desktop.ini
 .env
 /scratch/
 /tmp/
+
+# ── Python cache ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
