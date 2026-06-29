@@ -1,11 +1,11 @@
-//! Deterministic encoding boundary.
-//!
-//! Encoding behavior is intentionally absent during repository bootstrap.
+//! Deterministic encoding and wire-codec boundary.
 
 #![forbid(unsafe_code)]
 
 /// Identifies this bootstrap crate without defining codec behavior.
 pub const CRATE_NAME: &str = "mesh-codec";
+
+pub mod ble;
 
 /// Confirms the dependency direction toward `mesh-types`.
 #[must_use]

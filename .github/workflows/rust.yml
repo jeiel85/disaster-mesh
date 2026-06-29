@@ -21,12 +21,29 @@ jobs:
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install contract validators
+        run: |
+          python -m pip install --requirement tools/requirements-validation.txt
+          cargo install --locked cddl --version 0.10.5
+      - name: Verify generated contract constants
+        run: python tools/generate_contracts.py --check
+      - name: Validate normative design contracts
+        run: python tools/validate_design_bundle.py
       - name: Formatting
         run: cargo fmt --all -- --check
       - name: Clippy
         run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Tests
         run: cargo test --locked --workspace
+      - name: Validate source distribution
+        run: |
+          mkdir "$RUNNER_TEMP/disaster-mesh-distribution"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/disaster-mesh-distribution"
+          cd "$RUNNER_TEMP/disaster-mesh-distribution"
+          python tools/validate_design_bundle.py --distribution
       - name: Verify generated UniFFI bindings
         run: |
           ./tools/generate_uniffi_bindings.sh

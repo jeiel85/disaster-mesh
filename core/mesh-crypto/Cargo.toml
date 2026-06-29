@@ -10,5 +10,8 @@ description = "DisasterMesh cryptography adapter boundary"
 [dependencies]
 mesh-types.workspace = true
 
+[dev-dependencies]
+proptest.workspace = true
+
 [lints]
 workspace = true

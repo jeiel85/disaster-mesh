@@ -6,13 +6,13 @@
 - [ ] Accept or replace each ADR explicitly
 - [ ] Generate final project UUIDs only if intentionally changing specified UUIDs
 - [ ] Populate `docs/dependency-review.md` from actual Cargo/Gradle lockfiles and approve every critical dependency
-- [ ] Generate/check constants and persisted state codes from contracts/*.toml
+- [x] Generate/check constants and persisted state codes from contracts/*.toml
 - [x] Configure offlineRelease manifest assertion
 - [x] Configure OS/OEM backup and data-transfer exclusion assertion
 
 ## Protocol
 
-- [ ] CDDL files are used by tests
+- [x] CDDL files are used by tests
 - [ ] Deterministic CBOR enforced on encode and validated on decode
 - [ ] DM-BP7-1 block order/flags/CRC fixed
 - [ ] Packet/body size limits checked before allocation
@@ -26,7 +26,7 @@
 - [ ] same-grant reconciliation is idempotent
 - [ ] Direct destination bypasses token restriction
 - [ ] hop/age never decrease
-- [ ] receipt terminal/non-recursive; cancel reorder/pending control/idempotency tested
+- [x] receipt terminal/non-recursive; cancel reorder/pending control/idempotency tested
 - [ ] verified local P0/P1 protected pool
 - [ ] ingress peer quota
 
@@ -51,7 +51,7 @@
 
 ## Release
 
-- [ ] DB migration tests
+- [x] DB migration tests
 - [ ] compatibility matrix
 - [ ] battery/screen-off report
 - [ ] threat model updated

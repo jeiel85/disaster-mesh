@@ -156,7 +156,11 @@ cddl_files = sorted(ROOT.glob('spec/*.cddl'))
 cddl_cmd = shutil.which('cddl')
 if cddl_cmd:
     for path in cddl_files:
-        proc = subprocess.run([cddl_cmd, str(path)], text=True, capture_output=True)
+        proc = subprocess.run(
+            [cddl_cmd, '--ci', 'compile-cddl', '--cddl', str(path)],
+            text=True,
+            capture_output=True,
+        )
         if proc.returncode != 0:
             errors.append(f'cddl:{path.relative_to(ROOT)}:{proc.stderr.strip() or proc.stdout.strip()}')
 else:

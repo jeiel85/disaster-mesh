@@ -63,6 +63,11 @@
 | Gradle/JNA Android AAR | 5.19.1 | `b57125cb7d16253f0d65a80f7d3a4c3664effa711b8bdbb7f87fb572ce1624ed` | UniFFI Kotlin native loading | critical | Apache-2.0 OR LGPL-2.1-or-later | Gradle verification metadata; four-ABI APK packaging test | conditional — native/unsafe and license review in Goal 0.5 | automated inventory / 2026-06-29 |
 | Gradle/AndroidX Test runner + ext-junit | 1.7.0 / 1.3.0 | `970311c47119928a2e406a88892a3d270387cc5a49a181a1c44511105b41b818` / `3363df84da4540ba8daff02c3f7cd65471037a6a5370591a7e6deba377b36e7f` | Android instrumentation harness | dev-only | Apache-2.0 | API 36 emulator instrumentation passes; Gradle verification metadata | conditional, dev-only | automated inventory / 2026-06-29 |
 | Gradle/JUnit | 4.13.2 | `8e495b634469d64fb8acfa3495a065cbacc8a0fff55ce1e31007be4c16dc57d3` | Host unit tests | dev-only | EPL-1.0 | Gradle verification metadata; offlineRelease unit test passes | conditional, dev-only | automated inventory / 2026-06-29 |
+| Cargo/cddl-cat | 0.7.1 | `0def7310489015a41757b6ae8a0126ad1d91c4a3f77089f862eea7c000638825` | CDDL parse and representative CBOR conformance tests | dev-only | MIT | All normative CDDL parses and representative values validate; `cargo audit`/`cargo deny` gate | approved for implementation; release re-review | automated contract review / 2026-06-29 |
+| Cargo/crc32c | 0.6.8 | `3a47af21622d091a8f0fb295b88bc886ac74efcc613efc19f5d0b21de5c89e47` | BLE chunk and protocol CRC32C | high | Apache-2.0 OR MIT | Golden/corruption tests; locked registry source; advisory gates | approved for implementation; release re-review | automated contract review / 2026-06-29 |
+| Cargo/rusqlite | 0.40.1 | `11438310b19e3109b6446c33d1ed5e889428cf2e278407bc7896bc4aaea43323` | Rust-owned SQLite schema and transactions | critical | MIT | bundled SQLite; forward-only migration, CHECK and invariant tests; advisory gates | approved for implementation; power-loss review remains | automated contract review / 2026-06-29 |
+| Cargo/libsqlite3-sys | 0.38.1 | `f6c19a05435c21ac299d71b6a9c13db3e3f47c520517d58990a462a1397a61db` | Bundled native SQLite boundary | critical/transitive | MIT | exact Cargo checksum; native boundary covered by schema tests and later corruption campaign | approved for implementation; release native review | automated contract review / 2026-06-29 |
+| Cargo/proptest | 1.11.0 | `4b45fcc2344c680f5025fe57779faef368840d0bd1f42f216291f0dc4ace4744` | Replay/routing/parser property tests | dev-only | MIT OR Apache-2.0 | seeded shrinking tests; absent from production dependency graph | approved, dev-only | automated contract review / 2026-06-29 |
 
 Checksums for every transitive Gradle artifact are recorded in
 `apps/android/gradle/verification-metadata.xml`; every resolved configuration is
@@ -81,6 +86,7 @@ bootstrap inventory, not the human/security approval required by Goal 0.5.
 | cargo-ndk | 4.1.2 | exact CI install version |
 | cargo-deny | 0.19.9 | exact CI install version; all policy categories pass |
 | cargo-audit | 0.22.2 | exact CI install version; warnings denied |
+| cddl CLI | 0.10.5 | exact CI install version; RFC 8610 conformance compile for every `spec/*.cddl` |
 
 ## 5. Automated gates
 

@@ -24,6 +24,7 @@ apps/android/domain/build.gradle.kts
 apps/android/domain/gradle.lockfile
 apps/android/domain/src/main/AndroidManifest.xml
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/BootstrapBoundary.kt
+apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/GeneratedContracts.kt
 apps/android/feature-checkin/build.gradle.kts
 apps/android/feature-checkin/gradle.lockfile
 apps/android/feature-checkin/src/main/AndroidManifest.xml
@@ -73,6 +74,8 @@ apps/android/test-fixtures/src/main/AndroidManifest.xml
 apps/android/transport-ble/build.gradle.kts
 apps/android/transport-ble/gradle.lockfile
 apps/android/transport-ble/src/main/AndroidManifest.xml
+apps/android/transport-ble/src/main/kotlin/org/disastermesh/android/transport/GattCommandCorrelation.kt
+apps/android/transport-ble/src/test/kotlin/org/disastermesh/android/transport/GattCommandCorrelationTest.kt
 archive/design-review-v1.0.1.md
 archive/design_v0.1.md
 archive/FULL_IMPLEMENTATION_DESIGN_v1.0.md
@@ -89,10 +92,14 @@ contracts/state_codes.toml
 core/mesh-bundle/Cargo.toml
 core/mesh-bundle/src/lib.rs
 core/mesh-codec/Cargo.toml
+core/mesh-codec/src/ble.rs
 core/mesh-codec/src/lib.rs
+core/mesh-codec/tests/cddl_contracts.rs
 core/mesh-crypto/Cargo.toml
 core/mesh-crypto/src/lib.rs
+core/mesh-crypto/src/replay.rs
 core/mesh-engine/Cargo.toml
+core/mesh-engine/src/control.rs
 core/mesh-engine/src/lib.rs
 core/mesh-ffi/Cargo.toml
 core/mesh-ffi/src/bin/uniffi-bindgen.rs
@@ -105,6 +112,7 @@ core/mesh-sim/src/lib.rs
 core/mesh-store/Cargo.toml
 core/mesh-store/src/lib.rs
 core/mesh-types/Cargo.toml
+core/mesh-types/src/generated_contracts.rs
 core/mesh-types/src/lib.rs
 core/README.md
 deny.toml
@@ -184,8 +192,10 @@ test-vectors/cases.json
 test-vectors/cases.schema.json
 test-vectors/manifest.schema.json
 test-vectors/README.md
+tools/generate_contracts.py
 tools/generate_uniffi_bindings.ps1
 tools/generate_uniffi_bindings.sh
+tools/requirements-validation.txt
 tools/validate_design_bundle.py
 tools/verify_android_architecture.py
 tools/verify_android_manifest.py

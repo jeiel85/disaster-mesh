@@ -36,6 +36,14 @@
 
 ## Goal 0.5 — Normative Contract Freeze
 
+**Status: COMPLETE (2026-06-29).** Contract constants are generated into Rust
+and Kotlin, all CDDL is compiled by `cddl 0.10.5` and exercised with
+representative CBOR, SQLite v1 and invariant SQL execute in tests, and the BLE,
+replay, receipt/cancel, and command-correlation pure models have golden,
+invalid, reorder, and property coverage. Both source and distribution bundle
+validation pass. External security/release review remains a later release gate,
+not an open protocol interpretation.
+
 ### 결과물
 
 - `spec/dme-aad-v1.cddl`, `spec/ble-wire-v1.md`, complete BLE control CDDL

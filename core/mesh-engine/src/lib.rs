@@ -10,6 +10,8 @@ pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_owned()
 }
 
+pub mod control;
+
 /// Names the lower-level boundaries used by the future engine.
 #[must_use]
 pub const fn lower_boundaries() -> [&'static str; 3] {

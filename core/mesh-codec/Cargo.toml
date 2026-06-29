@@ -9,6 +9,11 @@ description = "DisasterMesh codec boundary"
 
 [dependencies]
 mesh-types.workspace = true
+crc32c.workspace = true
+
+[dev-dependencies]
+cddl-cat.workspace = true
+proptest.workspace = true
 
 [lints]
 workspace = true

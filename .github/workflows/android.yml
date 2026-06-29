@@ -47,6 +47,7 @@ jobs:
           ./gradlew --no-daemon
           :app:lintOfflineRelease
           :app:testOfflineReleaseUnitTest
+          :transport-ble:testDebugUnitTest
           :app:assembleOfflineRelease
           :app:assembleFieldTestRelease
           :app:assembleDevDebug
