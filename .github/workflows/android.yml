@@ -64,6 +64,10 @@ jobs:
             echo "Unsupported legacy ABI found in offlineRelease" >&2
             exit 1
           fi
+          if unzip -p "$apk" 'lib/*/libmesh_ffi.so' | grep -aF 'DisasterMesh/TEST-VECTOR-ONLY/1'; then
+            echo "test-vector key material marker leaked into offlineRelease" >&2
+            exit 1
+          fi
 
   instrumentation:
     runs-on: ubuntu-latest

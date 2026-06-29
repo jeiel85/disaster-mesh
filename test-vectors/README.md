@@ -4,7 +4,8 @@
 
 ## 규칙
 
-- RFC/프로토콜 입력과 random seed를 manifest에 기록한다.
+- RFC/프로토콜 입력과 고정된 비운영 identity fixture를 manifest에 기록한다.
+- HPKE ephemeral은 OS CSPRNG로 생성하고 결과 bytes를 golden vector에 캡처한다.
 - production build에는 deterministic RNG feature가 포함되지 않는다.
 - `.hex`는 공백 없는 lowercase hex.
 - JSON은 설명용이며 wire source of truth는 CBOR/BPv7 bytes다.
@@ -32,4 +33,5 @@
 14. malformed/non-canonical CBOR
 15. valid RFC 9171 outer indefinite bundle and invalid payload block number
 
-현재 묶음에는 암호 출력을 임의로 만들지 않았다. Goal 2 구현이 생성한 실제 bytes만 추가한다.
+현재 묶음에는 암호 출력을 임의로 만들지 않았다. Goal 2 구현이 production과
+같은 암호 경로와 OS CSPRNG로 생성한 실제 bytes만 추가한다.

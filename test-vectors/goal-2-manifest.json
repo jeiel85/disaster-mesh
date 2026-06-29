@@ -1,0 +1,9 @@
+{
+  "name": "goal-2-identity-e2ee",
+  "protocol": "DME v1 / DM-BP7-1 / RFC 9180",
+  "description": "Real Ed25519, X25519 HPKE and invalid mutation vectors",
+  "inputs": {"identity_fixture": "fixed non-production key material", "hpke_ephemeral": "OS CSPRNG output captured in committed ciphertext", "marker": "DisasterMesh/TEST-VECTOR-ONLY/1"},
+  "outputs": {"direct_bundle": "direct-text-bpv7.hex", "receipt_bundle": "receipt-bpv7.hex", "contact_card": "contact-card-v1.cbor.hex"},
+  "expected_error": null,
+  "generator_commit": "goal-2-local"
+}

@@ -55,6 +55,10 @@ json_files = [
     'test-vectors/cases.json',
     'release/release-manifest.schema.json',
 ]
+json_files.extend(
+    path.relative_to(ROOT).as_posix()
+    for path in sorted((ROOT / 'test-vectors').glob('*-manifest.json'))
+)
 parsed_json: dict[str, object] = {}
 for rel in json_files:
     try:
@@ -76,6 +80,12 @@ if 'test-vectors/cases.schema.json' in parsed_json and 'test-vectors/cases.json'
             errors.append('vector case IDs are not unique')
     except Exception as exc:
         errors.append(f'json-instance:test-vectors/cases.json:{exc}')
+if 'test-vectors/manifest.schema.json' in parsed_json:
+    for rel in sorted(name for name in parsed_json if name.endswith('-manifest.json')):
+        try:
+            Draft202012Validator(parsed_json['test-vectors/manifest.schema.json']).validate(parsed_json[rel])
+        except Exception as exc:
+            errors.append(f'json-instance:{rel}:{exc}')
 
 # SQLite schema and invariants.
 sql = (ROOT / 'schemas/sqlite_v1.sql').read_text('utf-8')

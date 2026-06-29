@@ -123,7 +123,10 @@ receipt-bpv7.hex
 invalid/
 ```
 
-random 입력은 vector generator에서 고정한다. production path에서 고정 random feature가 활성화되지 않도록 compile-time guard를 둔다.
+identity/ID fixture는 vector generator binary 안에서만 고정한다. HPKE ephemeral은
+production과 같은 OS CSPRNG 경로로 생성한 뒤 committed ciphertext에 캡처한다.
+generator marker와 test/property dependency가 `offlineRelease` native library에
+없음을 CI에서 검사한다.
 
 ## 6. Simulator scenarios
 

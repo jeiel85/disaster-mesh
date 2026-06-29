@@ -11,6 +11,9 @@ pub fn version() -> String {
 }
 
 pub mod control;
+pub mod secure_bundle;
+
+pub use secure_bundle::*;
 
 /// Names the lower-level boundaries used by the future engine.
 #[must_use]

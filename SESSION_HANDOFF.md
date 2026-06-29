@@ -2,7 +2,10 @@
 
 ## Current status
 
-The design is upgraded from an implementation-oriented v1.0.1 to a commercial implementation baseline. Goal 0 bootstrap, Goal 0.5 normative contract freeze, and Goal 1 protocol core/simulator completed on 2026-06-29. Goal 2 identity/E2EE work is unblocked.
+The design is upgraded from an implementation-oriented v1.0.1 to a commercial
+implementation baseline. Goal 0 bootstrap, Goal 0.5 normative contract freeze,
+Goal 1 protocol core/simulator, and Goal 2 identity/E2EE completed on
+2026-06-29. Goal 3 Android direct BLE is next.
 
 Goal 0 evidence includes Rust format/clippy/tests, Android release lint and unit
 tests, all three bootstrap variants, a four-ABI UniFFI package, merged-manifest
@@ -31,10 +34,11 @@ policy assertions, and an API 36 emulator instrumentation call to Rust `version(
 
 ## Next command
 
-Execute `/goal 2`. Goal 1 acceptance evidence includes deterministic CBOR and
-Base32, DM-BP7-1 CRC/block conformance, persistent SQLite token escrow,
-route/quota/eviction properties, SIM-001 through SIM-005, a deterministic
-100-node scenario, and four-ABI Android native linkage.
+Execute `/goal 3`. Goal 2 acceptance evidence includes separate identity/HPKE/
+Noise keys, signed contact QR and trust transitions, HPKE-protected DME bound to
+immutable routing AAD, DMEV local encryption, real cross-process golden/invalid
+vectors, secret zeroization/redaction, and a four-ABI offlineRelease with no
+test-vector marker or test dependency in its native graph.
 
 ## Stable 1.0 boundary
 

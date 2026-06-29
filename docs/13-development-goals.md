@@ -98,6 +98,13 @@ Android ABI native builds pass.
 
 ## Goal 2 — Identity, Contact and E2EE
 
+**Status: COMPLETE (2026-06-29).** Separate Ed25519 identity, X25519 HPKE and
+X25519 Noise keys, signed contact cards/QR, display and safety identifiers,
+trust/key-change handling, RFC 9180 HPKE-protected DME, DMEV local encryption,
+and real golden/invalid vectors are implemented. Cross-process vectors,
+wrong-recipient/AAD/signature rejection, secret redaction/zeroization, and the
+offlineRelease test-randomness exclusion gate pass.
+
 ### 결과물
 
 - identity bootstrap

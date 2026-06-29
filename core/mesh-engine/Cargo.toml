@@ -9,8 +9,12 @@ description = "DisasterMesh engine boundary"
 
 [dependencies]
 mesh-types.workspace = true
+mesh-bundle.workspace = true
+mesh-codec.workspace = true
+mesh-crypto.workspace = true
 mesh-routing.workspace = true
 mesh-store.workspace = true
+sha2.workspace = true
 
 [lints]
 workspace = true

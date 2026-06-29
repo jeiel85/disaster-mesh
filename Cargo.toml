@@ -29,10 +29,18 @@ mesh-store = { version = "=0.1.0", path = "core/mesh-store" }
 mesh-engine = { version = "=0.1.0", path = "core/mesh-engine" }
 uniffi = "=0.31.2"
 cddl-cat = "=0.7.1"
+chacha20poly1305 = "=0.10.1"
 crc32c = "=0.6.8"
+ed25519-dalek = "=2.2.0"
+hkdf = "=0.12.4"
+hpke = { version = "=0.13.0", default-features = false, features = ["alloc", "x25519"] }
 proptest = "=1.11.0"
+rand_core = { version = "=0.9.5", features = ["os_rng"] }
 rusqlite = { version = "=0.40.1", default-features = false, features = ["bundled"] }
-sha2 = "=0.11.0"
+sha2 = "=0.10.9"
+unicode-normalization = "=0.1.25"
+x25519-dalek = { version = "=2.0.1", features = ["static_secrets"] }
+zeroize = { version = "=1.9.0", features = ["derive"] }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

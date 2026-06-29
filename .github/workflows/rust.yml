@@ -38,6 +38,15 @@ jobs:
         run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
       - name: Tests
         run: cargo test --locked --workspace
+      - name: Verify cross-process cryptographic vectors
+        run: cargo run --locked -p mesh-engine --bin vector-tool -- verify
+      - name: Verify test-only code is absent from the FFI dependency graph
+        run: |
+          cargo tree --locked -p mesh-ffi > "$RUNNER_TEMP/mesh-ffi-tree.txt"
+          if grep -Eq 'mesh-sim|proptest' "$RUNNER_TEMP/mesh-ffi-tree.txt"; then
+            echo "test or simulator dependency leaked into mesh-ffi" >&2
+            exit 1
+          fi
       - name: Deterministic 100-node simulator acceptance
         run: cargo test --locked -p mesh-sim sim_003_one_hundred_nodes_is_seeded_and_deterministic
       - name: Validate source distribution

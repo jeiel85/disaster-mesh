@@ -245,8 +245,9 @@ disaster-mesh/
 | **Goal 7** | Commercial release readiness | Go-live checklist complete; rollout and rollback rehearsed |
 | **Goal 8** | iOS and fixed relay expansion after Android 1.0 | Shared-core compatibility and field tooling validated |
 
-**Current status:** Goal 0 bootstrap, Goal 0.5 contract freeze, and Goal 1
-protocol core/simulator completed on **2026-06-29**. Goal 2 identity and E2EE is next.
+**Current status:** Goal 0 bootstrap, Goal 0.5 contract freeze, Goal 1 protocol
+core/simulator, and Goal 2 identity/E2EE completed on **2026-06-29**. Goal 3
+Android direct BLE is next.
 
 ---
 

@@ -106,6 +106,10 @@ SHA256(contact_card_without_signature_cbor)
 - duplicate/key change
 - 화면 안전번호 비교
 
+display ID는 `SHA256(identity-signing-public-key)`의 앞 80 bits를 RFC 4648
+uppercase Base32 16글자(no padding)로 표시하고, 같은 32-byte hash의 CRC32C를
+lowercase hex 8글자로 덧붙인 `<BASE32-16>-<CRC32C-LOWERHEX-8>` 형식이다.
+
 QR import는 항상 `UNVERIFIED`다. 대면 확인 상태 전환은 별도 core API가 안전번호를
 재계산하고 사용자가 확인한 표시값과 일치시킨 뒤 수행한다.
 

@@ -16,8 +16,8 @@
 - [x] Deterministic CBOR enforced on encode and validated on decode
 - [x] DM-BP7-1 block order/flags/CRC fixed
 - [x] Packet/body size limits checked before allocation
-- [ ] HPKE AAD includes immutable hop_limit and matches spec/dme-aad-v1.cddl
-- [ ] Golden vectors committed
+- [x] HPKE AAD includes immutable hop_limit and matches spec/dme-aad-v1.cddl
+- [x] Golden vectors committed
 
 ## Routing
 
@@ -42,12 +42,12 @@
 
 ## Security
 
-- [ ] secrets excluded from Debug/log/export
+- [x] secrets excluded from Debug/log/export
 - [ ] master key wrapped in Keystore
-- [ ] test deterministic RNG absent in release
+- [x] test deterministic RNG absent in release
 - [ ] parser fuzz targets running
 - [ ] dependency review and SBOM
-- [ ] product limitations shown in UI
+- [x] product limitations shown in UI
 
 ## Release
 
