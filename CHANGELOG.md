@@ -1,5 +1,20 @@
 # Design Bundle Changelog
 
+## Android app v0.2.0 — 2026-06-30
+
+### Product experience
+
+- added a Material 3 status dashboard for Bluetooth, encrypted storage, and trusted contacts
+- added a dedicated settings/app-information screen with protocol, privacy, and safety status
+- persisted onboarding completion and retained feature navigation across Activity recreation
+- added accurate limited-diagnostic wording throughout the UI
+- kept protocol v1 and database schema v1 unchanged
+
+### Verification
+
+- expanded the API 36 emulator smoke path to cover the dashboard, settings, onboarding
+  persistence, system Back, foreground relay notification, diagnostic ZIP, and identity restart
+
 ## v2.0.0-rc1 — 2026-06-27
 
 ### Protocol and security

@@ -164,6 +164,8 @@ Save-Screenshot "01-onboarding.png"
 Tap-UiText "한계를 이해하고 계속"
 Wait-UiNode -Text "신뢰할 연락처 관리" | Out-Null
 Wait-UiNode -Text "제한된 진단 내보내기" | Out-Null
+Wait-UiNode -Text "설정 및 앱 정보" | Out-Null
+Wait-UiNode -Text "현재 준비 상태" | Out-Null
 Save-Screenshot "02-home.png"
 
 Tap-UiText "신뢰할 연락처 관리"
@@ -172,6 +174,21 @@ $identityBefore = Get-OwnQr
 $identityHash = Get-TextSha256 $identityBefore
 & $adb -s $Serial shell input keyevent KEYCODE_BACK | Out-Null
 Wait-UiNode -Text "릴레이 모드" | Out-Null
+Wait-UiNode -Text "신뢰할 연락처 관리" | Out-Null
+
+Tap-UiText "설정 및 앱 정보"
+Wait-UiNode -Text "앱 정보 및 설정" | Out-Null
+Wait-UiNode -Text "DisasterMesh 0.2.0-dev" | Out-Null
+Wait-UiNode -Text "Android offline edition" | Out-Null
+Save-Screenshot "05-settings.png"
+& $adb -s $Serial shell input keyevent KEYCODE_BACK | Out-Null
+Wait-UiNode -Text "신뢰할 연락처 관리" | Out-Null
+
+Tap-UiText "설정 및 앱 정보"
+Wait-UiNode -Text "안전 고지 다시 보기" | Out-Null
+Tap-UiText "안전 고지 다시 보기"
+Wait-UiNode -Text "한계를 이해하고 계속" | Out-Null
+Tap-UiText "한계를 이해하고 계속"
 Wait-UiNode -Text "신뢰할 연락처 관리" | Out-Null
 
 Tap-UiText "릴레이 모드"
@@ -239,9 +256,11 @@ try {
 
 & $adb -s $Serial shell am force-stop $PackageName | Out-Null
 & $adb -s $Serial shell am start -W -n $activity | Out-Null
-Wait-UiNode -Text "한계를 이해하고 계속" | Out-Null
-Tap-UiText "한계를 이해하고 계속"
 Wait-UiNode -Text "신뢰할 연락처 관리" | Out-Null
+$restartDocument = Get-UiDocument
+if (Find-UiNode -Document $restartDocument -Text "한계를 이해하고 계속") {
+    throw "Completed onboarding was shown again after process restart."
+}
 Tap-UiText "신뢰할 연락처 관리"
 Wait-UiNode -Text "내 연락처 QR 문자열" | Out-Null
 $identityAfter = Get-OwnQr
@@ -272,6 +291,10 @@ $result = [ordered]@{
     checks = @(
         "cold_start",
         "onboarding_and_home",
+        "onboarding_persistence",
+        "home_status_dashboard",
+        "settings_and_app_info",
+        "safety_notice_replay",
         "system_back_to_home",
         "keystore_database_identity_restart",
         "foreground_relay_start_notification_stop",

@@ -146,7 +146,7 @@ When earthquakes, floods, hurricanes, or power failures strike, cellular network
 disaster-mesh/
 │
 ├── core/                          # Rust 2024 workspace (9 crates, one FFI facade)
-├── apps/android/                  # Android 15-module project and Gradle wrapper
+├── apps/android/                  # Android 16-module project and Gradle wrapper
 ├── Cargo.toml                     # Locked workspace dependency graph
 ├── Cargo.lock
 ├── rust-toolchain.toml            # Rust 1.96.0 + Android targets
@@ -250,6 +250,8 @@ disaster-mesh/
 | **Goal 8** | iOS and fixed relay expansion after Android 1.0 | Shared-core compatibility and field tooling validated |
 
 **Current status:** Goal 0–7 implementation and release-gate preparation are locally committed.
+The Android product shell is now version **0.2.0** with persistent onboarding, a status
+dashboard, settings/app information, and an API 36 emulator regression path.
 The commercial decision remains **NO-GO** until the physical-device, soak, external-review,
 signing, legal, support, and approval evidence in `release/readiness-status.json` passes.
 

@@ -57,18 +57,20 @@ The script performs and asserts all of the following:
 1. build and debug-sign `app-dev-debug.apk`, then install it;
 2. grant API 36 nearby-device and notification permissions;
 3. cold-start the launcher activity and pass onboarding;
-4. verify the home and contact identity screens;
-5. verify Android system Back returns from contacts to the app home;
+4. verify the home status dashboard, settings/app information, and contact identity screens;
+5. verify Android system Back returns from contacts to the app home, and that the safety
+   notice can be replayed from settings before returning to the home screen;
 6. start the foreground relay service, observe its persistent notification, and stop it;
 7. preview and save the diagnostic ZIP through DocumentsUI, then verify its four-entry schema;
-8. force-stop/restart the process and verify the Keystore/database-backed contact identity is stable;
+8. force-stop/restart the process and verify completed onboarding stays dismissed and the
+   Keystore/database-backed contact identity is stable;
 9. require DisasterMesh to remain foreground with no fatal app crash in the cleared crash buffer.
 
 By default the smoke run clears only `org.disastermesh.android.dev` data for deterministic
 results. Use `-PreserveAppData` only when intentionally testing an existing emulator state.
 Use `-SkipBuild` to reuse an already-built APK.
 
-Evidence is written to `reports/evidence/emulator-api36/`: four screenshots and a JSON result
+Evidence is written to `reports/evidence/emulator-api36/`: five screenshots and a JSON result
 containing the source commit, dirty-state flag, AVD/API/package versions, identity hash, checks,
 and explicit physical-BLE limitations.
 

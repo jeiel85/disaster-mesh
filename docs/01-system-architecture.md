@@ -89,6 +89,7 @@ apps/android/
 ├─ feature-sos
 ├─ feature-relay-status
 ├─ feature-diagnostics
+├─ feature-settings
 └─ test-fixtures
 ```
 

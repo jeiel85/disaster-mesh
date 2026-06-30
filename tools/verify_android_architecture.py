@@ -25,6 +25,7 @@ EXPECTED_MODULES = {
     "feature-sos",
     "feature-relay-status",
     "feature-diagnostics",
+    "feature-settings",
     "test-fixtures",
 }
 PROJECT_DEPENDENCY = re.compile(r'(\w+Implementation|implementation|api)\(project\(":([^"]+)"\)\)')

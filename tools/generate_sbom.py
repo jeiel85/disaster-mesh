@@ -70,7 +70,7 @@ def generate() -> dict:
                 "type": "application",
                 "bom-ref": "pkg:github/jeiel85/disaster-mesh",
                 "name": "DisasterMesh",
-                "version": "0.1.0-beta-source",
+                "version": "0.2.0-beta-source",
             },
             "properties": [
                 {"name": "disastermesh:evidence-status", "value": "UNSIGNED_SOURCE_INVENTORY"},

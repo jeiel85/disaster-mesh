@@ -11,6 +11,8 @@ apps/android/app/gradle.lockfile
 apps/android/app/proguard-rules.pro
 apps/android/app/src/androidTest/kotlin/org/disastermesh/android/RustFacadeInstrumentationTest.kt
 apps/android/app/src/main/AndroidManifest.xml
+apps/android/app/src/main/kotlin/org/disastermesh/android/AppPreferences.kt
+apps/android/app/src/main/kotlin/org/disastermesh/android/DisasterMeshTheme.kt
 apps/android/app/src/main/kotlin/org/disastermesh/android/MainActivity.kt
 apps/android/app/src/main/res/drawable/ic_launcher.xml
 apps/android/app/src/main/res/values/strings.xml
@@ -67,6 +69,10 @@ apps/android/feature-relay-status/build.gradle.kts
 apps/android/feature-relay-status/gradle.lockfile
 apps/android/feature-relay-status/src/main/AndroidManifest.xml
 apps/android/feature-relay-status/src/main/kotlin/org/disastermesh/android/feature/relay/RelayStatusScreen.kt
+apps/android/feature-settings/build.gradle.kts
+apps/android/feature-settings/gradle.lockfile
+apps/android/feature-settings/src/main/AndroidManifest.xml
+apps/android/feature-settings/src/main/kotlin/org/disastermesh/android/feature/settings/SettingsScreen.kt
 apps/android/feature-sos/build.gradle.kts
 apps/android/feature-sos/gradle.lockfile
 apps/android/feature-sos/src/main/AndroidManifest.xml
@@ -207,9 +213,11 @@ docs/adr/ADR-015-commercial-release-governance.md
 docs/adr/ADR-016-no-delivery-guarantee.md
 docs/dependency-review.md
 docs/index.html
+fastlane/metadata/android/en-US/changelogs/2.txt
 fastlane/metadata/android/en-US/full_description.txt
 fastlane/metadata/android/en-US/short_description.txt
 fastlane/metadata/android/en-US/title.txt
+fastlane/metadata/android/ko-KR/changelogs/2.txt
 fastlane/metadata/android/ko-KR/full_description.txt
 fastlane/metadata/android/ko-KR/short_description.txt
 fastlane/metadata/android/ko-KR/title.txt

@@ -2,6 +2,13 @@
 
 각 Goal은 이전 Goal의 결과 위에서만 시작한다. 동시에 여러 Goal을 진행하지 않는다.
 
+## Android App Version 0.2.0 — Product Shell
+
+Goal 0–7의 protocol/security 구현 위에 영속 onboarding, Material 3 상태 dashboard,
+설정/앱 정보 화면, 정확한 degraded-state/safety copy와 API 36 emulator 회귀 검증을
+추가한다. DME/BLE-CLA major와 DB schema는 v1을 유지한다. 이 app version 증가는
+physical BLE·field·commercial gate 완료를 의미하지 않는다.
+
 ## Goal 0 — Repository Bootstrap
 
 **상태: 완료 (2026-06-29).** Rust/Android clean build, release manifest gate,

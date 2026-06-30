@@ -53,6 +53,11 @@ def main() -> int:
         ROOT
         / "apps/android/feature-home/src/main/kotlin/org/disastermesh/android/feature/home/ProductHome.kt"
     ).read_text("utf-8")
+    settings_screen = (
+        ROOT
+        / "apps/android/feature-settings/src/main/kotlin/org/disastermesh/android/feature/settings/SettingsScreen.kt"
+    ).read_text("utf-8")
+    app_build = (ROOT / "apps/android/app/build.gradle.kts").read_text("utf-8")
     listing_en = (ROOT / "fastlane/metadata/android/en-US/full_description.txt").read_text("utf-8")
     listing_ko = (ROOT / "fastlane/metadata/android/ko-KR/full_description.txt").read_text("utf-8")
 
@@ -64,6 +69,10 @@ def main() -> int:
     require(diagnostic, 'listOf("README.txt", "metadata.json", "relay.txt", "events.csv")', "diagnostic archive", errors)
     require(diagnostic_screen, "제한된 진단 ZIP 미리보기", "diagnostic screen", errors)
     require(product_home, "제한된 진단 내보내기", "product home", errors)
+    require(settings_screen, "계정, 광고, 분석 SDK와 인터넷 권한을 사용하지 않습니다.", "settings screen", errors)
+    require(settings_screen, "전달 성공과 공식 긴급 구조 접수는 보장되지 않습니다.", "settings screen", errors)
+    require(app_build, 'versionCode = 2', "Android app version", errors)
+    require(app_build, 'versionName = "0.2.0"', "Android app version", errors)
     if "익명 진단" in diagnostic_screen or "익명 진단" in product_home:
         errors.append("diagnostic UI must not claim anonymity while device metadata is exported")
     require(listing_en, "may never happen", "English store listing", errors)

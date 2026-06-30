@@ -10,8 +10,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +24,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import android.content.pm.PackageManager
 import org.disastermesh.android.feature.contacts.ContactRow
@@ -35,6 +42,8 @@ import org.disastermesh.android.feature.sos.PrivateSosScreen
 import org.disastermesh.android.feature.relay.RelayStatusScreen
 import org.disastermesh.android.feature.diagnostics.DiagnosticExportScreen
 import org.disastermesh.android.feature.diagnostics.buildDiagnosticArchive
+import org.disastermesh.android.feature.settings.AppInfoUiModel
+import org.disastermesh.android.feature.settings.SettingsScreen
 import org.disastermesh.android.service.EmergencyRelayService
 import org.disastermesh.android.security.MasterKeyManager
 import org.disastermesh.core.MeshEngine
@@ -46,13 +55,31 @@ import java.security.SecureRandom
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            MaterialTheme { DisasterMeshRoot() }
+            DisasterMeshTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    DisasterMeshRoot()
+                }
+            }
         }
     }
 }
 
-private enum class BootstrapScreen { ONBOARDING, HOME, CONTACTS, CONVERSATION, CHECK_IN, SOS, RELAY, DIAGNOSTICS }
+private enum class BootstrapScreen {
+    ONBOARDING,
+    HOME,
+    CONTACTS,
+    CONVERSATION,
+    CHECK_IN,
+    SOS,
+    RELAY,
+    DIAGNOSTICS,
+    SETTINGS,
+}
 
 private sealed interface EngineState {
     data object Loading : EngineState
@@ -64,7 +91,12 @@ private sealed interface EngineState {
 private fun DisasterMeshRoot() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var screen by remember { mutableStateOf(BootstrapScreen.ONBOARDING) }
+    val preferences = remember { AppPreferences(context) }
+    var screen by rememberSaveable {
+        mutableStateOf(
+            if (preferences.onboardingCompleted()) BootstrapScreen.HOME else BootstrapScreen.ONBOARDING,
+        )
+    }
     var engineState by remember { mutableStateOf<EngineState>(EngineState.Loading) }
     var contacts by remember { mutableStateOf(emptyList<ContactRow>()) }
     var selectedContactId by remember { mutableStateOf<ByteArray?>(null) }
@@ -123,19 +155,31 @@ private fun DisasterMeshRoot() {
         onDispose { (engineState as? EngineState.Ready)?.engine?.close() }
     }
 
-    when (screen) {
+    Box(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
+        when (screen) {
         BootstrapScreen.ONBOARDING -> OnboardingScreen(
             communicationReady = communicationReady,
             onRequestPermissions = { permissionLauncher.launch(requiredPermissions()) },
-            onContinue = { screen = BootstrapScreen.HOME },
+            onContinue = {
+                preferences.setOnboardingCompleted(true)
+                screen = BootstrapScreen.HOME
+            },
         )
         BootstrapScreen.HOME -> ProductHome(
             contactReady = selectedContactId != null,
+            communicationReady = communicationReady,
+            engineReady = when (engineState) {
+                EngineState.Loading -> null
+                is EngineState.Ready -> true
+                is EngineState.Blocked -> false
+            },
+            contactCount = contacts.size,
             onContacts = { screen = BootstrapScreen.CONTACTS },
             onCheckIn = { screen = BootstrapScreen.CHECK_IN },
             onSos = { screen = BootstrapScreen.SOS },
             onRelay = { screen = BootstrapScreen.RELAY },
             onDiagnostics = { screen = BootstrapScreen.DIAGNOSTICS },
+            onSettings = { screen = BootstrapScreen.SETTINGS },
         )
         BootstrapScreen.CONTACTS -> ContactsScreen(
             ownContactQr = (engineState as? EngineState.Ready)?.ownQr,
@@ -284,6 +328,25 @@ private fun DisasterMeshRoot() {
             },
             onBack = { screen = BootstrapScreen.HOME },
         )
+        BootstrapScreen.SETTINGS -> SettingsScreen(
+            model = AppInfoUiModel(
+                appVersion = BuildConfig.VERSION_NAME,
+                communicationReady = communicationReady,
+                engineReady = when (engineState) {
+                    EngineState.Loading -> null
+                    is EngineState.Ready -> true
+                    is EngineState.Blocked -> false
+                },
+                contactCount = contacts.size,
+            ),
+            onRequestPermissions = { permissionLauncher.launch(requiredPermissions()) },
+            onReviewSafety = {
+                preferences.setOnboardingCompleted(false)
+                screen = BootstrapScreen.ONBOARDING
+            },
+            onBack = { screen = BootstrapScreen.HOME },
+        )
+        }
     }
 }
 
