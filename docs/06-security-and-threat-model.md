@@ -234,3 +234,14 @@ Contact card의 `capabilities`는 서명 대상이다. bit registry는 `contract
 - threat model 최신화
 - known limitation UI 반영
 - 취약점 제보 이메일/SECURITY.md
+## 16. Implementation hardening status (2026-06-30)
+
+The implemented parser boundaries now have property/arbitrary-input tests and
+dedicated Linux libFuzzer targets. Database startup has a read-only quick-check,
+foreign-key, and schema-version health path that never replaces corrupt data.
+Diagnostic export is an explicit user action with a fixed ZIP entry set and no
+schema field capable of carrying plaintext, location, contacts, keys, raw DB,
+peer IDs, or packet IDs. These controls reduce parser DoS, silent-reset, and
+support-data disclosure risk; they do not replace the required external review,
+penetration work, physical BLE/OEM matrix, or lost-device/compromised-OS limits
+described above.

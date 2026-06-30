@@ -44,6 +44,8 @@ desktop.ini
 .env
 /scratch/
 /tmp/
+/fuzz/artifacts/
+/fuzz/corpus/
 
 # ── Python cache ─────────────────────────────────────────
 __pycache__/

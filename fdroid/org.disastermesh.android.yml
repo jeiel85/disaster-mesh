@@ -1,0 +1,18 @@
+Categories:
+  - Connectivity
+License: Apache-2.0
+SourceCode: https://github.com/jeiel85/disaster-mesh
+IssueTracker: https://github.com/jeiel85/disaster-mesh/issues
+Summary: Carry encrypted messages over opportunistic Bluetooth contacts
+Description: |-
+  DisasterMesh is an offline-first, delay-tolerant Android messenger for
+  pre-exchanged trusted contacts. Delivery is not guaranteed and the app does
+  not replace emergency services.
+
+  This metadata is packaging preparation only. No production build is declared
+  until signed artifacts and the physical acceptance gates exist.
+Builds: []
+AutoUpdateMode: None
+UpdateCheckMode: None
+CurrentVersion: unset
+CurrentVersionCode: 0

@@ -46,7 +46,7 @@
 - [x] master key wrapped in Keystore
 - [x] test deterministic RNG absent in release
 - [ ] parser fuzz targets running
-- [ ] dependency review and SBOM
+- [x] dependency review and source SBOM
 - [x] product limitations shown in UI
 
 ## Release
@@ -54,7 +54,7 @@
 - [x] DB migration tests
 - [ ] compatibility matrix
 - [ ] battery/screen-off report
-- [ ] threat model updated
+- [x] threat model updated
 - [ ] external review findings handled
 - [ ] safety wording reviewed
 

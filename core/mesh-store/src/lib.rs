@@ -12,8 +12,10 @@ pub const SCHEMA_V1_SQL: &str = include_str!("../../../schemas/sqlite_v1.sql");
 pub const SCHEMA_INVARIANTS_SQL: &str = include_str!("../../../schemas/schema_invariants.sql");
 
 mod contact_store;
+mod health;
 mod identity_store;
 pub use contact_store::*;
+pub use health::*;
 mod routing_store;
 mod transfer_store;
 pub use identity_store::*;

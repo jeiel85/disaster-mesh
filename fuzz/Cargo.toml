@@ -1,0 +1,56 @@
+[package]
+name = "disaster-mesh-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "=0.4.13"
+mesh-bundle = { path = "../core/mesh-bundle" }
+mesh-codec = { path = "../core/mesh-codec" }
+mesh-crypto = { path = "../core/mesh-crypto" }
+
+[[bin]]
+name = "cbor"
+path = "fuzz_targets/cbor.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "bundle"
+path = "fuzz_targets/bundle.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "ble_frames"
+path = "fuzz_targets/ble_frames.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "ble_reassembly"
+path = "fuzz_targets/ble_reassembly.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "control"
+path = "fuzz_targets/control.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "crypto_envelopes"
+path = "fuzz_targets/crypto_envelopes.rs"
+test = false
+doc = false
+bench = false

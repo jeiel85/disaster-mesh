@@ -1,0 +1,5 @@
+DisasterMesh stores encrypted messages for pre-exchanged trusted contacts and carries them over opportunistic Bluetooth encounters when internet and cellular service are unavailable.
+
+Delivery can be delayed or may never happen when no participating device is nearby or Android stops Bluetooth or background work. This app does not replace emergency services, public alerts, or radio communication. Use other emergency channels whenever possible.
+
+The offline build uses no account, cloud service, advertising, analytics SDK, or internet permission. Message content is end-to-end encrypted, while some metadata such as size, priority, and encounter timing can remain observable.

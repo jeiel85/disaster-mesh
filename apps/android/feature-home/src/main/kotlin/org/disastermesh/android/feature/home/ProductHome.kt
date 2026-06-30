@@ -19,6 +19,7 @@ fun ProductHome(
     onCheckIn: () -> Unit,
     onSos: () -> Unit,
     onRelay: () -> Unit,
+    onDiagnostics: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -34,5 +35,6 @@ fun ProductHome(
             modifier = Modifier.semantics { contentDescription = "선택한 연락처에게 비공개 구조 요청 작성" },
         ) { Text("비공개 SOS") }
         Button(onClick = onRelay) { Text("릴레이 모드") }
+        Button(onClick = onDiagnostics) { Text("익명 진단 내보내기") }
     }
 }

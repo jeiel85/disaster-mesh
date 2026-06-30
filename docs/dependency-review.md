@@ -77,6 +77,7 @@
 | Cargo/rusqlite | 0.40.1 | `11438310b19e3109b6446c33d1ed5e889428cf2e278407bc7896bc4aaea43323` | Rust-owned SQLite schema and transactions | critical | MIT | bundled SQLite; forward-only migration, CHECK and invariant tests; advisory gates | approved for implementation; power-loss review remains | automated contract review / 2026-06-29 |
 | Cargo/libsqlite3-sys | 0.38.1 | `f6c19a05435c21ac299d71b6a9c13db3e3f47c520517d58990a462a1397a61db` | Bundled native SQLite boundary | critical/transitive | MIT | exact Cargo checksum; native boundary covered by schema tests and later corruption campaign | approved for implementation; release native review | automated contract review / 2026-06-29 |
 | Cargo/proptest | 1.11.0 | `4b45fcc2344c680f5025fe57779faef368840d0bd1f42f216291f0dc4ace4744` | Replay/routing/parser property tests | dev-only | MIT OR Apache-2.0 | seeded shrinking tests; absent from production dependency graph | approved, dev-only | automated contract review / 2026-06-29 |
+| Cargo/libfuzzer-sys | 0.4.13 | `a9fd2f41a1cba099f79a0b6b6c35656cf7c03351a7bae8ff0f28f25270f929d2` | Nightly libFuzzer harness for every parser/reassembly boundary | dev-only | MIT OR Apache-2.0 | `fuzz/Cargo.lock`; Linux nightly smoke job; absent from production workspace graph | approved, dev-only; Windows GNU host unsupported | automated hardening review / 2026-06-30 |
 | Cargo/sha2 | 0.10.9 | `a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283` | BP identity, wire/payload, contact and DME SHA-256 | critical | MIT OR Apache-2.0 | RustCrypto upstream; bundle/contact/DME mutation and round-trip tests; advisory gates | approved for implementation; external protocol review remains | automated protocol review / 2026-06-29 |
 
 Checksums for every transitive Gradle artifact are recorded in
@@ -97,6 +98,7 @@ bootstrap inventory, not the human/security approval required by Goal 0.5.
 | cargo-deny | 0.19.9 | exact CI install version; all policy categories pass |
 | cargo-audit | 0.22.2 | exact CI install version; warnings denied |
 | cddl CLI | 0.10.5 | exact CI install version; RFC 8610 conformance compile for every `spec/*.cddl` |
+| cargo-fuzz | 0.13.2 | exact Linux nightly CI install version; six bounded smoke targets |
 
 ## 5. Automated gates
 

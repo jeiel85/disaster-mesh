@@ -32,6 +32,8 @@ import org.disastermesh.android.feature.home.ProductHome
 import org.disastermesh.android.feature.checkin.CheckInScreen
 import org.disastermesh.android.feature.sos.PrivateSosScreen
 import org.disastermesh.android.feature.relay.RelayStatusScreen
+import org.disastermesh.android.feature.diagnostics.DiagnosticExportScreen
+import org.disastermesh.android.feature.diagnostics.buildDiagnosticArchive
 import org.disastermesh.android.service.EmergencyRelayService
 import org.disastermesh.android.security.MasterKeyManager
 import org.disastermesh.core.MeshEngine
@@ -49,7 +51,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class BootstrapScreen { ONBOARDING, HOME, CONTACTS, CONVERSATION, CHECK_IN, SOS, RELAY }
+private enum class BootstrapScreen { ONBOARDING, HOME, CONTACTS, CONVERSATION, CHECK_IN, SOS, RELAY, DIAGNOSTICS }
 
 private sealed interface EngineState {
     data object Loading : EngineState
@@ -67,12 +69,24 @@ private fun DisasterMeshRoot() {
     var selectedContactId by remember { mutableStateOf<ByteArray?>(null) }
     var messages by remember { mutableStateOf(emptyList<ConversationRow>()) }
     var communicationReady by remember { mutableStateOf(isCommunicationReady(context)) }
+    var pendingDiagnosticArchive by remember { mutableStateOf<ByteArray?>(null) }
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) {
         communicationReady = isCommunicationReady(context)
     }
     val bootId = remember { ByteArray(16).also(SecureRandom()::nextBytes) }
+    val diagnosticLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/zip"),
+    ) { uri ->
+        val archive = pendingDiagnosticArchive
+        pendingDiagnosticArchive = null
+        if (uri != null && archive != null) {
+            scope.launch(Dispatchers.IO) {
+                context.contentResolver.openOutputStream(uri, "w")?.use { it.write(archive) }
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         engineState = withContext(Dispatchers.IO) {
@@ -110,6 +124,7 @@ private fun DisasterMeshRoot() {
             onCheckIn = { screen = BootstrapScreen.CHECK_IN },
             onSos = { screen = BootstrapScreen.SOS },
             onRelay = { screen = BootstrapScreen.RELAY },
+            onDiagnostics = { screen = BootstrapScreen.DIAGNOSTICS },
         )
         BootstrapScreen.CONTACTS -> ContactsScreen(
             ownContactQr = (engineState as? EngineState.Ready)?.ownQr,
@@ -249,6 +264,13 @@ private fun DisasterMeshRoot() {
         BootstrapScreen.RELAY -> RelayStatusScreen(
             onStart = { mode -> EmergencyRelayService.start(context, mode.name) },
             onStop = { EmergencyRelayService.stop(context) },
+            onBack = { screen = BootstrapScreen.HOME },
+        )
+        BootstrapScreen.DIAGNOSTICS -> DiagnosticExportScreen(
+            onExport = {
+                pendingDiagnosticArchive = buildDiagnosticArchive(context)
+                diagnosticLauncher.launch("disastermesh-diagnostics.zip")
+            },
             onBack = { screen = BootstrapScreen.HOME },
         )
     }

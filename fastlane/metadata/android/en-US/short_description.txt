@@ -1,0 +1,1 @@
+Carry encrypted messages over opportunistic Bluetooth contacts

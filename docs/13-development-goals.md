@@ -220,6 +220,20 @@ and process/reboot fault-injection report remain unexecuted release gates.
 
 ## Goal 6 — Hardening and Public Beta
 
+**Status: AUTOMATED HARDENING IMPLEMENTED; PUBLIC BETA BLOCKED (2026-06-30).**
+Six libFuzzer targets cover deterministic CBOR, BP/DME payloads, BLE frames,
+stateful outer reassembly, encrypted control payloads, contact/plaintext/local
+envelopes; Linux nightly smoke execution is an enforced CI job. Read-only DB
+health inspection detects corruption without replacement, and a fixed-schema,
+size-bounded diagnostic ZIP has a user preview/export flow and type-level
+exclusion of message, location, contact, key, DB, peer, and packet data. A
+deterministic CycloneDX source SBOM, dependency gates, unsigned artifact/native
+symbol evidence job, GitHub provenance attestation, and Play/F-Droid metadata
+are present. Local Windows GNU cannot run libFuzzer's Windows MSVC shim, so
+fuzz execution evidence comes from Linux CI. Physical compatibility/battery/
+field campaigns and external critical/high review closure remain mandatory;
+therefore the product is neither a completed public beta nor stable.
+
 ### 결과물
 
 - fuzz targets
