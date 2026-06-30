@@ -125,6 +125,17 @@ offlineRelease test-randomness exclusion gate pass.
 
 ## Goal 3 — Android Direct BLE
 
+**Status: IMPLEMENTATION FOUNDATION COMPLETE; PHYSICAL ACCEPTANCE BLOCKED
+(2026-06-30).** Exact legacy advertising/GATT contracts, API-level permission
+policy, callback backpressure, MTU/segmentation/reassembly, Noise XX session
+cryptography, Keystore-wrapped database master key, persistent identity/contact
+state, UniFFI runtime, and direct encrypted bundle commit are implemented and
+covered by host tests. The app provides onboarding, QR-string contact import,
+trust display, and receipt-safe conversation labels. A real central/peripheral
+device session, camera QR capture, radio-loss recovery, and the two-device
+airplane-mode acceptance campaign remain required; this status is not a claim
+that the physical Goal 3 completion criteria passed.
+
 ### 결과물
 
 - permissions/onboarding

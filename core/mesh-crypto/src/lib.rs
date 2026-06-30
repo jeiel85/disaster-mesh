@@ -10,12 +10,14 @@ pub mod contact;
 pub mod dme;
 pub mod identity;
 pub mod local_envelope;
+pub mod noise;
 pub mod replay;
 
 pub use contact::*;
 pub use dme::*;
 pub use identity::*;
 pub use local_envelope::*;
+pub use noise::*;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CryptoError {
@@ -33,6 +35,8 @@ pub enum CryptoError {
     AadMismatch,
     UnsupportedVersion,
     CorruptEncryptedValue,
+    InvalidHandshake,
+    InvalidFrameSequence,
 }
 
 impl fmt::Display for CryptoError {

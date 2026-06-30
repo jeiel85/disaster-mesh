@@ -32,9 +32,9 @@
 
 ## Android
 
-- [ ] INTERNET absent from offlineRelease
+- [x] INTERNET absent from offlineRelease
 - [ ] allowBackup/fullBackupContent/dataExtractionRules exclusions verified
-- [ ] BLE callbacks contain no blocking work
+- [x] BLE callbacks contain no blocking work
 - [ ] single coordinator actor owns core calls
 - [ ] foreground service user-started and visible
 - [ ] permission revoke/BT off paths tested
@@ -43,7 +43,7 @@
 ## Security
 
 - [x] secrets excluded from Debug/log/export
-- [ ] master key wrapped in Keystore
+- [x] master key wrapped in Keystore
 - [x] test deterministic RNG absent in release
 - [ ] parser fuzz targets running
 - [ ] dependency review and SBOM

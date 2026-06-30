@@ -22,6 +22,7 @@ class GattCommandCorrelation {
     private val inFlightByLink = mutableMapOf<Long, Long>()
     private val issuedCommandIds = mutableSetOf<Long>()
 
+    @Synchronized
     fun begin(commandId: Long, linkId: Long): BeginCommandResult {
         if (!issuedCommandIds.add(commandId)) {
             return BeginCommandResult.Violation(CorrelationViolation.COMMAND_ID_REUSED)
@@ -32,6 +33,7 @@ class GattCommandCorrelation {
         return BeginCommandResult.Accepted
     }
 
+    @Synchronized
     fun complete(commandId: Long, linkId: Long): CompleteCommandResult {
         val expected = inFlightByLink[linkId]
             ?: return CompleteCommandResult.Violation(
@@ -47,9 +49,11 @@ class GattCommandCorrelation {
         return CompleteCommandResult.Completed
     }
 
+    @Synchronized
     fun failAll(linkId: Long) {
         inFlightByLink.remove(linkId)
     }
 
+    @Synchronized
     fun inFlightCommand(linkId: Long): Long? = inFlightByLink[linkId]
 }

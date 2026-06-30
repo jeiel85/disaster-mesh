@@ -92,7 +92,7 @@ impl Identity {
         let signing_public_key = signing.verifying_key().to_bytes();
         let hpke_public_key = X25519PublicKey::from(&hpke).to_bytes();
         let noise_public_key = X25519PublicKey::from(&noise).to_bytes();
-        let identity_id = IdentityId::from(sha256(&signing_public_key));
+        let identity_id = identity_id_from_signing_public(&signing_public_key);
         Ok(Self {
             public: IdentityPublic {
                 identity_id,
@@ -133,6 +133,16 @@ impl Identity {
     pub(crate) const fn hpke_secret(&self) -> &StaticSecret {
         &self.secrets.hpke
     }
+
+    #[must_use]
+    pub(crate) fn noise_secret_bytes(&self) -> Zeroizing<[u8; 32]> {
+        Zeroizing::new(self.secrets.noise.to_bytes())
+    }
+}
+
+#[must_use]
+pub fn identity_id_from_signing_public(signing_public_key: &[u8; 32]) -> IdentityId {
+    IdentityId::from(sha256(signing_public_key))
 }
 
 pub fn verify_signature(

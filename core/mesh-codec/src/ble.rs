@@ -1,6 +1,7 @@
 //! Byte-exact BLE-CLA v1 frame headers.
 
 use core::fmt;
+use std::collections::{BTreeMap, VecDeque};
 
 use mesh_types::generated_contracts::protocol;
 
@@ -41,6 +42,229 @@ pub enum FrameError {
     InvalidFrameType,
     InvalidStream,
     CrcMismatch,
+    SegmentConflict,
+    ReassemblyCapacity,
+    FrameIdExhausted,
+}
+
+pub fn segment_logical_frame(
+    channel: Channel,
+    logical_frame_id: u32,
+    logical: &[u8],
+    max_att_payload: usize,
+) -> Result<Vec<OuterSegment>, FrameError> {
+    if logical_frame_id == 0
+        || logical.is_empty()
+        || logical.len() > protocol::BLE_WIRE_MAX_LOGICAL_FRAME_BYTES as usize
+        || max_att_payload <= OUTER_HEADER_BYTES
+    {
+        return Err(FrameError::InvalidLength);
+    }
+    let segment_payload = max_att_payload - OUTER_HEADER_BYTES;
+    let count = logical.len().div_ceil(segment_payload);
+    if count == 0 || count > protocol::BLE_WIRE_MAX_SEGMENT_COUNT as usize {
+        return Err(FrameError::InvalidSegmentLayout);
+    }
+    let segment_count = u16::try_from(count).map_err(|_| FrameError::InvalidSegmentLayout)?;
+    let logical_length = u32::try_from(logical.len()).map_err(|_| FrameError::InvalidLength)?;
+    logical
+        .chunks(segment_payload)
+        .enumerate()
+        .map(|(index, bytes)| {
+            let segment = OuterSegment {
+                channel,
+                logical_frame_id,
+                segment_index: u16::try_from(index)
+                    .map_err(|_| FrameError::InvalidSegmentLayout)?,
+                segment_count,
+                logical_length,
+                bytes: bytes.to_vec(),
+            };
+            segment.validate()?;
+            Ok(segment)
+        })
+        .collect()
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum ReassemblyOutcome {
+    Pending,
+    Duplicate,
+    Complete { channel: Channel, bytes: Vec<u8> },
+}
+
+#[derive(Clone, Debug)]
+struct PartialFrame {
+    channel: Channel,
+    segment_count: u16,
+    logical_length: u32,
+    started_ms: u64,
+    received_bytes: usize,
+    segments: Vec<Option<Vec<u8>>>,
+}
+
+#[derive(Clone, Debug)]
+struct CompletedFrame {
+    frame_id: u32,
+    channel: Channel,
+    logical_length: u32,
+    segments: Vec<Vec<u8>>,
+}
+
+#[derive(Debug)]
+pub struct OuterReassembler {
+    active: BTreeMap<u32, PartialFrame>,
+    completed: VecDeque<CompletedFrame>,
+    max_active: usize,
+    completed_cache: usize,
+    timeout_ms: u64,
+}
+
+impl OuterReassembler {
+    #[must_use]
+    pub fn new(max_active: usize, completed_cache: usize, timeout_ms: u64) -> Self {
+        Self {
+            active: BTreeMap::new(),
+            completed: VecDeque::new(),
+            max_active,
+            completed_cache,
+            timeout_ms,
+        }
+    }
+
+    pub fn accept(
+        &mut self,
+        segment: OuterSegment,
+        now_ms: u64,
+    ) -> Result<ReassemblyOutcome, FrameError> {
+        segment.validate()?;
+        if let Some(completed) = self
+            .completed
+            .iter()
+            .find(|completed| completed.frame_id == segment.logical_frame_id)
+        {
+            let same = completed.channel == segment.channel
+                && completed.logical_length == segment.logical_length
+                && completed.segments.len() == usize::from(segment.segment_count)
+                && completed.segments[usize::from(segment.segment_index)] == segment.bytes;
+            return if same {
+                Ok(ReassemblyOutcome::Duplicate)
+            } else {
+                Err(FrameError::SegmentConflict)
+            };
+        }
+
+        if !self.active.contains_key(&segment.logical_frame_id) {
+            if self.active.len() >= self.max_active || self.max_active == 0 {
+                return Err(FrameError::ReassemblyCapacity);
+            }
+            self.active.insert(
+                segment.logical_frame_id,
+                PartialFrame {
+                    channel: segment.channel,
+                    segment_count: segment.segment_count,
+                    logical_length: segment.logical_length,
+                    started_ms: now_ms,
+                    received_bytes: 0,
+                    segments: vec![None; usize::from(segment.segment_count)],
+                },
+            );
+        }
+
+        let partial = self
+            .active
+            .get_mut(&segment.logical_frame_id)
+            .expect("inserted above");
+        if partial.channel != segment.channel
+            || partial.segment_count != segment.segment_count
+            || partial.logical_length != segment.logical_length
+        {
+            self.active.remove(&segment.logical_frame_id);
+            return Err(FrameError::SegmentConflict);
+        }
+        let index = usize::from(segment.segment_index);
+        if let Some(existing) = &partial.segments[index] {
+            return if existing == &segment.bytes {
+                Ok(ReassemblyOutcome::Duplicate)
+            } else {
+                self.active.remove(&segment.logical_frame_id);
+                Err(FrameError::SegmentConflict)
+            };
+        }
+        partial.received_bytes = partial
+            .received_bytes
+            .checked_add(segment.bytes.len())
+            .ok_or(FrameError::InvalidLength)?;
+        if partial.received_bytes > partial.logical_length as usize {
+            self.active.remove(&segment.logical_frame_id);
+            return Err(FrameError::InvalidLength);
+        }
+        partial.segments[index] = Some(segment.bytes);
+        if partial.segments.iter().any(Option::is_none) {
+            return Ok(ReassemblyOutcome::Pending);
+        }
+
+        let partial = self
+            .active
+            .remove(&segment.logical_frame_id)
+            .expect("active frame exists");
+        if partial.received_bytes != partial.logical_length as usize {
+            return Err(FrameError::InvalidLength);
+        }
+        let segments = partial
+            .segments
+            .into_iter()
+            .collect::<Option<Vec<_>>>()
+            .ok_or(FrameError::InvalidSegmentLayout)?;
+        let bytes = segments.concat();
+        if self.completed_cache > 0 {
+            self.completed.push_back(CompletedFrame {
+                frame_id: segment.logical_frame_id,
+                channel: partial.channel,
+                logical_length: partial.logical_length,
+                segments,
+            });
+            while self.completed.len() > self.completed_cache {
+                self.completed.pop_front();
+            }
+        }
+        Ok(ReassemblyOutcome::Complete {
+            channel: partial.channel,
+            bytes,
+        })
+    }
+
+    pub fn expire(&mut self, now_ms: u64) -> Vec<u32> {
+        let expired = self
+            .active
+            .iter()
+            .filter_map(|(frame_id, partial)| {
+                (now_ms.saturating_sub(partial.started_ms) >= self.timeout_ms).then_some(*frame_id)
+            })
+            .collect::<Vec<_>>();
+        for frame_id in &expired {
+            self.active.remove(frame_id);
+        }
+        expired
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct FrameIdSequence(Option<u32>);
+
+impl FrameIdSequence {
+    pub fn new(initial: u32) -> Result<Self, FrameError> {
+        if initial == 0 {
+            return Err(FrameError::InvalidFrameId);
+        }
+        Ok(Self(Some(initial)))
+    }
+
+    pub fn take(&mut self) -> Result<u32, FrameError> {
+        let current = self.0.ok_or(FrameError::FrameIdExhausted)?;
+        self.0 = current.checked_add(1);
+        Ok(current)
+    }
 }
 
 impl fmt::Display for FrameError {
@@ -355,5 +579,60 @@ mod tests {
         assert_eq!(BundleChunk::decode(&encoded).unwrap(), chunk);
         *encoded.last_mut().unwrap() ^= 1;
         assert_eq!(BundleChunk::decode(&encoded), Err(FrameError::CrcMismatch));
+    }
+
+    #[test]
+    fn segmentation_reassembles_out_of_order_and_rejects_conflicts() {
+        let logical = b"twenty bytes exactly!";
+        let segments = segment_logical_frame(Channel::Data, 7, logical, 20).unwrap();
+        assert_eq!(segments.len(), logical.len().div_ceil(4));
+        assert!(
+            segments
+                .iter()
+                .all(|segment| segment.encode().unwrap().len() <= 20)
+        );
+
+        let mut reassembler = OuterReassembler::new(2, 2, 10_000);
+        for segment in segments.iter().skip(1).rev() {
+            assert_eq!(
+                reassembler.accept(segment.clone(), 0).unwrap(),
+                ReassemblyOutcome::Pending
+            );
+        }
+        assert_eq!(
+            reassembler.accept(segments[0].clone(), 1).unwrap(),
+            ReassemblyOutcome::Complete {
+                channel: Channel::Data,
+                bytes: logical.to_vec(),
+            }
+        );
+        assert_eq!(
+            reassembler.accept(segments[0].clone(), 2).unwrap(),
+            ReassemblyOutcome::Duplicate
+        );
+        let mut conflict = segments[0].clone();
+        conflict.bytes[0] ^= 1;
+        assert_eq!(
+            reassembler.accept(conflict, 3),
+            Err(FrameError::SegmentConflict)
+        );
+    }
+
+    #[test]
+    fn incomplete_reassembly_expires_and_frame_ids_never_wrap() {
+        let segment = segment_logical_frame(Channel::Control, 9, b"hello", 20)
+            .unwrap()
+            .remove(0);
+        let mut reassembler = OuterReassembler::new(1, 0, 10_000);
+        assert_eq!(
+            reassembler.accept(segment, 100).unwrap(),
+            ReassemblyOutcome::Pending
+        );
+        assert_eq!(reassembler.expire(10_099), Vec::<u32>::new());
+        assert_eq!(reassembler.expire(10_100), vec![9]);
+
+        let mut ids = FrameIdSequence::new(u32::MAX).unwrap();
+        assert_eq!(ids.take().unwrap(), u32::MAX);
+        assert_eq!(ids.take(), Err(FrameError::FrameIdExhausted));
     }
 }

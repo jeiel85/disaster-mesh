@@ -20,6 +20,7 @@ bindgen-cli = ["uniffi/cli"]
 
 [dependencies]
 mesh-engine.workspace = true
+mesh-types.workspace = true
 uniffi.workspace = true
 
 [lints]

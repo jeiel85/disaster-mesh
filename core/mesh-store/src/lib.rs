@@ -11,7 +11,11 @@ pub const SCHEMA_VERSION: i64 = 1;
 pub const SCHEMA_V1_SQL: &str = include_str!("../../../schemas/sqlite_v1.sql");
 pub const SCHEMA_INVARIANTS_SQL: &str = include_str!("../../../schemas/schema_invariants.sql");
 
+mod contact_store;
+mod identity_store;
+pub use contact_store::*;
 mod routing_store;
+pub use identity_store::*;
 pub use routing_store::*;
 
 #[derive(Debug, Eq, PartialEq)]
@@ -25,6 +29,9 @@ pub enum StoreError {
     UnknownGrant,
     TokenOverflow,
     IntegerOutOfRange,
+    Crypto(String),
+    KeyMaterialMismatch,
+    ContactNotFound,
 }
 
 impl fmt::Display for StoreError {
@@ -38,6 +45,12 @@ impl std::error::Error for StoreError {}
 impl From<rusqlite::Error> for StoreError {
     fn from(value: rusqlite::Error) -> Self {
         Self::Sqlite(value.to_string())
+    }
+}
+
+impl From<mesh_crypto::CryptoError> for StoreError {
+    fn from(value: mesh_crypto::CryptoError) -> Self {
+        Self::Crypto(value.to_string())
     }
 }
 

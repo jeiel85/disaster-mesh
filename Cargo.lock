@@ -149,6 +149,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4388bee8683e3d04af747c73422af53102d2bd24d9eadb6cbc100baef4b43f8"
 
 [[package]]
+name = "blake2"
+version = "0.10.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46502ad458c9a52b69d4d4d32775c788b7a1b85e8bc9d482d92250fc0e3f8efe"
+dependencies = [
+ "digest",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -770,6 +779,7 @@ dependencies = [
  "proptest",
  "rand_core 0.9.5",
  "sha2",
+ "snow",
  "unicode-normalization",
  "x25519-dalek",
  "zeroize",
@@ -785,6 +795,7 @@ dependencies = [
  "mesh-routing",
  "mesh-store",
  "mesh-types",
+ "rand_core 0.9.5",
  "sha2",
 ]
 
@@ -793,6 +804,7 @@ name = "mesh-ffi"
 version = "0.1.0"
 dependencies = [
  "mesh-engine",
+ "mesh-types",
  "uniffi",
 ]
 
@@ -819,6 +831,7 @@ name = "mesh-store"
 version = "0.1.0"
 dependencies = [
  "mesh-bundle",
+ "mesh-crypto",
  "mesh-routing",
  "mesh-types",
  "rusqlite",
@@ -1241,6 +1254,20 @@ name = "smawk"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8e2fb0f499abb4d162f2bedad68f5ef91a1682b5a03596ddb67efd37768d100"
+
+[[package]]
+name = "snow"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "599b506ccc4aff8cf7844bc42cf783009a434c1e26c964432560fb6d6ad02d82"
+dependencies = [
+ "blake2",
+ "chacha20poly1305",
+ "curve25519-dalek",
+ "getrandom 0.3.4",
+ "rustc_version",
+ "subtle",
+]
 
 [[package]]
 name = "spki"

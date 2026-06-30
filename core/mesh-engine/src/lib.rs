@@ -11,8 +11,12 @@ pub fn version() -> String {
 }
 
 pub mod control;
+pub mod direct_transfer;
+pub mod runtime;
 pub mod secure_bundle;
 
+pub use direct_transfer::*;
+pub use runtime::*;
 pub use secure_bundle::*;
 
 /// Names the lower-level boundaries used by the future engine.

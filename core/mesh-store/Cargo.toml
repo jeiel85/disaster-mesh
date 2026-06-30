@@ -10,6 +10,7 @@ description = "DisasterMesh persistence boundary"
 [dependencies]
 mesh-types.workspace = true
 mesh-bundle.workspace = true
+mesh-crypto.workspace = true
 mesh-routing.workspace = true
 rusqlite.workspace = true
 
