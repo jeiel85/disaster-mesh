@@ -41,6 +41,8 @@ required = [
     'tools/check_policy_consistency.py',
     'tools/validate_release_manifest.py',
     'tools/tests/test_release_tools.py',
+    'docs/23-android-emulator-testing.md',
+    'tools/setup_android_emulator.ps1', 'tools/smoke_android_emulator.ps1',
     'test-vectors/cases.schema.json', 'test-vectors/cases.json',
 ]
 for rel in required:

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Build
 import android.os.SystemClock
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -85,6 +86,16 @@ private fun DisasterMeshRoot() {
             scope.launch(Dispatchers.IO) {
                 context.contentResolver.openOutputStream(uri, "w")?.use { it.write(archive) }
             }
+        }
+    }
+
+    BackHandler(
+        enabled = screen != BootstrapScreen.ONBOARDING && screen != BootstrapScreen.HOME,
+    ) {
+        screen = if (screen == BootstrapScreen.CONVERSATION) {
+            BootstrapScreen.CONTACTS
+        } else {
+            BootstrapScreen.HOME
         }
     }
 

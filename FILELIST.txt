@@ -188,6 +188,7 @@ docs/19-operational-readiness.md
 docs/20-security-verification-plan.md
 docs/21-requirements-traceability.md
 docs/22-go-live-checklist.md
+docs/23-android-emulator-testing.md
 docs/adr/ADR-001-android-first.md
 docs/adr/ADR-002-rust-owns-protocol-db.md
 docs/adr/ADR-003-bpv7-profile.md
@@ -290,6 +291,8 @@ tools/generate_sbom.py
 tools/generate_uniffi_bindings.ps1
 tools/generate_uniffi_bindings.sh
 tools/requirements-validation.txt
+tools/setup_android_emulator.ps1
+tools/smoke_android_emulator.ps1
 tools/tests/test_release_tools.py
 tools/validate_design_bundle.py
 tools/validate_release_manifest.py

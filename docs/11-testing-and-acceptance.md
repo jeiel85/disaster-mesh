@@ -98,7 +98,7 @@ invalid input never panics
 - chunk reassembler, duplicate/conflicting/out-of-order segment, frame-ID reuse
 - resume bitmap parser and tuple mismatch cleanup
 - diagnostic export redaction and ZIP entry-name generator
-- diagnostic export 4 MiB cap and truncation manifest
+- diagnostic export 1 MiB cap and truncation manifest
 
 각 target:
 
@@ -192,6 +192,16 @@ generator marker와 test/property dependency가 `offlineRelease` native library�
 - SOS long-press와 TalkBack accessibility send path
 
 BLE 자체는 fake adapter와 physical-device suite를 분리한다.
+
+### 8.1 API 36 emulator smoke
+
+`tools/setup_android_emulator.ps1`와 `tools/smoke_android_emulator.ps1`은 Android 16/API 36
+x86_64 AVD에서 build/install, onboarding, system Back, Keystore/DB identity 재시작,
+foreground relay service/notification, diagnostic ZIP 저장과 crash buffer를 검증한다.
+실행법과 evidence 형식은 `docs/23-android-emulator-testing.md`를 따른다.
+
+표준 Android Emulator 결과는 실제 BLE scan/advertise/GATT/MTU, screen-off radio,
+OEM background 정책 또는 direct/multi-hop acceptance의 증거로 사용하지 않는다.
 
 ## 9. Physical device matrix
 

@@ -45,6 +45,14 @@ def main() -> int:
         ROOT
         / "apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/DiagnosticArchive.kt"
     ).read_text("utf-8")
+    diagnostic_screen = (
+        ROOT
+        / "apps/android/feature-diagnostics/src/main/kotlin/org/disastermesh/android/feature/diagnostics/DiagnosticExportScreen.kt"
+    ).read_text("utf-8")
+    product_home = (
+        ROOT
+        / "apps/android/feature-home/src/main/kotlin/org/disastermesh/android/feature/home/ProductHome.kt"
+    ).read_text("utf-8")
     listing_en = (ROOT / "fastlane/metadata/android/en-US/full_description.txt").read_text("utf-8")
     listing_ko = (ROOT / "fastlane/metadata/android/ko-KR/full_description.txt").read_text("utf-8")
 
@@ -54,6 +62,10 @@ def main() -> int:
     require(governance, "최대 1 MiB", "data governance", errors)
     require(diagnostic, "it.size <= 1_048_576", "diagnostic archive", errors)
     require(diagnostic, 'listOf("README.txt", "metadata.json", "relay.txt", "events.csv")', "diagnostic archive", errors)
+    require(diagnostic_screen, "제한된 진단 ZIP 미리보기", "diagnostic screen", errors)
+    require(product_home, "제한된 진단 내보내기", "product home", errors)
+    if "익명 진단" in diagnostic_screen or "익명 진단" in product_home:
+        errors.append("diagnostic UI must not claim anonymity while device metadata is exported")
     require(listing_en, "may never happen", "English store listing", errors)
     require(listing_en, "does not replace emergency services", "English store listing", errors)
     require(listing_en, "no account, cloud service, advertising, analytics SDK, or internet permission", "English store listing", errors)

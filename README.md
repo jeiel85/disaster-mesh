@@ -151,7 +151,7 @@ disaster-mesh/
 ├── Cargo.lock
 ├── rust-toolchain.toml            # Rust 1.96.0 + Android targets
 │
-├── docs/                          # 23 numbered specifications + readiness docs
+├── docs/                          # 24 numbered specifications + readiness docs
 │   ├── adr/                       # ADR-001 through ADR-016
 │   ├── 00-product-requirements.md
 │   ├── 01-system-architecture.md
@@ -163,6 +163,7 @@ disaster-mesh/
 │   ├── 20-security-verification-plan.md
 │   ├── 21-requirements-traceability.md
 │   ├── 22-go-live-checklist.md
+│   ├── 23-android-emulator-testing.md
 │   ├── dependency-review.md
 │   └── index.html                 # Landing page (GitHub Pages)
 │
@@ -189,6 +190,8 @@ disaster-mesh/
 ├── policies/                      # Privacy and store-disclosure release inputs
 ├── release/                       # Signed release-evidence manifest schema
 ├── tools/validate_design_bundle.py
+├── tools/setup_android_emulator.ps1
+├── tools/smoke_android_emulator.ps1
 ├── SECURITY.md
 ├── SUPPORT.md
 ├── IMPLEMENTATION_CHECKLIST.md
@@ -226,6 +229,7 @@ disaster-mesh/
 | 20 | [Security Verification Plan](docs/20-security-verification-plan.md) | MASVS mapping, review scope, and exit evidence |
 | 21 | [Requirements Traceability](docs/21-requirements-traceability.md) | Requirement-to-contract-to-test mapping |
 | 22 | [Go-Live Checklist](docs/22-go-live-checklist.md) | Required owners, evidence, and release signatures |
+| 23 | [Android Emulator Testing](docs/23-android-emulator-testing.md) | Reproducible API 36 AVD setup and runtime smoke test |
 | — | [Dependency Review](docs/dependency-review.md) | Lockfile/SBOM-based dependency approval register |
 
 ---
@@ -245,9 +249,9 @@ disaster-mesh/
 | **Goal 7** | Commercial release readiness | Go-live checklist complete; rollout and rollback rehearsed |
 | **Goal 8** | iOS and fixed relay expansion after Android 1.0 | Shared-core compatibility and field tooling validated |
 
-**Current status:** Goal 0 bootstrap, Goal 0.5 contract freeze, Goal 1 protocol
-core/simulator, and Goal 2 identity/E2EE completed on **2026-06-29**. Goal 3
-Android direct BLE is next.
+**Current status:** Goal 0–7 implementation and release-gate preparation are locally committed.
+The commercial decision remains **NO-GO** until the physical-device, soak, external-review,
+signing, legal, support, and approval evidence in `release/readiness-status.json` passes.
 
 ---
 
