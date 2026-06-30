@@ -45,7 +45,11 @@ object DiagnosticArchive {
     ) {
         require(events.size <= 1_000)
         ZipOutputStream(output, StandardCharsets.UTF_8).use { zip ->
-            zip.entry("README.txt", "사용자가 선택해 생성한 익명 집계 진단입니다. 메시지, 위치, 연락처, 키, DB는 포함하지 않습니다.\n")
+            zip.entry(
+                "README.txt",
+                "사용자가 선택해 생성한 제한된 진단입니다. 앱/OS/기기 모델과 집계 상태를 포함하며 " +
+                    "메시지, 위치, 연락처, 키, DB는 포함하지 않습니다.\n",
+            )
             zip.entry("metadata.json", metadataJson(metadata))
             zip.entry("relay.txt", relay.redactedLines().joinToString("\n", postfix = "\n"))
             zip.entry("events.csv", buildString {

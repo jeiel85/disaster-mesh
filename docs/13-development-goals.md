@@ -253,6 +253,15 @@ therefore the product is neither a completed public beta nor stable.
 
 ## Goal 7 — Commercial Release Readiness
 
+### 구현 상태 — 2026-06-30
+
+상용 출시를 위한 자동 NO-GO 게이트, signed-evidence 입력 조건, rollout/rollback,
+incident response, signing runbook, MASVS evidence map과 법률·migration 기록 양식을
+구현했다. 현재 `release/readiness-status.json`의 결정은 **NO-GO**다. 실기기·soak·현장
+시험, 200/200 controlled acceptance, 외부 security/penetration review, 법률 승인,
+실제 support/security channel, production signing과 조직 승인 없이는 Goal 7 완료 또는
+상용 출시로 표시하지 않는다.
+
 ### 결과물
 
 - privacy policy/data safety/support/security policy

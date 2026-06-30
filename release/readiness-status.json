@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "release_candidate": null,
+  "decision": "NO-GO",
+  "updated_at": "2026-06-30",
+  "gates": {
+    "controlled-acceptance": {
+      "status": "blocked",
+      "evidence": ["reports/goal-07-commercial-gates.md"],
+      "blocker": "The required 200/200 controlled direct and multi-hop acceptance runs have not been executed."
+    },
+    "device-compatibility": {
+      "status": "blocked",
+      "evidence": ["reports/compatibility-matrix.md"],
+      "blocker": "The physical supported-device matrix is not populated."
+    },
+    "external-security-review": {
+      "status": "blocked",
+      "evidence": ["reports/goal-07-commercial-gates.md"],
+      "blocker": "No version-bound external protocol and cryptography review is retained."
+    },
+    "final-approvals": {
+      "status": "blocked",
+      "evidence": ["docs/22-go-live-checklist.md"],
+      "blocker": "Product, engineering, QA, security, operations, and legal approvals are unsigned."
+    },
+    "legal-privacy-review": {
+      "status": "blocked",
+      "evidence": ["reports/legal-safety-review.md"],
+      "blocker": "Publisher fields, target markets, privacy review, and safety wording review are incomplete."
+    },
+    "masvs-penetration": {
+      "status": "blocked",
+      "evidence": ["reports/masvs-evidence-map.md"],
+      "blocker": "The implementation map exists, but independent mobile penetration evidence is absent."
+    },
+    "migration-recovery": {
+      "status": "blocked",
+      "evidence": ["reports/migration-rollback.md"],
+      "blocker": "Physical interrupted migration, downgrade, corruption, and Keystore-loss recovery exercises are incomplete."
+    },
+    "release-signing-provenance": {
+      "status": "blocked",
+      "evidence": ["release/SIGNING_RUNBOOK.md"],
+      "blocker": "There is no signed production artifact, tag, release manifest, artifact SBOM, or verified provenance."
+    },
+    "rollout-incident-drill": {
+      "status": "blocked",
+      "evidence": ["release/ROLLOUT_RUNBOOK.md", "release/INCIDENT_RESPONSE_RUNBOOK.md"],
+      "blocker": "Named owners and completed rollback and SEV-0/SEV-1 rehearsal records are absent."
+    },
+    "soak-field-exercise": {
+      "status": "blocked",
+      "evidence": ["reports/field-exercise.md"],
+      "blocker": "Eight-hour normal, 24-hour fixed-relay, battery, and controlled field evidence is absent."
+    },
+    "support-security-channels": {
+      "status": "blocked",
+      "evidence": ["SECURITY.md", "SUPPORT.md"],
+      "blocker": "Real support ownership and tested private security reporting routes are not configured."
+    }
+  }
+}

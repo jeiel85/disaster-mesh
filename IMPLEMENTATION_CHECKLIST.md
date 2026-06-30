@@ -60,6 +60,9 @@
 
 ## Commercial release
 
+- [x] machine-readable NO-GO gate blocks incomplete production evidence
+- [x] rollout/rollback, signing, and incident-response templates prepared
+- [x] source/privacy/store disclosure consistency gate prepared
 - [ ] privacy policy/Data Safety/manifest/SBOM are mutually consistent
 - [ ] external protocol/crypto review closed
 - [ ] MASVS mapping and penetration evidence complete

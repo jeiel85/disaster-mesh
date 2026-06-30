@@ -13,6 +13,9 @@
 
 ## 2. OWASP MASVS mapping
 
+구현 근거와 미실행 외부 시험은 `reports/masvs-evidence-map.md`에서 분리해 추적한다.
+해당 표는 독립 평가나 인증을 대신하지 않는다.
+
 - STORAGE: Keystore wrapping, DMEV column envelope, backup exclusion, deletion/reset.
 - CRYPTO: vetted primitives, nonce uniqueness, deterministic vectors, key separation/rotation.
 - AUTH: contact QR signature, safety number, key-change/revoke state.

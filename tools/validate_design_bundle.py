@@ -33,7 +33,14 @@ required = [
     'schemas/sqlite_v1.sql', 'schemas/schema_invariants.sql',
     'docs/dependency-review.md', 'docs/22-go-live-checklist.md',
     'policies/PRIVACY_POLICY_DRAFT.md', 'policies/STORE_DISCLOSURE_CHECKLIST.md',
-    'release/release-manifest.schema.json',
+    'release/release-manifest.schema.json', 'release/readiness-status.json',
+    'release/ROLLOUT_RUNBOOK.md', 'release/INCIDENT_RESPONSE_RUNBOOK.md',
+    'release/SIGNING_RUNBOOK.md', 'reports/goal-07-commercial-gates.md',
+    'reports/masvs-evidence-map.md', 'reports/migration-rollback.md',
+    'reports/legal-safety-review.md', 'tools/check_release_readiness.py',
+    'tools/check_policy_consistency.py',
+    'tools/validate_release_manifest.py',
+    'tools/tests/test_release_tools.py',
     'test-vectors/cases.schema.json', 'test-vectors/cases.json',
 ]
 for rel in required:
@@ -142,6 +149,24 @@ goal_ids = re.findall(r'^## Goal ([0-9]+(?:\.[0-9]+)?)\b', goal_text, re.MULTILI
 duplicate_goal_ids = sorted({goal_id for goal_id in goal_ids if goal_ids.count(goal_id) > 1})
 if duplicate_goal_ids:
     errors.append(f'duplicate development goal IDs:{",".join(duplicate_goal_ids)}')
+
+readiness = subprocess.run(
+    [sys.executable, str(ROOT / 'tools/check_release_readiness.py')],
+    cwd=ROOT,
+    text=True,
+    capture_output=True,
+)
+if readiness.returncode != 0:
+    errors.append(f'release-readiness:{readiness.stdout.strip() or readiness.stderr.strip()}')
+
+disclosures = subprocess.run(
+    [sys.executable, str(ROOT / 'tools/check_policy_consistency.py')],
+    cwd=ROOT,
+    text=True,
+    capture_output=True,
+)
+if disclosures.returncode != 0:
+    errors.append(f'policy-consistency:{disclosures.stdout.strip() or disclosures.stderr.strip()}')
 
 # Normative machine files must not contain unfinished markers.
 for path in list(ROOT.glob('spec/*')) + list(ROOT.glob('contracts/*')) + list(ROOT.glob('schemas/*')):

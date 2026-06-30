@@ -2,6 +2,20 @@
 
 Release candidate: __________  Commit: __________  Artifact SHA-256: __________
 
+Current decision (2026-06-30): **NO-GO — candidate not assigned**
+
+Evidence index:
+
+- machine decision: `release/readiness-status.json`
+- commercial gate record: `reports/goal-07-commercial-gates.md`
+- MASVS map: `reports/masvs-evidence-map.md`
+- migration/rollback: `reports/migration-rollback.md`
+- legal/safety: `reports/legal-safety-review.md`
+- rollout and incident procedures: `release/ROLLOUT_RUNBOOK.md`, `release/INCIDENT_RESPONSE_RUNBOOK.md`
+- signing procedure: `release/SIGNING_RUNBOOK.md`
+
+The checklist remains unsigned until every item is bound to one production candidate.
+
 ## Product and safety — Product owner
 
 - [ ] scope/limitations/store listing match the binary
@@ -53,6 +67,6 @@ Release candidate: __________  Commit: __________  Artifact SHA-256: __________
 ## Final decision
 
 - [ ] GO — all required items complete; waivers attached and none affect P0/P1
-- [ ] NO-GO — release blocked
+- [x] NO-GO — release blocked; see `release/readiness-status.json`
 
 Approvals: Product ____  Core ____  Android ____  QA ____  Security ____  Operations ____  Legal ____

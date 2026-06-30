@@ -17,7 +17,7 @@
 - 정확한 위치는 매 전송마다 사용자가 포함을 선택한 경우에만 DME ciphertext에 들어간다.
 - relay는 source identity나 body를 복호화하지 않는다.
 - display name은 로컬 편의 정보이며 신원 검증 근거가 아니다.
-- diagnostic export는 항목 preview, 최대 4 MiB, entry allowlist, ZIP traversal 방지를 적용한다.
+- diagnostic export는 항목 preview, 최대 1 MiB, entry allowlist, ZIP traversal 방지를 적용한다.
 
 ## 3. User controls
 
