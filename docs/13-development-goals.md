@@ -156,6 +156,18 @@ that the physical Goal 3 completion criteria passed.
 
 ## Goal 4 — Multi-hop Relay
 
+**Status: AUTOMATED IMPLEMENTATION COMPLETE; PHYSICAL ACCEPTANCE BLOCKED
+(2026-06-30).** The complete encrypted control-payload family now has bounded
+deterministic-CBOR codecs; relay preparation persists token escrow before
+exposing metadata; partial chunks are file-backed, bitmap-resumable across DB
+reopen, conflict checked, hash verified, quota bounded, and atomically promoted
+to the bundle store. Lost-ACK uncertainty and same-grant reconciliation remain
+idempotent. A deterministic campaign runs 50 A→B, separation, B→C deliveries
+with an undecrypting relay and later receipt return, while existing flood,
+protected-floor, cancel/reorder, quota, and scoring tests continue to pass.
+This is simulation evidence only: 50 controlled three-device radio runs and
+their capture/report artifacts are still mandatory before Goal 4 is COMPLETE.
+
 ### 결과물
 
 - relay queue

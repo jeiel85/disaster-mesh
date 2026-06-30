@@ -8,6 +8,7 @@ pub const CRATE_NAME: &str = "mesh-codec";
 pub mod base32;
 pub mod ble;
 pub mod cbor;
+pub mod control;
 
 pub use cbor::{
     CborError, CborValue, DecodeLimits, decode_deterministic, decode_deterministic_prefix,

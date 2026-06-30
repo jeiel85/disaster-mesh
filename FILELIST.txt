@@ -26,7 +26,9 @@ apps/android/domain/src/main/AndroidManifest.xml
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/BluetoothPermissionPolicy.kt
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/BootstrapBoundary.kt
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/GeneratedContracts.kt
+apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/RelayDiagnostics.kt
 apps/android/domain/src/test/kotlin/org/disastermesh/android/domain/BluetoothPermissionPolicyTest.kt
+apps/android/domain/src/test/kotlin/org/disastermesh/android/domain/RelayDiagnosticsTest.kt
 apps/android/feature-checkin/build.gradle.kts
 apps/android/feature-checkin/gradle.lockfile
 apps/android/feature-checkin/src/main/AndroidManifest.xml
@@ -41,6 +43,7 @@ apps/android/feature-conversation/src/main/kotlin/org/disastermesh/android/featu
 apps/android/feature-diagnostics/build.gradle.kts
 apps/android/feature-diagnostics/gradle.lockfile
 apps/android/feature-diagnostics/src/main/AndroidManifest.xml
+apps/android/feature-diagnostics/src/main/kotlin/org/disastermesh/android/feature/diagnostics/RelayDiagnosticsScreen.kt
 apps/android/feature-home/build.gradle.kts
 apps/android/feature-home/gradle.lockfile
 apps/android/feature-home/src/main/AndroidManifest.xml
@@ -109,6 +112,7 @@ core/mesh-codec/Cargo.toml
 core/mesh-codec/src/base32.rs
 core/mesh-codec/src/ble.rs
 core/mesh-codec/src/cbor.rs
+core/mesh-codec/src/control.rs
 core/mesh-codec/src/lib.rs
 core/mesh-codec/tests/cddl_contracts.rs
 core/mesh-crypto/Cargo.toml
@@ -124,6 +128,7 @@ core/mesh-engine/src/bin/vector-tool.rs
 core/mesh-engine/src/control.rs
 core/mesh-engine/src/direct_transfer.rs
 core/mesh-engine/src/lib.rs
+core/mesh-engine/src/multihop.rs
 core/mesh-engine/src/runtime.rs
 core/mesh-engine/src/secure_bundle.rs
 core/mesh-ffi/Cargo.toml
@@ -139,6 +144,7 @@ core/mesh-store/src/contact_store.rs
 core/mesh-store/src/identity_store.rs
 core/mesh-store/src/lib.rs
 core/mesh-store/src/routing_store.rs
+core/mesh-store/src/transfer_store.rs
 core/mesh-types/Cargo.toml
 core/mesh-types/src/domain.rs
 core/mesh-types/src/generated_contracts.rs

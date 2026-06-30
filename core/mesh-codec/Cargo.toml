@@ -10,6 +10,7 @@ description = "DisasterMesh codec boundary"
 [dependencies]
 mesh-types.workspace = true
 crc32c.workspace = true
+sha2.workspace = true
 
 [dev-dependencies]
 cddl-cat.workspace = true

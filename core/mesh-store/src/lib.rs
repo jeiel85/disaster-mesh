@@ -15,8 +15,10 @@ mod contact_store;
 mod identity_store;
 pub use contact_store::*;
 mod routing_store;
+mod transfer_store;
 pub use identity_store::*;
 pub use routing_store::*;
+pub use transfer_store::*;
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum StoreError {
@@ -32,6 +34,12 @@ pub enum StoreError {
     Crypto(String),
     KeyMaterialMismatch,
     ContactNotFound,
+    TransferNotFound,
+    TransferConflict,
+    PartialQuotaExceeded,
+    IncompleteTransfer,
+    TransferHashMismatch,
+    Io(String),
 }
 
 impl fmt::Display for StoreError {

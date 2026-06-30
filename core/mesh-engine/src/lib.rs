@@ -12,10 +12,12 @@ pub fn version() -> String {
 
 pub mod control;
 pub mod direct_transfer;
+pub mod multihop;
 pub mod runtime;
 pub mod secure_bundle;
 
 pub use direct_transfer::*;
+pub use multihop::*;
 pub use runtime::*;
 pub use secure_bundle::*;
 
