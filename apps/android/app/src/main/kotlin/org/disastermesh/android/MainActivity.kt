@@ -2,6 +2,7 @@ package org.disastermesh.android
 
 import android.Manifest
 import android.bluetooth.BluetoothManager
+import android.os.BatteryManager
 import android.os.Bundle
 import android.os.Build
 import android.os.SystemClock
@@ -27,6 +28,11 @@ import org.disastermesh.android.feature.conversation.ConversationRow
 import org.disastermesh.android.feature.conversation.ConversationScreen
 import org.disastermesh.android.feature.conversation.MessageStateLabel
 import org.disastermesh.android.feature.onboarding.OnboardingScreen
+import org.disastermesh.android.feature.home.ProductHome
+import org.disastermesh.android.feature.checkin.CheckInScreen
+import org.disastermesh.android.feature.sos.PrivateSosScreen
+import org.disastermesh.android.feature.relay.RelayStatusScreen
+import org.disastermesh.android.service.EmergencyRelayService
 import org.disastermesh.android.security.MasterKeyManager
 import org.disastermesh.core.MeshEngine
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +49,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class BootstrapScreen { ONBOARDING, CONTACTS, CONVERSATION }
+private enum class BootstrapScreen { ONBOARDING, HOME, CONTACTS, CONVERSATION, CHECK_IN, SOS, RELAY }
 
 private sealed interface EngineState {
     data object Loading : EngineState
@@ -96,7 +102,14 @@ private fun DisasterMeshRoot() {
         BootstrapScreen.ONBOARDING -> OnboardingScreen(
             communicationReady = communicationReady,
             onRequestPermissions = { permissionLauncher.launch(requiredPermissions()) },
-            onContinue = { screen = BootstrapScreen.CONTACTS },
+            onContinue = { screen = BootstrapScreen.HOME },
+        )
+        BootstrapScreen.HOME -> ProductHome(
+            contactReady = selectedContactId != null,
+            onContacts = { screen = BootstrapScreen.CONTACTS },
+            onCheckIn = { screen = BootstrapScreen.CHECK_IN },
+            onSos = { screen = BootstrapScreen.SOS },
+            onRelay = { screen = BootstrapScreen.RELAY },
         )
         BootstrapScreen.CONTACTS -> ContactsScreen(
             ownContactQr = (engineState as? EngineState.Ready)?.ownQr,
@@ -139,13 +152,104 @@ private fun DisasterMeshRoot() {
                                 bootId,
                                 SystemClock.elapsedRealtime().toULong(),
                             )
-                        }.isSuccess
+                        }.getOrNull()
                     }
-                    if (stored) {
-                        messages = messages + ConversationRow(text, MessageStateLabel.STORED)
+                    if (stored != null) {
+                        messages = messages + ConversationRow(
+                            text = text,
+                            state = MessageStateLabel.STORED,
+                            packetId = stored.packetId,
+                            messageId = stored.messageId,
+                        )
                     }
                 }
             },
+            onCancel = { row ->
+                val ready = engineState as? EngineState.Ready ?: return@ConversationScreen
+                val contactId = selectedContactId ?: return@ConversationScreen
+                val packetId = row.packetId ?: return@ConversationScreen
+                val messageId = row.messageId ?: return@ConversationScreen
+                scope.launch {
+                    val canceled = withContext(Dispatchers.IO) {
+                        runCatching {
+                            ready.engine.sendCancel(
+                                contactId,
+                                packetId,
+                                messageId,
+                                1u,
+                                System.currentTimeMillis().toULong(),
+                                bootId,
+                                SystemClock.elapsedRealtime().toULong(),
+                            )
+                        }.isSuccess
+                    }
+                    if (canceled) {
+                        messages = messages.map {
+                            if (it.packetId?.contentEquals(packetId) == true) {
+                                it.copy(state = MessageStateLabel.CANCEL_PROPAGATING)
+                            } else {
+                                it
+                            }
+                        }
+                    }
+                }
+            },
+            onBack = { screen = BootstrapScreen.HOME },
+        )
+        BootstrapScreen.CHECK_IN -> CheckInScreen(
+            recipientName = contacts.firstOrNull()?.displayName ?: "연락처",
+            onBack = { screen = BootstrapScreen.HOME },
+            onSend = { status, people, note, location ->
+                val ready = engineState as? EngineState.Ready ?: return@CheckInScreen
+                val contactId = selectedContactId ?: return@CheckInScreen
+                scope.launch(Dispatchers.IO) {
+                    runCatching {
+                        ready.engine.sendCheckIn(
+                            contactId,
+                            status.toUByte(),
+                            people.coerceIn(1, 99).toUByte(),
+                            note,
+                            location,
+                            batteryPercent(context),
+                            System.currentTimeMillis().toULong(),
+                            bootId,
+                            SystemClock.elapsedRealtime().toULong(),
+                        )
+                    }
+                }
+                screen = BootstrapScreen.HOME
+            },
+        )
+        BootstrapScreen.SOS -> PrivateSosScreen(
+            recipientName = contacts.firstOrNull()?.displayName ?: "연락처",
+            onBack = { screen = BootstrapScreen.HOME },
+            onSend = { category, description, people, injuries, location, movement ->
+                val ready = engineState as? EngineState.Ready ?: return@PrivateSosScreen
+                val contactId = selectedContactId ?: return@PrivateSosScreen
+                scope.launch(Dispatchers.IO) {
+                    runCatching {
+                        ready.engine.sendPrivateSos(
+                            contactId,
+                            category.toUByte(),
+                            description,
+                            people.coerceIn(1, 99).toUByte(),
+                            injuries.coerceIn(0, people).toUByte(),
+                            location,
+                            movement,
+                            batteryPercent(context),
+                            System.currentTimeMillis().toULong(),
+                            bootId,
+                            SystemClock.elapsedRealtime().toULong(),
+                        )
+                    }
+                }
+                screen = BootstrapScreen.HOME
+            },
+        )
+        BootstrapScreen.RELAY -> RelayStatusScreen(
+            onStart = { mode -> EmergencyRelayService.start(context, mode.name) },
+            onStop = { EmergencyRelayService.stop(context) },
+            onBack = { screen = BootstrapScreen.HOME },
         )
     }
 }
@@ -153,11 +257,18 @@ private fun DisasterMeshRoot() {
 private fun requiredPermissions(): Array<String> = if (Build.VERSION.SDK_INT <= 30) {
     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 } else {
-    arrayOf(
-        Manifest.permission.BLUETOOTH_SCAN,
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.BLUETOOTH_ADVERTISE,
-    )
+    buildList {
+        add(Manifest.permission.BLUETOOTH_SCAN)
+        add(Manifest.permission.BLUETOOTH_CONNECT)
+        add(Manifest.permission.BLUETOOTH_ADVERTISE)
+        if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
+    }.toTypedArray()
+}
+
+private fun batteryPercent(context: android.content.Context): UByte? {
+    val value = context.getSystemService(BatteryManager::class.java)
+        ?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: return null
+    return value.takeIf { it in 0..100 }?.toUByte()
 }
 
 private fun isCommunicationReady(context: android.content.Context): Boolean {

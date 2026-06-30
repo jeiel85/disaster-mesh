@@ -36,7 +36,7 @@
 - [ ] allowBackup/fullBackupContent/dataExtractionRules exclusions verified
 - [x] BLE callbacks contain no blocking work
 - [ ] single coordinator actor owns core calls
-- [ ] foreground service user-started and visible
+- [x] foreground service user-started and visible
 - [ ] permission revoke/BT off paths tested
 - [ ] physical-device BLE tests performed; command_id correlation and Android 14+ MTU rule verified
 

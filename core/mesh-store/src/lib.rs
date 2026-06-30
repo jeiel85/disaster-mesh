@@ -34,6 +34,7 @@ pub enum StoreError {
     Crypto(String),
     KeyMaterialMismatch,
     ContactNotFound,
+    BundleNotFound,
     TransferNotFound,
     TransferConflict,
     PartialQuotaExceeded,

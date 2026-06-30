@@ -188,6 +188,19 @@ their capture/report artifacts are still mandatory before Goal 4 is COMPLETE.
 
 ## Goal 5 — Disaster UX and Persistent Relay
 
+**Status: AUTOMATED IMPLEMENTATION COMPLETE; SOAK ACCEPTANCE BLOCKED
+(2026-06-30).** CHECK_IN, PRIVATE_SOS, optional manual location, outbound cancel
+suppression/tombstone, fixed product routing policies, receipt-safe UI labels,
+accessible product screens, and explicit non-guarantee wording are wired through
+Rust, UniFFI, and Android. A user-started connected-device foreground service
+persists the chosen standby/emergency/fixed mode, displays an ongoing stop
+action, and only restores that prior opt-in after reboot. Deterministic policy
+tests cover normal duty cycles, battery below 20% and 10%, thermal severe, and
+low storage; persisted queue/partial-transfer reopen tests cover process-state
+loss. No location permission is required to create SOS. The required physical
+screen-off eight-hour campaign, OEM background behavior, power measurements,
+and process/reboot fault-injection report remain unexecuted release gates.
+
 ### 결과물
 
 - check-in/private SOS/location/cancel

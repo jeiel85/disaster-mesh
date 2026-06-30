@@ -26,6 +26,8 @@ enum class MessageStateLabel(val display: String) {
 data class ConversationRow(
     val text: String,
     val state: MessageStateLabel,
+    val packetId: ByteArray? = null,
+    val messageId: ByteArray? = null,
 )
 
 @Composable
@@ -34,6 +36,8 @@ fun ConversationScreen(
     rows: List<ConversationRow>,
     communicationReady: Boolean,
     onSend: (String) -> Unit,
+    onCancel: (ConversationRow) -> Unit,
+    onBack: () -> Unit,
 ) {
     var draft by remember { mutableStateOf("") }
     Column(
@@ -44,6 +48,9 @@ fun ConversationScreen(
         rows.forEach { row ->
             Text(row.text)
             Text(row.state.display)
+            if (row.state == MessageStateLabel.STORED && row.packetId != null && row.messageId != null) {
+                Button(onClick = { onCancel(row) }) { Text("전송 취소 전파") }
+            }
         }
         OutlinedTextField(
             value = draft,
@@ -60,5 +67,6 @@ fun ConversationScreen(
             Text("암호화하여 기기에 보관")
         }
         if (!communicationReady) Text("통신 기능 중지됨 — 작성한 메시지는 전송되지 않습니다.")
+        Button(onClick = onBack) { Text("홈으로") }
     }
 }

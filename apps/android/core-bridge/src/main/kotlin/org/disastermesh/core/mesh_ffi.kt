@@ -646,7 +646,13 @@ internal object IntegrityCheckingUniffiLib {
     ): Int
     external fun uniffi_mesh_ffi_checksum_method_meshengine_own_contact_qr(
     ): Int
+    external fun uniffi_mesh_ffi_checksum_method_meshengine_send_cancel(
+    ): Int
+    external fun uniffi_mesh_ffi_checksum_method_meshengine_send_check_in(
+    ): Int
     external fun uniffi_mesh_ffi_checksum_method_meshengine_send_direct_text(
+    ): Int
+    external fun uniffi_mesh_ffi_checksum_method_meshengine_send_private_sos(
     ): Int
     external fun uniffi_mesh_ffi_checksum_method_meshengine_verify_contact(
     ): Int
@@ -682,7 +688,13 @@ internal object UniffiLib {
     ): RustBuffer.ByValue
     external fun uniffi_mesh_ffi_fn_method_meshengine_own_contact_qr(`ptr`: Long,`capabilities`: Int,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
+    external fun uniffi_mesh_ffi_fn_method_meshengine_send_cancel(`ptr`: Long,`contactId`: RustBuffer.ByValue,`targetPacketId`: RustBuffer.ByValue,`targetMessageId`: RustBuffer.ByValue,`reason`: Byte,`nowMs`: Long,`bootId`: RustBuffer.ByValue,`elapsedMs`: Long,uniffi_out_err: UniffiRustCallStatus,
+    ): RustBuffer.ByValue
+    external fun uniffi_mesh_ffi_fn_method_meshengine_send_check_in(`ptr`: Long,`contactId`: RustBuffer.ByValue,`status`: Byte,`peopleCount`: Byte,`note`: RustBuffer.ByValue,`manualLocation`: RustBuffer.ByValue,`batteryPercent`: RustBuffer.ByValue,`nowMs`: Long,`bootId`: RustBuffer.ByValue,`elapsedMs`: Long,uniffi_out_err: UniffiRustCallStatus,
+    ): RustBuffer.ByValue
     external fun uniffi_mesh_ffi_fn_method_meshengine_send_direct_text(`ptr`: Long,`contactId`: RustBuffer.ByValue,`text`: RustBuffer.ByValue,`nowMs`: Long,`bootId`: RustBuffer.ByValue,`elapsedMs`: Long,uniffi_out_err: UniffiRustCallStatus,
+    ): RustBuffer.ByValue
+    external fun uniffi_mesh_ffi_fn_method_meshengine_send_private_sos(`ptr`: Long,`contactId`: RustBuffer.ByValue,`category`: Byte,`description`: RustBuffer.ByValue,`peopleCount`: Byte,`severeInjuryCount`: Byte,`manualLocation`: RustBuffer.ByValue,`movementDirection`: RustBuffer.ByValue,`batteryPercent`: RustBuffer.ByValue,`nowMs`: Long,`bootId`: RustBuffer.ByValue,`elapsedMs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): RustBuffer.ByValue
     external fun uniffi_mesh_ffi_fn_method_meshengine_verify_contact(`ptr`: Long,`contactId`: RustBuffer.ByValue,`displayedSafetyNumber`: RustBuffer.ByValue,`nowMs`: Long,uniffi_out_err: UniffiRustCallStatus,
     ): Unit
@@ -819,7 +831,16 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_mesh_ffi_checksum_method_meshengine_own_contact_qr() != 59716) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_mesh_ffi_checksum_method_meshengine_send_cancel() != 5431) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_mesh_ffi_checksum_method_meshengine_send_check_in() != 12036) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_mesh_ffi_checksum_method_meshengine_send_direct_text() != 9112) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_mesh_ffi_checksum_method_meshengine_send_private_sos() != 32681) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_mesh_ffi_checksum_method_meshengine_verify_contact() != 59103) {
@@ -983,6 +1004,33 @@ private class AndroidSystemCleanable(
     private val cleanable: java.lang.ref.Cleaner.Cleanable,
 ) : UniffiCleaner.Cleanable {
     override fun clean() = cleanable.clean()
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterUByte: FfiConverter<UByte, Byte> {
+    override fun lift(value: Byte): UByte {
+        return value.toUByte()
+    }
+
+    fun lift(value: Int): UByte {
+        return value.toUByte()
+    }
+
+    override fun read(buf: ByteBuffer): UByte {
+        return lift(buf.get())
+    }
+
+    override fun lower(value: UByte): Byte {
+        return value.toByte()
+    }
+
+    override fun allocationSize(value: UByte) = 1UL
+
+    override fun write(value: UByte, buf: ByteBuffer) {
+        buf.put(value.toByte())
+    }
 }
 
 /**
@@ -1211,7 +1259,13 @@ public interface MeshEngineInterface {
 
     fun `ownContactQr`(`capabilities`: kotlin.UInt): kotlin.String
 
+    fun `sendCancel`(`contactId`: kotlin.ByteArray, `targetPacketId`: kotlin.ByteArray, `targetMessageId`: kotlin.ByteArray, `reason`: kotlin.UByte, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend
+
+    fun `sendCheckIn`(`contactId`: kotlin.ByteArray, `status`: kotlin.UByte, `peopleCount`: kotlin.UByte, `note`: kotlin.String, `manualLocation`: kotlin.String?, `batteryPercent`: kotlin.UByte?, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend
+
     fun `sendDirectText`(`contactId`: kotlin.ByteArray, `text`: kotlin.String, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend
+
+    fun `sendPrivateSos`(`contactId`: kotlin.ByteArray, `category`: kotlin.UByte, `description`: kotlin.String, `peopleCount`: kotlin.UByte, `severeInjuryCount`: kotlin.UByte, `manualLocation`: kotlin.String?, `movementDirection`: kotlin.String, `batteryPercent`: kotlin.UByte?, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend
 
     fun `verifyContact`(`contactId`: kotlin.ByteArray, `displayedSafetyNumber`: kotlin.String, `nowMs`: kotlin.ULong)
 
@@ -1357,6 +1411,34 @@ open class MeshEngine: Disposable, AutoCloseable, MeshEngineInterface
 
 
 
+    @Throws(MeshFfiException::class)override fun `sendCancel`(`contactId`: kotlin.ByteArray, `targetPacketId`: kotlin.ByteArray, `targetMessageId`: kotlin.ByteArray, `reason`: kotlin.UByte, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend {
+            return FfiConverterTypeDirectSend.lift(
+    callWithHandle {
+    uniffiRustCallWithError(MeshFfiException) { _status ->
+    UniffiLib.uniffi_mesh_ffi_fn_method_meshengine_send_cancel(
+        it,
+        FfiConverterByteArray.lower(`contactId`),FfiConverterByteArray.lower(`targetPacketId`),FfiConverterByteArray.lower(`targetMessageId`),FfiConverterUByte.lower(`reason`),FfiConverterULong.lower(`nowMs`),FfiConverterByteArray.lower(`bootId`),FfiConverterULong.lower(`elapsedMs`),_status)
+}
+    }
+    )
+    }
+
+
+
+    @Throws(MeshFfiException::class)override fun `sendCheckIn`(`contactId`: kotlin.ByteArray, `status`: kotlin.UByte, `peopleCount`: kotlin.UByte, `note`: kotlin.String, `manualLocation`: kotlin.String?, `batteryPercent`: kotlin.UByte?, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend {
+            return FfiConverterTypeDirectSend.lift(
+    callWithHandle {
+    uniffiRustCallWithError(MeshFfiException) { _status ->
+    UniffiLib.uniffi_mesh_ffi_fn_method_meshengine_send_check_in(
+        it,
+        FfiConverterByteArray.lower(`contactId`),FfiConverterUByte.lower(`status`),FfiConverterUByte.lower(`peopleCount`),FfiConverterString.lower(`note`),FfiConverterOptionalString.lower(`manualLocation`),FfiConverterOptionalUByte.lower(`batteryPercent`),FfiConverterULong.lower(`nowMs`),FfiConverterByteArray.lower(`bootId`),FfiConverterULong.lower(`elapsedMs`),_status)
+}
+    }
+    )
+    }
+
+
+
     @Throws(MeshFfiException::class)override fun `sendDirectText`(`contactId`: kotlin.ByteArray, `text`: kotlin.String, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend {
             return FfiConverterTypeDirectSend.lift(
     callWithHandle {
@@ -1364,6 +1446,20 @@ open class MeshEngine: Disposable, AutoCloseable, MeshEngineInterface
     UniffiLib.uniffi_mesh_ffi_fn_method_meshengine_send_direct_text(
         it,
         FfiConverterByteArray.lower(`contactId`),FfiConverterString.lower(`text`),FfiConverterULong.lower(`nowMs`),FfiConverterByteArray.lower(`bootId`),FfiConverterULong.lower(`elapsedMs`),_status)
+}
+    }
+    )
+    }
+
+
+
+    @Throws(MeshFfiException::class)override fun `sendPrivateSos`(`contactId`: kotlin.ByteArray, `category`: kotlin.UByte, `description`: kotlin.String, `peopleCount`: kotlin.UByte, `severeInjuryCount`: kotlin.UByte, `manualLocation`: kotlin.String?, `movementDirection`: kotlin.String, `batteryPercent`: kotlin.UByte?, `nowMs`: kotlin.ULong, `bootId`: kotlin.ByteArray, `elapsedMs`: kotlin.ULong): DirectSend {
+            return FfiConverterTypeDirectSend.lift(
+    callWithHandle {
+    uniffiRustCallWithError(MeshFfiException) { _status ->
+    UniffiLib.uniffi_mesh_ffi_fn_method_meshengine_send_private_sos(
+        it,
+        FfiConverterByteArray.lower(`contactId`),FfiConverterUByte.lower(`category`),FfiConverterString.lower(`description`),FfiConverterUByte.lower(`peopleCount`),FfiConverterUByte.lower(`severeInjuryCount`),FfiConverterOptionalString.lower(`manualLocation`),FfiConverterString.lower(`movementDirection`),FfiConverterOptionalUByte.lower(`batteryPercent`),FfiConverterULong.lower(`nowMs`),FfiConverterByteArray.lower(`bootId`),FfiConverterULong.lower(`elapsedMs`),_status)
 }
     }
     )
@@ -1616,6 +1712,70 @@ public object FfiConverterTypeMeshFfiError : FfiConverterRustBuffer<MeshFfiExcep
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
 
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalUByte: FfiConverterRustBuffer<kotlin.UByte?> {
+    override fun read(buf: ByteBuffer): kotlin.UByte? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterUByte.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.UByte?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterUByte.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.UByte?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterUByte.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterOptionalString: FfiConverterRustBuffer<kotlin.String?> {
+    override fun read(buf: ByteBuffer): kotlin.String? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterString.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.String?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterString.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.String?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterString.write(value, buf)
+        }
+    }
 }
         /**
          * Returns the Rust core package version.

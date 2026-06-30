@@ -27,11 +27,14 @@ apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/BluetoothPer
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/BootstrapBoundary.kt
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/GeneratedContracts.kt
 apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/RelayDiagnostics.kt
+apps/android/domain/src/main/kotlin/org/disastermesh/android/domain/RelayDutyPolicy.kt
 apps/android/domain/src/test/kotlin/org/disastermesh/android/domain/BluetoothPermissionPolicyTest.kt
 apps/android/domain/src/test/kotlin/org/disastermesh/android/domain/RelayDiagnosticsTest.kt
+apps/android/domain/src/test/kotlin/org/disastermesh/android/domain/RelayDutyPolicyTest.kt
 apps/android/feature-checkin/build.gradle.kts
 apps/android/feature-checkin/gradle.lockfile
 apps/android/feature-checkin/src/main/AndroidManifest.xml
+apps/android/feature-checkin/src/main/kotlin/org/disastermesh/android/feature/checkin/CheckInScreen.kt
 apps/android/feature-contacts/build.gradle.kts
 apps/android/feature-contacts/gradle.lockfile
 apps/android/feature-contacts/src/main/AndroidManifest.xml
@@ -48,6 +51,7 @@ apps/android/feature-home/build.gradle.kts
 apps/android/feature-home/gradle.lockfile
 apps/android/feature-home/src/main/AndroidManifest.xml
 apps/android/feature-home/src/main/kotlin/org/disastermesh/android/feature/home/BootstrapHome.kt
+apps/android/feature-home/src/main/kotlin/org/disastermesh/android/feature/home/ProductHome.kt
 apps/android/feature-home/src/main/res/values/strings.xml
 apps/android/feature-onboarding/build.gradle.kts
 apps/android/feature-onboarding/gradle.lockfile
@@ -56,9 +60,11 @@ apps/android/feature-onboarding/src/main/kotlin/org/disastermesh/android/feature
 apps/android/feature-relay-status/build.gradle.kts
 apps/android/feature-relay-status/gradle.lockfile
 apps/android/feature-relay-status/src/main/AndroidManifest.xml
+apps/android/feature-relay-status/src/main/kotlin/org/disastermesh/android/feature/relay/RelayStatusScreen.kt
 apps/android/feature-sos/build.gradle.kts
 apps/android/feature-sos/gradle.lockfile
 apps/android/feature-sos/src/main/AndroidManifest.xml
+apps/android/feature-sos/src/main/kotlin/org/disastermesh/android/feature/sos/PrivateSosScreen.kt
 apps/android/gradle/libs.versions.toml
 apps/android/gradle/verification-metadata.xml
 apps/android/gradle/wrapper/gradle-wrapper.jar
@@ -211,6 +217,7 @@ prompts/goal-07-commercial-release.md
 README.md
 release/README.md
 release/release-manifest.schema.json
+reports/goal-05-acceptance.md
 rust-toolchain.toml
 schemas/schema_invariants.sql
 schemas/sqlite_v1.sql

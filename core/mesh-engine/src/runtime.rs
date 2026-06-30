@@ -174,6 +174,134 @@ impl MeshRuntimeEngine {
         if text.is_empty() {
             return Err(RuntimeError::InvalidInput);
         }
+        self.send_message(
+            contact_id,
+            mesh_crypto::MessageBody::DirectText {
+                text,
+                reply_to: None,
+            },
+            259_200_000,
+            12,
+            6,
+            now_ms,
+            boot_id,
+            elapsed_ms,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn send_check_in(
+        &mut self,
+        contact_id: ContactId,
+        status: u8,
+        people_count: u8,
+        note: String,
+        manual_location: Option<String>,
+        battery_percent: Option<u8>,
+        now_ms: u64,
+        boot_id: [u8; 16],
+        elapsed_ms: u64,
+    ) -> Result<DirectSendResult, RuntimeError> {
+        self.send_message(
+            contact_id,
+            mesh_crypto::MessageBody::CheckIn {
+                status,
+                people_count,
+                note,
+                location: manual_location
+                    .map(|description| mesh_crypto::Location::Manual { description }),
+                battery_percent,
+            },
+            172_800_000,
+            12,
+            8,
+            now_ms,
+            boot_id,
+            elapsed_ms,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn send_private_sos(
+        &mut self,
+        contact_id: ContactId,
+        category: u8,
+        description: String,
+        people_count: u8,
+        severe_injury_count: u8,
+        manual_location: Option<String>,
+        movement_direction: String,
+        battery_percent: Option<u8>,
+        now_ms: u64,
+        boot_id: [u8; 16],
+        elapsed_ms: u64,
+    ) -> Result<DirectSendResult, RuntimeError> {
+        self.send_message(
+            contact_id,
+            mesh_crypto::MessageBody::PrivateSos {
+                category,
+                description,
+                people_count,
+                severe_injury_count,
+                location: manual_location
+                    .map(|description| mesh_crypto::Location::Manual { description }),
+                movement_direction,
+                battery_percent,
+            },
+            86_400_000,
+            16,
+            12,
+            now_ms,
+            boot_id,
+            elapsed_ms,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn send_cancel(
+        &mut self,
+        contact_id: ContactId,
+        target_packet_id: PacketId,
+        target_message_id: MessageId,
+        reason: u8,
+        now_ms: u64,
+        boot_id: [u8; 16],
+        elapsed_ms: u64,
+    ) -> Result<DirectSendResult, RuntimeError> {
+        let cancel = self.send_message(
+            contact_id,
+            mesh_crypto::MessageBody::Cancel {
+                target_packet_id,
+                target_message_id,
+                reason,
+            },
+            604_800_000,
+            16,
+            12,
+            now_ms,
+            boot_id,
+            elapsed_ms,
+        )?;
+        self.store.suppress_outbound_offer(
+            target_packet_id,
+            now_ms,
+            now_ms.saturating_add(691_200_000),
+        )?;
+        Ok(cancel)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn send_message(
+        &mut self,
+        contact_id: ContactId,
+        body: mesh_crypto::MessageBody,
+        lifetime_ms: u64,
+        hop_limit: u8,
+        copy_tokens: u8,
+        now_ms: u64,
+        boot_id: [u8; 16],
+        elapsed_ms: u64,
+    ) -> Result<DirectSendResult, RuntimeError> {
         let contact = self.store.load_contact(&self.master_key, contact_id)?;
         if contact.trust == ContactTrustState::Revoked {
             return Err(RuntimeError::RevokedContact);
@@ -193,16 +321,14 @@ impl MeshRuntimeEngine {
                 destination: contact.destination_routing_slot,
                 source: RandomSourceId::from(random_array()?),
                 creation_sequence: CreationSequence::from_u64(u64::from_be_bytes(random_array()?)),
-                lifetime: BundleLifetime::from_millis(259_200_000)
+                lifetime: BundleLifetime::from_millis(lifetime_ms)
                     .map_err(|_| RuntimeError::InvalidInput)?,
-                hop_limit: 12,
-                copy_tokens: CopyTokens::new(6).map_err(|_| RuntimeError::InvalidInput)?,
+                hop_limit,
+                copy_tokens: CopyTokens::new(copy_tokens)
+                    .map_err(|_| RuntimeError::InvalidInput)?,
                 sender_sequence,
                 created_time_ms: Some(now_ms),
-                body: mesh_crypto::MessageBody::DirectText {
-                    text,
-                    reply_to: None,
-                },
+                body,
             },
         )?;
         let outcome = self.store.put_bundle(
@@ -285,5 +411,82 @@ mod tests {
             plaintext.body,
             mesh_crypto::MessageBody::DirectText { ref text, .. } if text == "hello"
         ));
+    }
+
+    #[test]
+    fn check_in_sos_without_location_and_cancel_use_fixed_product_policy() {
+        let (mut alice, _) = MeshRuntimeEngine::open_in_memory([1; 32], "Alice".into(), 1).unwrap();
+        let (bob, _) = MeshRuntimeEngine::open_in_memory([2; 32], "Bob".into(), 1).unwrap();
+        let contact = alice
+            .import_contact_qr(&bob.own_contact_qr(0x1f).unwrap(), 2)
+            .unwrap();
+        let check_in = alice
+            .send_check_in(
+                contact.contact_id,
+                1,
+                2,
+                "safe".into(),
+                None,
+                Some(50),
+                3,
+                [4; 16],
+                5,
+            )
+            .unwrap();
+        let (_, plaintext) = open_secure_bundle(bob.identity(), &check_in.wire_bytes).unwrap();
+        assert!(matches!(
+            plaintext.body,
+            mesh_crypto::MessageBody::CheckIn { location: None, .. }
+        ));
+        let sos = alice
+            .send_private_sos(
+                contact.contact_id,
+                1,
+                "need help".into(),
+                2,
+                1,
+                Some("north shelter".into()),
+                "north".into(),
+                Some(9),
+                4,
+                [4; 16],
+                6,
+            )
+            .unwrap();
+        let (_, plaintext) = open_secure_bundle(bob.identity(), &sos.wire_bytes).unwrap();
+        assert!(matches!(
+            plaintext.body,
+            mesh_crypto::MessageBody::PrivateSos {
+                location: Some(mesh_crypto::Location::Manual { .. }),
+                ..
+            }
+        ));
+        let cancel = alice
+            .send_cancel(
+                contact.contact_id,
+                check_in.packet_id,
+                check_in.message_id,
+                1,
+                5,
+                [4; 16],
+                7,
+            )
+            .unwrap();
+        let (_, plaintext) = open_secure_bundle(bob.identity(), &cancel.wire_bytes).unwrap();
+        assert!(
+            matches!(plaintext.body, mesh_crypto::MessageBody::Cancel { target_packet_id, .. } if target_packet_id == check_in.packet_id)
+        );
+        assert_eq!(
+            alice
+                .store
+                .connection()
+                .query_row(
+                    "SELECT state FROM bundles WHERE packet_id = ?1",
+                    [check_in.packet_id.as_bytes().as_slice()],
+                    |row| row.get::<_, u8>(0)
+                )
+                .unwrap(),
+            1
+        );
     }
 }

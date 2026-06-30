@@ -49,6 +49,43 @@ pub enum GrantCommitOutcome {
 }
 
 impl Store {
+    pub fn suppress_outbound_offer(
+        &mut self,
+        packet_id: PacketId,
+        now_ms: u64,
+        expires_at_ms: u64,
+    ) -> Result<(), StoreError> {
+        let transaction = self.connection.transaction()?;
+        let payload_hash: Option<Vec<u8>> = transaction
+            .query_row(
+                "SELECT payload_sha256 FROM bundles
+                 WHERE packet_id = ?1 AND origin = 0 AND state IN (0,1)",
+                [packet_id.as_bytes().as_slice()],
+                |row| row.get(0),
+            )
+            .optional()?;
+        let payload_hash = payload_hash.ok_or(StoreError::BundleNotFound)?;
+        transaction.execute(
+            "UPDATE bundles SET state = 1 WHERE packet_id = ?1",
+            [packet_id.as_bytes().as_slice()],
+        )?;
+        transaction.execute(
+            "INSERT INTO tombstones(packet_id, payload_sha256, reason, created_at_ms, expires_at_ms)
+             VALUES (?1, ?2, 1, ?3, ?4)
+             ON CONFLICT(packet_id) DO UPDATE SET
+                reason = excluded.reason,
+                expires_at_ms = MAX(tombstones.expires_at_ms, excluded.expires_at_ms)",
+            params![
+                packet_id.as_bytes().as_slice(),
+                payload_hash,
+                i64_value(now_ms)?,
+                i64_value(expires_at_ms)?,
+            ],
+        )?;
+        transaction.commit()?;
+        Ok(())
+    }
+
     pub fn put_bundle(
         &mut self,
         decoded: &DecodedBundle,
