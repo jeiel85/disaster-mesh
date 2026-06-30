@@ -72,6 +72,8 @@ Evidence is written to `reports/evidence/emulator-api36/`: four screenshots and 
 containing the source commit, dirty-state flag, AVD/API/package versions, identity hash, checks,
 and explicit physical-BLE limitations.
 
+The latest retained local run is summarized in `reports/emulator-smoke-api36.md`.
+
 ## 5. Instrumentation test
 
 With the AVD online, run the Rust/UniFFI device instrumentation test as a separate gate:

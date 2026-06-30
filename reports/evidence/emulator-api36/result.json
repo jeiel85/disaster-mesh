@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "tested_at": "2026-06-30T15:21:26.3597248+09:00",
+  "source_commit": "00088fb3e765a055678fe6f7a84bce7a7db65eaf",
+  "source_dirty": false,
+  "avd": "disastermesh-api36-smoke",
+  "serial": "emulator-5554",
+  "android_api": 36,
+  "android_release": "16",
+  "device_model": "Android SDK built for x86_64",
+  "package": "org.disastermesh.android.dev",
+  "app_version": "0.1.0-dev",
+  "identity_qr_sha256": "a359232cfaf0bf50487a1bdde3e9a0562ea016ae5ffa862d50307495ea10b811",
+  "checks": [
+    "cold_start",
+    "onboarding_and_home",
+    "system_back_to_home",
+    "keystore_database_identity_restart",
+    "foreground_relay_start_notification_stop",
+    "diagnostic_preview_save_and_zip_schema",
+    "no_fatal_crash"
+  ],
+  "limitations": [
+    "Android Emulator does not prove physical BLE scan/advertise/GATT/MTU behavior.",
+    "Direct and multi-hop radio acceptance still requires physical devices."
+  ]
+}
