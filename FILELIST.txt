@@ -259,6 +259,7 @@ reports/evidence/emulator-api36/01-onboarding.png
 reports/evidence/emulator-api36/02-home.png
 reports/evidence/emulator-api36/03-relay.png
 reports/evidence/emulator-api36/04-diagnostics.png
+reports/evidence/emulator-api36/05-settings.png
 reports/evidence/emulator-api36/result.json
 reports/field-exercise.md
 reports/goal-05-acceptance.md
