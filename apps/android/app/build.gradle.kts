@@ -67,7 +67,10 @@ android {
         warningsAsErrors = true
         // Target 36 and Gradle 9.4.1 are deliberate compatibility baselines
         // from the approved design and AGP 9.2 compatibility table.
-        disable += setOf("OldTargetApi", "AndroidGradlePluginVersion")
+        // Dependency versions are deliberately pinned and Gradle-locked
+        // (see gradle.lockfile); bumping is a separate, reviewed step, not
+        // something lint should fail the build over.
+        disable += setOf("OldTargetApi", "AndroidGradlePluginVersion", "GradleDependency")
     }
 
     packaging {
