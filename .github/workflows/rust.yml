@@ -72,6 +72,8 @@ jobs:
       - name: Install pinned cargo-fuzz
         run: cargo install --locked cargo-fuzz --version 0.13.2
       - name: Run every parser and reassembly target
+        env:
+          RUSTUP_TOOLCHAIN: nightly
         run: |
           for target in cbor bundle ble_frames ble_reassembly control crypto_envelopes; do
             cargo fuzz run "$target" -- -max_total_time=10 -timeout=2
